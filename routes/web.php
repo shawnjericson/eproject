@@ -10,6 +10,7 @@ use App\Http\Controllers\Admin\FeedbackController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\SiteSettingController;
 use App\Http\Controllers\Admin\ProfileController;
+use App\Http\Controllers\Admin\VisitorController;
 
 /*
 |--------------------------------------------------------------------------
@@ -31,43 +32,6 @@ Route::get('/', function () {
 Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
 Route::post('/login', [LoginController::class, 'login']);
 Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
-
-// Debug upload route
-Route::get('/debug-upload', function () {
-    return view('debug-upload');
-})->name('debug.upload');
-
-// Test upload route
-Route::post('/test-upload', [App\Http\Controllers\TestUploadController::class, 'store'])->name('test.upload.store');
-
-// Final test route
-Route::get('/final-test', function () {
-    return view('final-test');
-})->name('final.test');
-
-// Cloudinary test routes
-Route::get('/cloudinary-test', function () {
-    return view('cloudinary-test');
-})->name('cloudinary.test');
-
-Route::post('/cloudinary-test', [App\Http\Controllers\CloudinaryTestController::class, 'store'])->name('cloudinary.test.store');
-
-// Test monument form
-Route::get('/test-monument-form', function () {
-    return view('test-monument-form');
-})->name('test.monument.form');
-
-// Check PHP config from web server
-Route::get('/check-config', function () {
-    return response()->json([
-        'upload_max_filesize' => ini_get('upload_max_filesize'),
-        'post_max_size' => ini_get('post_max_size'),
-        'memory_limit' => ini_get('memory_limit'),
-        'max_file_uploads' => ini_get('max_file_uploads'),
-        'config_file' => php_ini_loaded_file(),
-        'server_software' => $_SERVER['SERVER_SOFTWARE'] ?? 'Unknown'
-    ]);
-});
 
 // Admin Routes
 Route::prefix('admin')->name('admin.')->middleware(['admin', 'locale'])->group(function () {
@@ -120,6 +84,15 @@ Route::prefix('admin')->name('admin.')->middleware(['admin', 'locale'])->group(f
         Route::resource('settings', SiteSettingController::class)->except(['show']);
     });
 
+    // Visitor Statistics (Admin Only)
+    Route::middleware(['admin.only'])->group(function () {
+        Route::get('visitors', [VisitorController::class, 'index'])->name('visitors.index');
+        Route::get('visitors/recent', [VisitorController::class, 'recent'])->name('visitors.recent');
+        Route::delete('visitors/{id}', [VisitorController::class, 'destroy'])->name('visitors.destroy');
+        Route::post('visitors/clear-old', [VisitorController::class, 'clearOld'])->name('visitors.clear-old');
+        Route::get('visitors/export', [VisitorController::class, 'export'])->name('visitors.export');
+    });
+
     // Profile Management (Admin & Moderator)
     Route::prefix('profile')->name('profile.')->group(function () {
         Route::get('/', [ProfileController::class, 'show'])->name('show');
@@ -129,49 +102,4 @@ Route::prefix('admin')->name('admin.')->middleware(['admin', 'locale'])->group(f
         Route::delete('/avatar', [ProfileController::class, 'deleteAvatar'])->name('avatar.delete');
         Route::put('/password', [ProfileController::class, 'updatePassword'])->name('password.update');
     });
-});
-
-// Test routes
-Route::get('/test-simple-form', function () {
-    return view('test-simple-form');
-});
-
-Route::post('/test-monument-no-csrf', function (Illuminate\Http\Request $request) {
-    // Test monument creation without CSRF for debugging
-    $data = [
-        'title' => $request->title ?: 'Test Monument',
-        'description' => $request->description ?: 'Test description',
-        'location' => $request->location ?: 'Test location',
-        'zone' => $request->zone ?: 'North',
-        'content' => $request->content ?: '<p>Test content</p>',
-        'status' => $request->status ?: 'draft',
-        'created_by' => 1,
-    ];
-
-    try {
-        $monument = \App\Models\Monument::create($data);
-        return response()->json([
-            'success' => true,
-            'monument_id' => $monument->id,
-            'message' => 'Monument created successfully!',
-            'data' => $data
-        ]);
-    } catch (\Exception $e) {
-        return response()->json([
-            'success' => false,
-            'error' => $e->getMessage(),
-            'data' => $data
-        ], 500);
-    }
-})->withoutMiddleware([\App\Http\Middleware\VerifyCsrfToken::class]);
-
-Route::get('/check-config', function () {
-    return response()->json([
-        'upload_max_filesize' => ini_get('upload_max_filesize'),
-        'post_max_size' => ini_get('post_max_size'),
-        'memory_limit' => ini_get('memory_limit'),
-        'max_file_uploads' => ini_get('max_file_uploads'),
-        'config_file' => php_ini_loaded_file(),
-        'server_software' => $_SERVER['SERVER_SOFTWARE'] ?? 'Unknown'
-    ]);
 });

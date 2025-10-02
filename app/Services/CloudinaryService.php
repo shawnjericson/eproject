@@ -27,6 +27,35 @@ class CloudinaryService
         ]);
     }
 
+    public function extractPublicIdFromUrl(string $url): ?string
+    {
+        // Bỏ query string nếu có
+        $url = explode('?', $url)[0];
+
+        // Tách phần sau /upload/
+        $parts = explode('/upload/', $url);
+        if (count($parts) < 2) {
+            return null;
+        }
+
+        // Phần sau upload/ có dạng: v17251234/monuments/....../filename_xyz.jpg
+        $afterUpload = $parts[1];
+
+        // Bỏ segment version: v1234567/
+        $afterVersion = preg_replace('#^v\d+/#', '', $afterUpload);
+
+        // Nếu có transformations (c_fill,w_500/...), hãy loại bỏ chúng:
+        // Quy ước đơn giản: Cloudinary transformations là một chuỗi có dấu phẩy/dấu gạch dưới,
+        // thường đứng TRƯỚC "v123...". Ở URL của bạn đang không dùng transform khi upload,
+        // nên có thể không cần bước này. Giữ lại để an toàn:
+        // (Ở đây transformations đã nằm trước 'v', nên sau khi bỏ v.../ thì không còn nữa)
+
+        // Bỏ đuôi extension (jpg|jpeg|png|gif|webp)
+        $publicId = preg_replace('#\.(jpg|jpeg|png|gif|webp)$#i', '', $afterVersion);
+
+        return $publicId ?: null;
+    }
+
     /**
      * Upload image to Cloudinary using simple HTTP POST
      */
@@ -109,7 +138,6 @@ class CloudinaryService
                 'url' => $result['secure_url'],
                 'public_id' => $result['public_id']
             ];
-
         } catch (\Exception $e) {
             Log::error('Cloudinary upload failed:', [
                 'error' => $e->getMessage(),
@@ -131,14 +159,14 @@ class CloudinaryService
     {
         try {
             $result = $this->cloudinary->uploadApi()->destroy($publicId);
-            
+
             return [
                 'success' => true,
                 'result' => $result
             ];
         } catch (\Exception $e) {
             Log::error('Cloudinary delete failed:', ['error' => $e->getMessage()]);
-            
+
             return [
                 'success' => false,
                 'error' => $e->getMessage()

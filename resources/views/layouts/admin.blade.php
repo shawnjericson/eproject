@@ -290,6 +290,48 @@
             padding: 1.25rem;
         }
 
+        /* Custom Pagination - Small and Clean */
+        .pagination-sm .page-link {
+            padding: 0.35rem 0.65rem;
+            font-size: 0.8125rem;
+            line-height: 1.3;
+            border-radius: 4px;
+            border: 1px solid #dee2e6;
+            color: #374151;
+            background-color: white;
+            margin: 0 3px;
+            min-width: 32px;
+            text-align: center;
+            font-weight: 500;
+            transition: all 0.15s ease;
+        }
+
+        .pagination-sm .page-link:hover {
+            background-color: #f3f4f6;
+            border-color: #374151;
+            color: #374151;
+            text-decoration: none;
+        }
+
+        .pagination-sm .page-item.active .page-link {
+            background-color: #374151;
+            border-color: #374151;
+            color: white;
+            font-weight: 600;
+        }
+
+        .pagination-sm .page-item.disabled .page-link {
+            color: #9ca3af;
+            background-color: #f9fafb;
+            border-color: #e5e7eb;
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+
+        .pagination-sm {
+            margin: 0;
+        }
+
         /* Professional Editor Styles */
         .editor-toolbar {
             background: var(--secondary-color);
@@ -581,8 +623,9 @@
     <!-- Modern Sidebar Navigation -->
     <nav class="navbar navbar-expand-lg modern-sidebar fixed-top">
         <div class="container-fluid flex-column align-items-start p-0 h-100">
-            <a class="navbar-brand w-100 text-center" href="{{ route('admin.dashboard') }}">
-                Global Heritage
+            <a class="navbar-brand w-100 text-center d-flex align-items-center justify-content-center gap-2" href="{{ route('admin.dashboard') }}">
+                <img src="{{ asset('favicon_io/android-chrome-192x192.png') }}" alt="Global Heritage Logo" style="width: 80px; height: 80px; object-fit: contain;">
+                <span>Global Heritage</span>
             </a>
 
             <!-- Main Navigation -->
@@ -633,6 +676,11 @@
                         <li class="nav-item">
                             <a class="nav-link" href="{{ route('admin.users.index') }}">
                                 <i class="bi bi-people me-2"></i>{{ __('admin.users') }}
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ route('admin.visitors.index') }}">
+                                <i class="bi bi-eye me-2"></i>Visitor Stats
                             </a>
                         </li>
                         <li class="nav-item">

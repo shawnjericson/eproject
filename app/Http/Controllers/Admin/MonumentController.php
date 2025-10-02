@@ -254,9 +254,9 @@ class MonumentController extends Controller
         ];
 
         // Handle featured image with Cloudinary
-        if ($request->hasFile('image')) {
+        if ($request->hasFile('featured_image')) {
             try {
-                $uploadResult = $this->cloudinaryService->uploadImage($request->file('image'), 'monuments');
+                $uploadResult = $this->cloudinaryService->uploadImage($request->file('featured_image'), 'monuments');
 
                 if ($uploadResult['success']) {
                     $data['image'] = $uploadResult['url'];

@@ -196,7 +196,7 @@ class MonumentController extends Controller
     public function zones()
     {
         return response()->json([
-            'zones' => ['East', 'North', 'West', 'South']
+            'zones' => ['East', 'North', 'West', 'South', 'Central']
         ]);
     }
 }

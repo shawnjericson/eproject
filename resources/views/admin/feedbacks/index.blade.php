@@ -181,14 +181,47 @@
             </table>
         </div>
 
-        {{ $feedbacks->appends(request()->query())->links() }}
+        {{-- Custom Pagination --}}
+        @if ($feedbacks->hasPages())
+            <div class="d-flex justify-content-center mt-4 mb-3">
+                <nav>
+                    <ul class="pagination pagination-sm">
+                        {{-- Previous --}}
+                        @if ($feedbacks->onFirstPage())
+                            <li class="page-item disabled">
+                                <span class="page-link">Previous</span>
+                            </li>
+                        @else
+                            <li class="page-item">
+                                <a class="page-link" href="{{ $feedbacks->appends(request()->query())->previousPageUrl() }}">Previous</a>
+                            </li>
+                        @endif
 
-        @if(config('app.debug'))
-            <div class="mt-3">
-                <small class="text-muted">
-                    Debug: Total {{ $feedbacks->total() }} feedbacks found.
-                    Filters: {{ json_encode(request()->only(['search', 'monument_id', 'days'])) }}
-                </small>
+                        {{-- Page Numbers --}}
+                        @for ($i = 1; $i <= $feedbacks->lastPage(); $i++)
+                            @if ($i == $feedbacks->currentPage())
+                                <li class="page-item active">
+                                    <span class="page-link">{{ $i }}</span>
+                                </li>
+                            @else
+                                <li class="page-item">
+                                    <a class="page-link" href="{{ $feedbacks->appends(request()->query())->url($i) }}">{{ $i }}</a>
+                                </li>
+                            @endif
+                        @endfor
+
+                        {{-- Next --}}
+                        @if ($feedbacks->hasMorePages())
+                            <li class="page-item">
+                                <a class="page-link" href="{{ $feedbacks->appends(request()->query())->nextPageUrl() }}">Next</a>
+                            </li>
+                        @else
+                            <li class="page-item disabled">
+                                <span class="page-link">Next</span>
+                            </li>
+                        @endif
+                    </ul>
+                </nav>
             </div>
         @endif
     </div>

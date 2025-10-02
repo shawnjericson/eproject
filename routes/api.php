@@ -10,6 +10,7 @@ use App\Http\Controllers\Api\FeedbackController;
 use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\Api\SiteSettingController;
 use App\Http\Controllers\Api\DashboardController;
+use App\Http\Controllers\Api\VisitorController;
 
 /*
 |--------------------------------------------------------------------------
@@ -33,10 +34,16 @@ Route::get('/monuments/{monument}', [MonumentController::class, 'show']);
 Route::get('/monuments/zones', [MonumentController::class, 'zones']);
 Route::post('/monuments/{monument}/feedback', [MonumentController::class, 'submitFeedback']);
 Route::get('/gallery', [GalleryController::class, 'index']);
+Route::get('/gallery/categories', [GalleryController::class, 'categories']);
 Route::get('/feedback', [FeedbackController::class, 'index']); // Public - show all feedbacks
 Route::get('/feedback/{feedback}', [FeedbackController::class, 'show']); // Public - show single feedback
 Route::post('/feedback', [FeedbackController::class, 'store']);
 Route::get('/settings', [SiteSettingController::class, 'index']);
+
+// Visitor tracking routes
+Route::post('/visitor/track', [VisitorController::class, 'track']); // Track visitor by IP
+Route::get('/visitor/count', [VisitorController::class, 'count']); // Get current count
+Route::get('/visitor/stats', [VisitorController::class, 'stats']); // Get detailed stats
 
 // Protected routes
 Route::middleware('auth:sanctum')->group(function () {

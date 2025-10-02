@@ -13,7 +13,14 @@ class GalleryController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Gallery::with('monument');
+        $query = Gallery::with('monument:id,title,zone');
+
+        // Filter by category (monument zone)
+        if ($request->filled('category') && $request->category !== 'all') {
+            $query->whereHas('monument', function($q) use ($request) {
+                $q->where('zone', $request->category);
+            });
+        }
 
         // Filter by monument - only apply if monument_id is provided
         if ($request->filled('monument_id')) {
@@ -28,10 +35,29 @@ class GalleryController extends Controller
             });
         }
 
+        // Support larger page sizes for infinite scroll
+        $perPage = min($request->get('per_page', 24), 100); // Max 100 per request
+
         $galleries = $query->orderBy('created_at', 'desc')
-                          ->paginate($request->get('per_page', 20));
+                          ->paginate($perPage);
 
         return response()->json($galleries);
+    }
+
+    /**
+     * Get available categories from monuments
+     */
+    public function categories()
+    {
+        $categories = Monument::select('zone')
+            ->distinct()
+            ->whereNotNull('zone')
+            ->pluck('zone')
+            ->toArray();
+
+        return response()->json([
+            'categories' => array_merge(['all'], $categories)
+        ]);
     }
 
     public function show(Gallery $gallery)

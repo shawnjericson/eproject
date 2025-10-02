@@ -25,10 +25,16 @@ class DashboardController extends Controller
         ];
 
         // Get recent data safely
-        $recentPosts = Post::orderBy('created_at', 'desc')->limit(5)->get();
-        $recentMonuments = Monument::orderBy('created_at', 'desc')->limit(5)->get();
-        $recentFeedbacks = Feedback::orderBy('created_at', 'desc')->limit(5)->get();
+        $recent_posts = Post::with('creator')->orderBy('created_at', 'desc')->limit(5)->get();
+        $recent_monuments = Monument::with('creator')->orderBy('created_at', 'desc')->limit(5)->get();
+        $recent_feedbacks = Feedback::with('monument')->orderBy('created_at', 'desc')->limit(5)->get();
 
-        return view('admin.dashboard_modern', compact('stats', 'recentPosts', 'recentMonuments', 'recentFeedbacks'));
+        //Model::count(): đếm nhanh số bản ghi.
+        //where(...)->count(): đếm theo điều kiện (ví dụ status).
+        //with('creator'): eager load quan hệ để tránh N+1 query khi ra view.
+        //orderBy('created_at', 'desc')->limit(5)->get(): lấy 5 bản ghi mới nhất.
+        //view('...') + compact(...): trả dữ liệu cho Blade.
+
+        return view('admin.dashboard', compact('stats', 'recent_posts', 'recent_monuments', 'recent_feedbacks'));
     }
 }

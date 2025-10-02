@@ -105,30 +105,45 @@
 
                                 <div class="mb-3">
                                     <label for="title_vi" class="form-label">Tiêu đề (Tiếng Việt) <span class="text-danger">*</span></label>
-                                    <input type="text" class="form-control" id="title_vi" name="translations[vi][title]"
-                                           value="{{ old('translations.vi.title', $monument->title) }}" required>
+                                    <input type="text" class="form-control @error('translations.vi.title') is-invalid @enderror" id="title_vi" name="translations[vi][title]"
+                                           value="{{ old('translations.vi.title', $monument->title) }}">
                                     <small class="text-muted">This is the default language. Required field.</small>
+                                    @error('translations.vi.title')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
                                 </div>
 
                                 <div class="mb-3">
                                     <label for="location_vi" class="form-label">Địa điểm (Tiếng Việt)</label>
-                                    <input type="text" class="form-control" id="location_vi" name="translations[vi][location]"
+                                    <input type="text" class="form-control @error('translations.vi.location') is-invalid @enderror" id="location_vi" name="translations[vi][location]"
                                            value="{{ old('translations.vi.location', $monument->location) }}">
+                                    @error('translations.vi.location')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
                                 </div>
 
                                 <div class="mb-3">
                                     <label for="description_vi" class="form-label">Mô tả (Tiếng Việt)</label>
-                                    <textarea class="form-control" id="description_vi" name="translations[vi][description]" rows="3">{{ old('translations.vi.description', $monument->description) }}</textarea>
+                                    <textarea class="form-control @error('translations.vi.description') is-invalid @enderror" id="description_vi" name="translations[vi][description]" rows="3">{{ old('translations.vi.description', $monument->description) }}</textarea>
+                                    @error('translations.vi.description')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
                                 </div>
 
                                 <div class="mb-3">
                                     <label for="history_vi" class="form-label">Lịch sử (Tiếng Việt)</label>
-                                    <textarea class="form-control ckeditor" id="history_vi" name="translations[vi][history]" rows="8">{{ old('translations.vi.history', $monument->history) }}</textarea>
+                                    <textarea class="form-control ckeditor @error('translations.vi.history') is-invalid @enderror" id="history_vi" name="translations[vi][history]" rows="8">{{ old('translations.vi.history', $monument->history) }}</textarea>
+                                    @error('translations.vi.history')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
                                 </div>
 
                                 <div class="mb-3">
                                     <label for="content_vi" class="form-label">Nội dung (Tiếng Việt)</label>
-                                    <textarea class="form-control ckeditor" id="content_vi" name="translations[vi][content]" rows="15">{{ old('translations.vi.content', $monument->content) }}</textarea>
+                                    <textarea class="form-control ckeditor @error('translations.vi.content') is-invalid @enderror" id="content_vi" name="translations[vi][content]" rows="15">{{ old('translations.vi.content', $monument->content) }}</textarea>
+                                    @error('translations.vi.content')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
                                 </div>
                             </div>
                         </div>

@@ -155,7 +155,49 @@
             </table>
         </div>
 
-        {{ $users->appends(request()->query())->links() }}
+        {{-- Custom Pagination --}}
+        @if ($users->hasPages())
+            <div class="d-flex justify-content-center mt-4">
+                <nav>
+                    <ul class="pagination pagination-sm">
+                        {{-- Previous --}}
+                        @if ($users->onFirstPage())
+                            <li class="page-item disabled">
+                                <span class="page-link">Previous</span>
+                            </li>
+                        @else
+                            <li class="page-item">
+                                <a class="page-link" href="{{ $users->appends(request()->query())->previousPageUrl() }}">Previous</a>
+                            </li>
+                        @endif
+
+                        {{-- Page Numbers --}}
+                        @for ($i = 1; $i <= $users->lastPage(); $i++)
+                            @if ($i == $users->currentPage())
+                                <li class="page-item active">
+                                    <span class="page-link">{{ $i }}</span>
+                                </li>
+                            @else
+                                <li class="page-item">
+                                    <a class="page-link" href="{{ $users->appends(request()->query())->url($i) }}">{{ $i }}</a>
+                                </li>
+                            @endif
+                        @endfor
+
+                        {{-- Next --}}
+                        @if ($users->hasMorePages())
+                            <li class="page-item">
+                                <a class="page-link" href="{{ $users->appends(request()->query())->nextPageUrl() }}">Next</a>
+                            </li>
+                        @else
+                            <li class="page-item disabled">
+                                <span class="page-link">Next</span>
+                            </li>
+                        @endif
+                    </ul>
+                </nav>
+            </div>
+        @endif
     </div>
 </div>
 @endsection

@@ -60,7 +60,7 @@
                             <td>
                                 <div class="d-flex align-items-center">
                                     @if($post->image)
-                                        <img src="{{ asset('storage/' . $post->image) }}" alt="{{ $post->title }}" 
+                                        <img src="{{ $post->image_url }}" alt="{{ $post->title }}"
                                              class="rounded me-2" style="width: 50px; height: 50px; object-fit: cover;">
                                     @endif
                                     <div>
@@ -133,8 +133,50 @@
                 </tbody>
             </table>
         </div>
-        
-        {{ $posts->links() }}
+
+        {{-- Custom Pagination --}}
+        @if ($posts->hasPages())
+            <div class="d-flex justify-content-center mt-4">
+                <nav>
+                    <ul class="pagination pagination-sm">
+                        {{-- Previous --}}
+                        @if ($posts->onFirstPage())
+                            <li class="page-item disabled">
+                                <span class="page-link">Previous</span>
+                            </li>
+                        @else
+                            <li class="page-item">
+                                <a class="page-link" href="{{ $posts->previousPageUrl() }}">Previous</a>
+                            </li>
+                        @endif
+
+                        {{-- Page Numbers --}}
+                        @for ($i = 1; $i <= $posts->lastPage(); $i++)
+                            @if ($i == $posts->currentPage())
+                                <li class="page-item active">
+                                    <span class="page-link">{{ $i }}</span>
+                                </li>
+                            @else
+                                <li class="page-item">
+                                    <a class="page-link" href="{{ $posts->url($i) }}">{{ $i }}</a>
+                                </li>
+                            @endif
+                        @endfor
+
+                        {{-- Next --}}
+                        @if ($posts->hasMorePages())
+                            <li class="page-item">
+                                <a class="page-link" href="{{ $posts->nextPageUrl() }}">Next</a>
+                            </li>
+                        @else
+                            <li class="page-item disabled">
+                                <span class="page-link">Next</span>
+                            </li>
+                        @endif
+                    </ul>
+                </nav>
+            </div>
+        @endif
     </div>
 </div>
 @endsection

@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gallery API Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 20px;
+        }
+        .stats {
+            background: #f0f0f0;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        .stats h2 {
+            margin-top: 0;
+        }
+        .images {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 15px;
+        }
+        .image-card {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 10px;
+            background: white;
+        }
+        .image-card img {
+            width: 100%;
+            height: 150px;
+            object-fit: cover;
+            border-radius: 4px;
+        }
+        .image-card h4 {
+            margin: 10px 0 5px 0;
+            font-size: 14px;
+        }
+        .image-card p {
+            margin: 0;
+            font-size: 12px;
+            color: #666;
+        }
+        button {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-right: 10px;
+        }
+        button:hover {
+            background: #45a049;
+        }
+        .loading {
+            text-align: center;
+            padding: 20px;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <h1>Gallery API Test</h1>
+    
+    <div class="stats">
+        <h2>API Statistics</h2>
+        <p><strong>Total Images:</strong> <span id="total">-</span></p>
+        <p><strong>Per Page:</strong> <span id="perPage">-</span></p>
+        <p><strong>Current Page:</strong> <span id="currentPage">-</span></p>
+        <p><strong>Last Page:</strong> <span id="lastPage">-</span></p>
+        <p><strong>Images Loaded:</strong> <span id="loadedCount">0</span></p>
+        <p><strong>Has More:</strong> <span id="hasMore">-</span></p>
+    </div>
+
+    <div>
+        <button onclick="loadPage(1)">Load Page 1</button>
+        <button onclick="loadPage(2)">Load Page 2</button>
+        <button onclick="loadPage(3)">Load Page 3</button>
+        <button onclick="loadAll()">Load All (100 per page)</button>
+    </div>
+
+    <div id="loading" class="loading" style="display: none;">Loading...</div>
+    
+    <div class="images" id="images"></div>
+
+    <script>
+        let allImages = [];
+
+        async function loadPage(page) {
+            document.getElementById('loading').style.display = 'block';
+            document.getElementById('images').innerHTML = '';
+            
+            try {
+                const url = `http://127.0.0.1:8000/api/gallery?page=${page}&per_page=24`;
+                console.log('Fetching:', url);
+                
+                const response = await fetch(url);
+                const result = await response.json();
+                
+                console.log('API Response:', result);
+                
+                // Update stats
+                document.getElementById('total').textContent = result.total || 0;
+                document.getElementById('perPage').textContent = result.per_page || 0;
+                document.getElementById('currentPage').textContent = result.current_page || 0;
+                document.getElementById('lastPage').textContent = result.last_page || 0;
+                document.getElementById('loadedCount').textContent = result.data?.length || 0;
+                document.getElementById('hasMore').textContent = result.current_page < result.last_page ? 'Yes' : 'No';
+                
+                // Display images
+                const imagesContainer = document.getElementById('images');
+                result.data.forEach(item => {
+                    const card = document.createElement('div');
+                    card.className = 'image-card';
+                    card.innerHTML = `
+                        <img src="${item.thumbnail_url || item.image_url || item.image_path}" alt="${item.title}">
+                        <h4>${item.title}</h4>
+                        <p>ID: ${item.id}</p>
+                        <p>Category: ${item.category || 'N/A'}</p>
+                    `;
+                    imagesContainer.appendChild(card);
+                });
+                
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Error loading images: ' + error.message);
+            } finally {
+                document.getElementById('loading').style.display = 'none';
+            }
+        }
+
+        async function loadAll() {
+            document.getElementById('loading').style.display = 'block';
+            document.getElementById('images').innerHTML = '';
+            allImages = [];
+            
+            try {
+                const url = `http://127.0.0.1:8000/api/gallery?per_page=100`;
+                console.log('Fetching all:', url);
+                
+                const response = await fetch(url);
+                const result = await response.json();
+                
+                console.log('API Response (All):', result);
+                
+                // Update stats
+                document.getElementById('total').textContent = result.total || 0;
+                document.getElementById('perPage').textContent = result.per_page || 0;
+                document.getElementById('currentPage').textContent = result.current_page || 0;
+                document.getElementById('lastPage').textContent = result.last_page || 0;
+                document.getElementById('loadedCount').textContent = result.data?.length || 0;
+                document.getElementById('hasMore').textContent = result.current_page < result.last_page ? 'Yes' : 'No';
+                
+                // Display images
+                const imagesContainer = document.getElementById('images');
+                result.data.forEach(item => {
+                    const card = document.createElement('div');
+                    card.className = 'image-card';
+                    card.innerHTML = `
+                        <img src="${item.thumbnail_url || item.image_url || item.image_path}" alt="${item.title}" 
+                             onerror="this.src='https://via.placeholder.com/200x150?text=No+Image'">
+                        <h4>${item.title}</h4>
+                        <p>ID: ${item.id}</p>
+                        <p>Category: ${item.category || item.monument?.zone || 'N/A'}</p>
+                    `;
+                    imagesContainer.appendChild(card);
+                });
+                
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Error loading images: ' + error.message);
+            } finally {
+                document.getElementById('loading').style.display = 'none';
+            }
+        }
+
+        // Load page 1 on start
+        loadPage(1);
+    </script>
+</body>
+</html>
+

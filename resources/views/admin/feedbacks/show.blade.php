@@ -56,7 +56,7 @@
                                 <div class="row">
                                     <div class="col-md-3">
                                         @if($feedback->monument->image)
-                                            <img src="{{ asset('storage/' . $feedback->monument->image) }}"
+                                            <img src="{{ $feedback->monument->image_url }}"
                                                  alt="{{ $feedback->monument->title }}"
                                                  class="img-fluid rounded">
                                         @else

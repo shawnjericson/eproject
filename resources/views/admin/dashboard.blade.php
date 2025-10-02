@@ -6,7 +6,7 @@
 <div class="page-header">
     <div class="d-flex justify-content-between align-items-center">
         <div>
-            <h1 class="mb-2">{{ __('admin.welcome_back') }}, {{ auth()->user()->name }}! 👋</h1>
+            <h1 class="mb-2">{{ __('admin.welcome_back') }}, {{ auth()->user()?->name ?? 'Admin' }}! 👋</h1>
             <p class="text-muted mb-0">{{ __('admin.dashboard_subtitle') }}</p>
         </div>
         <div class="d-flex align-items-center gap-3">
@@ -18,211 +18,203 @@
     </div>
 </div>
 
-<!-- Stats Cards -->
-<div class="row mb-4">
+<!-- Modern Stats Cards -->
+<div class="row mb-5">
     <div class="col-xl-3 col-md-6 mb-4">
-        <div class="card border-left-primary shadow h-100 py-2">
-            <div class="card-body">
-                <div class="row no-gutters align-items-center">
-                    <div class="col mr-2">
-                        <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">{{ __('admin.total_posts') }}</div>
-                        <div class="h5 mb-0 font-weight-bold text-gray-800">{{ $stats['total_posts'] }}</div>
-                    </div>
-                    <div class="col-auto">
-                        <i class="bi bi-file-text fa-2x text-gray-300"></i>
-                    </div>
+        <div class="stat-card primary">
+            <div class="stat-icon">
+                <i class="bi bi-file-text"></i>
+            </div>
+            <div class="d-flex justify-content-between align-items-end">
+                <div>
+                    <h3 class="mb-0 fw-bold">{{ $stats['total_posts'] }}</h3>
+                    <p class="text-muted mb-0 small">{{ __('admin.total_posts') }}</p>
+                </div>
+                <div class="text-success small">
+                    <i class="bi bi-arrow-up"></i> +12%
                 </div>
             </div>
         </div>
     </div>
 
     <div class="col-xl-3 col-md-6 mb-4">
-        <div class="card border-left-warning shadow h-100 py-2">
-            <div class="card-body">
-                <div class="row no-gutters align-items-center">
-                    <div class="col mr-2">
-                        <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">{{ __('admin.pending') }} {{ __('admin.posts') }}</div>
-                        <div class="h5 mb-0 font-weight-bold text-gray-800">{{ $stats['pending_posts'] }}</div>
-                    </div>
-                    <div class="col-auto">
-                        <i class="bi bi-clock fa-2x text-gray-300"></i>
-                    </div>
+        <div class="stat-card warning">
+            <div class="stat-icon">
+                <i class="bi bi-clock"></i>
+            </div>
+            <div class="d-flex justify-content-between align-items-end">
+                <div>
+                    <h3 class="mb-0 fw-bold">{{ $stats['pending_posts'] }}</h3>
+                    <p class="text-muted mb-0 small">Pending Posts</p>
+                </div>
+                <div class="text-warning small">
+                    <i class="bi bi-dash"></i> 0%
                 </div>
             </div>
         </div>
     </div>
 
     <div class="col-xl-3 col-md-6 mb-4">
-        <div class="card border-left-success shadow h-100 py-2">
-            <div class="card-body">
-                <div class="row no-gutters align-items-center">
-                    <div class="col mr-2">
-                        <div class="text-xs font-weight-bold text-success text-uppercase mb-1">{{ __('admin.total_monuments') }}</div>
-                        <div class="h5 mb-0 font-weight-bold text-gray-800">{{ $stats['total_monuments'] }}</div>
-                    </div>
-                    <div class="col-auto">
-                        <i class="bi bi-building fa-2x text-gray-300"></i>
-                    </div>
+        <div class="stat-card success">
+            <div class="stat-icon">
+                <i class="bi bi-building"></i>
+            </div>
+            <div class="d-flex justify-content-between align-items-end">
+                <div>
+                    <h3 class="mb-0 fw-bold">{{ $stats['total_monuments'] }}</h3>
+                    <p class="text-muted mb-0 small">{{ __('admin.total_monuments') }}</p>
+                </div>
+                <div class="text-success small">
+                    <i class="bi bi-arrow-up"></i> +8%
                 </div>
             </div>
         </div>
     </div>
 
     <div class="col-xl-3 col-md-6 mb-4">
-        <div class="card border-left-info shadow h-100 py-2">
-            <div class="card-body">
-                <div class="row no-gutters align-items-center">
-                    <div class="col mr-2">
-                        <div class="text-xs font-weight-bold text-info text-uppercase mb-1">Total Feedbacks</div>
-                        <div class="h5 mb-0 font-weight-bold text-gray-800">{{ $stats['total_feedbacks'] }}</div>
-                    </div>
-                    <div class="col-auto">
-                        <i class="bi bi-chat-dots fa-2x text-gray-300"></i>
-                    </div>
+        <div class="stat-card danger">
+            <div class="stat-icon">
+                <i class="bi bi-people"></i>
+            </div>
+            <div class="d-flex justify-content-between align-items-end">
+                <div>
+                    <h3 class="mb-0 fw-bold">{{ $stats['total_users'] }}</h3>
+                    <p class="text-muted mb-0 small">{{ __('admin.total_users') }}</p>
                 </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- content Row -->
-<div class="row">
-    <!-- Recent Posts -->
-    <div class="col-lg-6 mb-4">
-        <div class="card shadow">
-            <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                <h6 class="m-0 font-weight-bold text-primary">Recent Posts</h6>
-                <a href="{{ route('admin.posts.index') }}" class="btn btn-sm btn-primary">{{ __('admin.view') }} All</a>
-            </div>
-            <div class="card-body">
-                @forelse($recent_posts as $post)
-                    <div class="d-flex align-items-center mb-3">
-                        <div class="flex-grow-1">
-                            <h6 class="mb-1">{{ Str::limit($post->title, 50) }}</h6>
-                            <small class="text-muted">
-                                By {{ $post->creator->name }} • {{ $post->created_at->diffForHumans() }}
-                                <span class="badge bg-{{ $post->status === 'approved' ? 'success' : ($post->status === 'pending' ? 'warning' : 'secondary') }}">
-                                    {{ ucfirst($post->status) }}
-                                </span>
-                            </small>
-                        </div>
-                        <a href="{{ route('admin.posts.show', $post) }}" class="btn btn-sm btn-outline-primary">{{ __('admin.view') }}</a>
-                    </div>
-                @empty
-                    <p class="text-muted">{{ __('admin.no_posts_yet') }}</p>
-                @endforelse
-            </div>
-        </div>
-    </div>
-
-    <!-- Recent Feedbacks -->
-    <div class="col-lg-6 mb-4">
-        <div class="card shadow">
-            <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                <h6 class="m-0 font-weight-bold text-primary">Recent Feedbacks</h6>
-                <a href="{{ route('admin.feedbacks.index') }}" class="btn btn-sm btn-primary">{{ __('admin.view') }} All</a>
-            </div>
-            <div class="card-body">
-                @forelse($recent_feedbacks as $feedback)
-                    <div class="d-flex align-items-center mb-3">
-                        <div class="flex-grow-1">
-                            <h6 class="mb-1">{{ $feedback->name }}</h6>
-                            <p class="mb-1 small">{{ Str::limit($feedback->message, 80) }}</p>
-                            <small class="text-muted">
-                                {{ $feedback->created_at->diffForHumans() }}
-                                @if($feedback->monument)
-                                    • {{ $feedback->monument->title }}
-                                @endif
-                            </small>
-                        </div>
-                        <a href="{{ route('admin.feedbacks.show', $feedback) }}" class="btn btn-sm btn-outline-primary">{{ __('admin.view') }}</a>
-                    </div>
-                @empty
-                    <p class="text-muted">{{ __('admin.no_feedbacks_yet') }}</p>
-                @endforelse
+                <div class="text-success small">
+                    <i class="bi bi-arrow-up"></i> +5%
+                </div>
             </div>
         </div>
     </div>
 </div>
 
 <!-- Quick Actions -->
-<div class="row mt-4">
-    <div class="col-md-12">
-        <div class="card shadow">
-            <div class="card-header py-3">
-                <h6 class="m-0 font-weight-bold text-primary">
-                    <i class="bi bi-lightning"></i> Quick Actions
-                </h6>
+<div class="row mb-5">
+    <div class="col-12">
+        <div class="modern-card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="bi bi-lightning me-2"></i>Quick Actions</h5>
             </div>
             <div class="card-body">
                 <div class="row">
                     <div class="col-md-3 mb-3">
-                        <a href="{{ route('admin.posts.create') }}" class="btn btn-primary w-100 py-3">
-                            <i class="bi bi-plus-circle fs-4"></i><br>
+                        <a href="{{ route('admin.posts.create') }}" class="btn btn-modern-primary w-100 py-3">
+                            <i class="bi bi-plus-circle fs-4 d-block mb-2"></i>
                             <small>Create New Post</small>
                         </a>
                     </div>
                     <div class="col-md-3 mb-3">
-                        <a href="{{ route('admin.monuments.create') }}" class="btn btn-success w-100 py-3">
-                            <i class="bi bi-plus-circle fs-4"></i><br>
+                        <a href="{{ route('admin.monuments.create') }}" class="btn btn-modern-secondary w-100 py-3">
+                            <i class="bi bi-plus-circle fs-4 d-block mb-2"></i>
                             <small>Create New Monument</small>
                         </a>
                     </div>
                     <div class="col-md-3 mb-3">
-                        <a href="{{ route('admin.gallery.index') }}" class="btn btn-info w-100 py-3">
-                            <i class="bi bi-images fs-4"></i><br>
+                        <a href="{{ route('admin.gallery.index') }}" class="btn btn-modern-secondary w-100 py-3">
+                            <i class="bi bi-images fs-4 d-block mb-2"></i>
                             <small>Manage Gallery</small>
                         </a>
                     </div>
                     <div class="col-md-3 mb-3">
-                        <a href="{{ route('admin.feedbacks.index') }}" class="btn btn-warning w-100 py-3">
-                            <i class="bi bi-chat-dots fs-4"></i><br>
-                            <small>View Feedbacks</small>
-                        </a>
-                    </div>
-                </div>
-                @if(auth()->user()->role === 'admin')
-                <div class="row">
-                    <div class="col-md-4 mb-3">
-                        <a href="{{ route('admin.users.index') }}" class="btn btn-secondary w-100 py-3">
-                            <i class="bi bi-people fs-4"></i><br>
+                        <a href="{{ route('admin.users.index') }}" class="btn btn-modern-secondary w-100 py-3">
+                            <i class="bi bi-people fs-4 d-block mb-2"></i>
                             <small>Manage Users</small>
                         </a>
                     </div>
-                    <div class="col-md-4 mb-3">
-                        <a href="{{ route('admin.settings.index') }}" class="btn btn-dark w-100 py-3">
-                            <i class="bi bi-gear fs-4"></i><br>
-                            <small>Site Settings</small>
-                        </a>
-                    </div>
-
                 </div>
-                @endif
             </div>
         </div>
     </div>
 </div>
 
-@push('styles')
-<style>
-.border-left-primary {
-    border-left: 0.25rem solid #4e73df !important;
-}
-.border-left-success {
-    border-left: 0.25rem solid #1cc88a !important;
-}
-.border-left-info {
-    border-left: 0.25rem solid #36b9cc !important;
-}
-.border-left-warning {
-    border-left: 0.25rem solid #f6c23e !important;
-}
-#current-time {
-    font-family: 'Courier New', monospace;
-    font-weight: bold;
-}
-</style>
-@endpush
+<!-- Recent Activity -->
+<div class="row">
+    <div class="col-lg-8 mb-4">
+        <div class="modern-card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="bi bi-clock-history me-2"></i>Recent Posts</h5>
+            </div>
+            <div class="card-body">
+                @if($recent_posts->count() > 0)
+                    <div class="list-group list-group-flush">
+                        @foreach($recent_posts as $post)
+                        <div class="list-group-item border-0 px-0 py-3">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div class="flex-grow-1">
+                                    <h6 class="mb-1 fw-semibold">{{ $post->title }}</h6>
+                                    <p class="mb-1 text-muted small">{{ Str::limit(strip_tags($post->content), 100) }}</p>
+                                    <small class="text-muted">
+                                        <i class="bi bi-calendar me-1"></i>{{ $post->created_at->format('M d, Y') }}
+                                        <i class="bi bi-tag ms-3 me-1"></i>{{ ucfirst($post->status) }}
+                                    </small>
+                                </div>
+                                <span class="badge bg-{{ $post->status == 'approved' ? 'success' : ($post->status == 'pending' ? 'warning' : 'secondary') }}">
+                                    {{ ucfirst($post->status) }}
+                                </span>
+                            </div>
+                        </div>
+                        @endforeach
+                    </div>
+                    <div class="text-center mt-3">
+                        <a href="{{ route('admin.posts.index') }}" class="btn btn-modern-secondary">
+                            View All Posts <i class="bi bi-arrow-right ms-1"></i>
+                        </a>
+                    </div>
+                @else
+                    <div class="text-center py-4">
+                        <i class="bi bi-file-text text-muted" style="font-size: 3rem;"></i>
+                        <p class="text-muted mt-2">{{ __('admin.no_posts_yet') }} {{ __('admin.create_first_post') }}</p>
+                        <a href="{{ route('admin.posts.create') }}" class="btn btn-modern-primary">
+                            <i class="bi bi-plus-lg me-2"></i>Create Post
+                        </a>
+                    </div>
+                @endif
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-4 mb-4">
+        <div class="modern-card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="bi bi-building me-2"></i>Recent Monuments</h5>
+            </div>
+            <div class="card-body">
+                @if($recent_monuments->count() > 0)
+                    <div class="list-group list-group-flush">
+                        @foreach($recent_monuments as $monument)
+                        <div class="list-group-item border-0 px-0 py-2">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="mb-1 fw-semibold">{{ $monument->title }}</h6>
+                                    <small class="text-muted">
+                                        <i class="bi bi-geo-alt me-1"></i>{{ $monument->zone }}
+                                    </small>
+                                </div>
+                                <small class="text-muted">{{ $monument->created_at->format('M d') }}</small>
+                            </div>
+                        </div>
+                        @endforeach
+                    </div>
+                    <div class="text-center mt-3">
+                        <a href="{{ route('admin.monuments.index') }}" class="btn btn-modern-secondary btn-sm">
+                            View All <i class="bi bi-arrow-right ms-1"></i>
+                        </a>
+                    </div>
+                @else
+                    <div class="text-center py-4">
+                        <i class="bi bi-building text-muted" style="font-size: 2rem;"></i>
+                        <p class="text-muted mt-2 small">{{ __('admin.no_monuments_yet') }}</p>
+                        <a href="{{ route('admin.monuments.create') }}" class="btn btn-modern-primary btn-sm">
+                            <i class="bi bi-plus-lg me-1"></i>Create Monument
+                        </a>
+                    </div>
+                @endif
+            </div>
+        </div>
+    </div>
+</div>
+@endsection
 
 @push('scripts')
 <script>
@@ -237,7 +229,6 @@ function updateClock() {
 
     const hour = now.getHours();
     let greeting = '';
-    let icon = '';
 
     if (hour >= 5 && hour < 12) {
         greeting = '🌅 Good Morning';
@@ -258,4 +249,3 @@ updateClock();
 setInterval(updateClock, 1000);
 </script>
 @endpush
-@endsection

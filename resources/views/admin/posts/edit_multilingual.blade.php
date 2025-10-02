@@ -62,24 +62,33 @@
                             <div class="tab-pane fade show active" id="en-content" role="tabpanel">
                                 <div class="mb-3">
                                     <label for="en_title" class="form-label">{{ __('admin.title_english') }} <span class="text-danger">*</span></label>
-                                    <input type="text" class="form-control" id="en_title" 
-                                           name="translations[0][title]" 
-                                           value="{{ old('translations.0.title', $post->translation('en')->title ?? '') }}" 
-                                           placeholder="{{ __('admin.placeholder_title_en') }}" required>
+                                    <input type="text" class="form-control @error('translations.0.title') is-invalid @enderror" id="en_title"
+                                           name="translations[0][title]"
+                                           value="{{ old('translations.0.title', $post->translation('en')->title ?? '') }}"
+                                           placeholder="{{ __('admin.placeholder_title_en') }}">
                                     <input type="hidden" name="translations[0][language]" value="en">
+                                    @error('translations.0.title')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
                                 </div>
 
                                 <div class="mb-3">
                                     <label for="en_description" class="form-label">{{ __('admin.description_english') }}</label>
-                                    <textarea class="form-control" id="en_description" 
-                                              name="translations[0][description]" rows="3" 
+                                    <textarea class="form-control @error('translations.0.description') is-invalid @enderror" id="en_description"
+                                              name="translations[0][description]" rows="3"
                                               placeholder="{{ __('admin.placeholder_description_en') }}">{{ old('translations.0.description', $post->translation('en')->description ?? '') }}</textarea>
+                                    @error('translations.0.description')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
                                 </div>
 
                                 <div class="mb-3">
                                     <label for="en_content" class="form-label">{{ __('admin.content_english') }} <span class="text-danger">*</span></label>
-                                    <textarea class="form-control ckeditor" id="en_content" 
-                                              name="translations[0][content]" rows="15" required>{{ old('translations.0.content', $post->translation('en')->content ?? '') }}</textarea>
+                                    <textarea class="form-control ckeditor @error('translations.0.content') is-invalid @enderror" id="en_content"
+                                              name="translations[0][content]" rows="15">{{ old('translations.0.content', $post->translation('en')->content ?? '') }}</textarea>
+                                    @error('translations.0.content')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
                                 </div>
                             </div>
 
@@ -87,24 +96,33 @@
                             <div class="tab-pane fade" id="vi-content" role="tabpanel">
                                 <div class="mb-3">
                                     <label for="vi_title" class="form-label">Tiêu đề (Tiếng Việt) <span class="text-danger">*</span></label>
-                                    <input type="text" class="form-control" id="vi_title" 
-                                           name="translations[1][title]" 
-                                           value="{{ old('translations.1.title', $post->translation('vi')->title ?? '') }}" 
-                                           placeholder="Nhập tiêu đề tiếng Việt" required>
+                                    <input type="text" class="form-control @error('translations.1.title') is-invalid @enderror" id="vi_title"
+                                           name="translations[1][title]"
+                                           value="{{ old('translations.1.title', $post->translation('vi')->title ?? '') }}"
+                                           placeholder="Nhập tiêu đề tiếng Việt">
                                     <input type="hidden" name="translations[1][language]" value="vi">
+                                    @error('translations.1.title')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
                                 </div>
 
                                 <div class="mb-3">
                                     <label for="vi_description" class="form-label">Mô tả ngắn (Tiếng Việt)</label>
-                                    <textarea class="form-control" id="vi_description" 
-                                              name="translations[1][description]" rows="3" 
+                                    <textarea class="form-control @error('translations.1.description') is-invalid @enderror" id="vi_description"
+                                              name="translations[1][description]" rows="3"
                                               placeholder="Tóm tắt ngắn gọn tiếng Việt">{{ old('translations.1.description', $post->translation('vi')->description ?? '') }}</textarea>
+                                    @error('translations.1.description')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
                                 </div>
 
                                 <div class="mb-3">
                                     <label for="vi_content" class="form-label">Nội dung (Tiếng Việt) <span class="text-danger">*</span></label>
-                                    <textarea class="form-control ckeditor" id="vi_content" 
-                                              name="translations[1][content]" rows="15" required>{{ old('translations.1.content', $post->translation('vi')->content ?? '') }}</textarea>
+                                    <textarea class="form-control ckeditor @error('translations.1.content') is-invalid @enderror" id="vi_content"
+                                              name="translations[1][content]" rows="15">{{ old('translations.1.content', $post->translation('vi')->content ?? '') }}</textarea>
+                                    @error('translations.1.content')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
                                 </div>
                             </div>
                         </div>
