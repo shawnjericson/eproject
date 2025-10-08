@@ -12,6 +12,11 @@ class SiteSetting extends Model
     protected $fillable = [
         'key',
         'value',
+        'description',
+        'category',
+        'type',
+        'min',
+        'max',
     ];
 
     /**

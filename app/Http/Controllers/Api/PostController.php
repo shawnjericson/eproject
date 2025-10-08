@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Api\PostStoreRequest;
+use App\Http\Requests\Api\PostUpdateRequest;
 use App\Models\Post;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -54,32 +56,13 @@ class PostController extends Controller
             }
         }
 
-        $post->load('creator');
-        
+        $post->load(['creator', 'translations']);
+
         return response()->json($post);
     }
 
-    public function store(Request $request)
+    public function store(PostStoreRequest $request)
     {
-        // Validate based on selected language
-        $rules = [
-            'language' => 'required|in:en,vi',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'status' => 'required|in:draft,pending,approved',
-        ];
-
-        if ($request->language === 'vi') {
-            $rules['title_vi'] = 'required|string|max:255';
-            $rules['description_vi'] = 'nullable|string';
-            $rules['content_vi'] = 'required|string';
-        } else {
-            $rules['title'] = 'required|string|max:255';
-            $rules['description'] = 'nullable|string';
-            $rules['content'] = 'required|string';
-        }
-
-        $request->validate($rules);
-
         $data = [
             'language' => $request->language,
             'status' => $request->status,
@@ -115,27 +98,8 @@ class PostController extends Controller
         return response()->json($post, 201);
     }
 
-    public function update(Request $request, Post $post)
+    public function update(PostUpdateRequest $request, Post $post)
     {
-        // Validate based on selected language
-        $rules = [
-            'language' => 'required|in:en,vi',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'status' => 'required|in:draft,pending,approved',
-        ];
-
-        if ($request->language === 'vi') {
-            $rules['title_vi'] = 'required|string|max:255';
-            $rules['description_vi'] = 'nullable|string';
-            $rules['content_vi'] = 'required|string';
-        } else {
-            $rules['title'] = 'required|string|max:255';
-            $rules['description'] = 'nullable|string';
-            $rules['content'] = 'required|string';
-        }
-
-        $request->validate($rules);
-
         $data = [
             'language' => $request->language,
             'status' => $request->status,

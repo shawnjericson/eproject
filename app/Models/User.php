@@ -28,6 +28,12 @@ class User extends Authenticatable
         'bio',
         'address',
         'date_of_birth',
+        'security_question_1',
+        'security_answer_1',
+        'security_question_2',
+        'security_answer_2',
+        'security_question_3',
+        'security_answer_3',
     ];
 
     /**
@@ -98,9 +104,7 @@ class User extends Authenticatable
         }
 
         // Default avatar based on role
-        return $this->role === 'admin'
-            ? asset('images/default-admin-avatar.png')
-            : asset('images/default-moderator-avatar.png');
+        return 'https://placehold.co/600x400/EEE/31343C';
     }
 
     /**

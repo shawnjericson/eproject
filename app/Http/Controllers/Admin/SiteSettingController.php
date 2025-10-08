@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Admin\SettingStoreRequest;
+use App\Http\Requests\Admin\SettingUpdateRequest;
 use App\Models\SiteSetting;
 use Illuminate\Http\Request;
 
@@ -19,13 +21,8 @@ class SiteSettingController extends Controller
         return view('admin.settings.create');
     }
 
-    public function store(Request $request)
+    public function store(SettingStoreRequest $request)
     {
-        $request->validate([
-            'key' => 'required|string|max:255|unique:site_settings',
-            'value' => 'required|string',
-        ]);
-
         SiteSetting::create($request->only(['key', 'value']));
 
         return redirect()->route('admin.settings.index')->with('success', 'Setting created successfully!');
@@ -36,13 +33,8 @@ class SiteSettingController extends Controller
         return view('admin.settings.edit', compact('setting'));
     }
 
-    public function update(Request $request, SiteSetting $setting)
+    public function update(SettingUpdateRequest $request, SiteSetting $setting)
     {
-        $request->validate([
-            'key' => 'required|string|max:255|unique:site_settings,key,' . $setting->id,
-            'value' => 'required|string',
-        ]);
-
         $setting->update($request->only(['key', 'value']));
 
         return redirect()->route('admin.settings.index')->with('success', 'Setting updated successfully!');

@@ -16,10 +16,10 @@
 <!-- Filters -->
 <div class="card-minimal mb-4">
     <div class="card-body">
-        <form method="GET" action="{{ route('admin.monuments.index') }}">
+        <form method="GET" action="{{ route('admin.monuments.index') }}" id="filterForm">
             <div class="row g-3">
                 <div class="col-md-3">
-                    <select name="status" class="form-select">
+                    <select name="status" class="form-select auto-filter">
                         <option value="">All Status</option>
                         <option value="draft" {{ request('status') === 'draft' ? 'selected' : '' }}>{{ __('admin.draft') }}</option>
                         <option value="pending" {{ request('status') === 'pending' ? 'selected' : '' }}>{{ __('admin.pending') }}</option>
@@ -27,7 +27,7 @@
                     </select>
                 </div>
                 <div class="col-md-3">
-                    <select name="zone" class="form-select">
+                    <select name="zone" class="form-select auto-filter">
                         <option value="">All Zones</option>
                         <option value="East" {{ request('zone') === 'East' ? 'selected' : '' }}>East</option>
                         <option value="North" {{ request('zone') === 'North' ? 'selected' : '' }}>North</option>
@@ -40,7 +40,6 @@
                     <input type="text" name="search" class="form-control" placeholder="Search monuments..." value="{{ request('search') }}">
                 </div>
                 <div class="col-md-2">
-                    <button type="submit" class="btn-minimal btn-primary me-2">{{ __('admin.filter') }}</button>
                     <a href="{{ route('admin.monuments.index') }}" class="btn-minimal">{{ __('admin.clear') }}</a>
                 </div>
             </div>

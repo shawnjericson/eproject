@@ -170,13 +170,43 @@
                     <h5 class="mb-0">{{ __('admin.security') }}</h5>
                 </div>
                 <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-center">
+                    <!-- Password Section -->
+                    <div class="d-flex justify-content-between align-items-center mb-3">
                         <div>
                             <h6 class="mb-1">{{ __('admin.password') }}</h6>
                             <p class="text-muted mb-0 small">{{ __('admin.change_password') }}</p>
                         </div>
                         <a href="{{ route('admin.profile.edit') }}#password" class="btn btn-outline-primary btn-sm">
                             {{ __('admin.change_password') }}
+                        </a>
+                    </div>
+
+                    <hr>
+
+                    <!-- Security Questions Section -->
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="mb-1">
+                                <i class="fas fa-shield-alt me-2 text-primary"></i>Câu Hỏi Bảo Mật
+                            </h6>
+                            <p class="text-muted mb-0 small">
+                                @if($user->security_question_1)
+                                    <span class="text-success">
+                                        <i class="fas fa-check-circle me-1"></i>Đã thiết lập
+                                    </span>
+                                @else
+                                    <span class="text-warning">
+                                        <i class="fas fa-exclamation-triangle me-1"></i>Chưa thiết lập
+                                    </span>
+                                @endif
+                            </p>
+                        </div>
+                        <a href="{{ route('admin.profile.security-questions') }}" class="btn btn-outline-secondary btn-sm">
+                            @if($user->security_question_1)
+                                <i class="fas fa-edit me-1"></i>Chỉnh sửa
+                            @else
+                                <i class="fas fa-plus me-1"></i>Thiết lập
+                            @endif
                         </a>
                     </div>
                 </div>

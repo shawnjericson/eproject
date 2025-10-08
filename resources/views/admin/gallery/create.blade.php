@@ -22,7 +22,7 @@
                     <div class="mb-3">
                         <label for="monument_id" class="form-label">Monument <span class="text-danger">*</span></label>
                         <select class="form-select @error('monument_id') is-invalid @enderror" 
-                                id="monument_id" name="monument_id" required>
+                                id="monument_id" name="monument_id">
                             <option value="">Select Monument</option>
                             @foreach($monuments as $monument)
                                 <option value="{{ $monument->id }}" 
@@ -39,7 +39,7 @@
                     <div class="mb-3">
                         <label for="title" class="form-label">{{ __('admin.image') }} {{ __('admin.title') }} <span class="text-danger">*</span></label>
                         <input type="text" class="form-control @error('title') is-invalid @enderror" 
-                               id="title" name="title" value="{{ old('title') }}" required>
+                               id="title" name="title" value="{{ old('title') }}">
                         @error('title')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
@@ -58,7 +58,7 @@
                     <div class="mb-3">
                         <label for="image" class="form-label">{{ __('admin.image') }} <span class="text-danger">*</span></label>
                         <input type="file" class="form-control @error('image') is-invalid @enderror" 
-                               id="image" name="image" accept="image/*" required>
+                               id="image" name="image" accept="image/*">
                         @error('image')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror

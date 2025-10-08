@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Admin\PostStoreRequest;
+use App\Http\Requests\Admin\PostUpdateRequest;
 use App\Models\Post;
 use App\Models\PostTranslation;
 use App\Services\CloudinaryService;
@@ -22,6 +24,11 @@ class PostController extends Controller
     public function index(Request $request)
     {
         $query = Post::with(['creator', 'translations']);
+
+        // Filter by user role - moderators only see their own posts
+        if (auth()->user()->isModerator()) {
+            $query->where('created_by', auth()->id());
+        }
 
         // Filter by status - only apply if status is provided
         if ($request->filled('status')) {
@@ -53,17 +60,8 @@ class PostController extends Controller
         return view('admin.posts.create_multilingual');
     }
 
-    public function store(Request $request)
+    public function store(PostStoreRequest $request)
     {
-        $request->validate([
-            'language' => 'required|in:en,vi',
-            'title' => 'required|string|max:255',
-            'description' => 'nullable|string',
-            'content' => 'required|string',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:5120',
-            'status' => 'required|in:draft,pending,approved',
-        ]);
-
         // Create the main post
         $postData = [
             'title' => $request->title, // Fallback title
@@ -119,19 +117,8 @@ class PostController extends Controller
         return view('admin.posts.edit_multilingual', compact('post'));
     }
 
-    public function update(Request $request, Post $post)
+    public function update(PostUpdateRequest $request, Post $post)
     {
-        $request->validate([
-            'status' => 'required|in:draft,pending,approved',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:5120',
-            // Validate translations
-            'translations' => 'required|array',
-            'translations.*.language' => 'required|in:en,vi',
-            'translations.*.title' => 'required|string|max:255',
-            'translations.*.description' => 'nullable|string',
-            'translations.*.content' => 'required|string',
-        ]);
-
         // Update main post
         $postData = ['status' => $request->status];
 

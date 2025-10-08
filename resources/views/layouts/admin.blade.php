@@ -35,7 +35,7 @@
             --success-color: #10b981;
             --warning-color: #f59e0b;
             --danger-color: #ef4444;
-            --sidebar-width: 280px;
+            --sidebar-width: 260px;
             --accent-color: #9ca3af;
         }
 
@@ -49,6 +49,197 @@
             font-size: 14px;
             line-height: 1.6;
             min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Top Navigation Bar - Custom Modern Styling */
+        .top-navbar {
+            background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+            border-bottom: 1px solid var(--border-color);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            height: 70px;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            backdrop-filter: blur(10px);
+        }
+
+        .top-navbar-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            padding: 0 2rem;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .top-navbar-left {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        .top-navbar-right {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .sidebar-toggle {
+            background: var(--primary-color);
+            border: none;
+            border-radius: 12px;
+            padding: 0.75rem;
+            color: white;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            font-size: 1.1rem;
+        }
+
+        .sidebar-toggle:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+        }
+
+        .page-title {
+            color: var(--text-primary);
+            font-weight: 700;
+            font-size: 1.4rem;
+            margin: 0;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        /* Custom Button Styles */
+        .top-navbar .btn {
+            border: none;
+            border-radius: 12px;
+            padding: 0.75rem 1.5rem;
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .top-navbar .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .top-navbar .btn:hover::before {
+            left: 100%;
+        }
+
+        .top-navbar .btn-outline-secondary {
+            background: white;
+            color: var(--text-primary);
+            border: 2px solid var(--border-color);
+        }
+
+        .top-navbar .btn-outline-secondary:hover {
+            background: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+        }
+
+        .top-navbar .btn-outline-primary {
+            background: var(--primary-color);
+            color: white;
+            border: 2px solid var(--primary-color);
+        }
+
+        .top-navbar .btn-outline-primary:hover {
+            background: var(--primary-dark);
+            border-color: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+        }
+
+        /* Custom Dropdown Styles */
+        .top-navbar .dropdown-menu {
+            background: white;
+            border: none;
+            border-radius: 16px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+            padding: 0.5rem;
+            margin-top: 0.5rem;
+            min-width: 200px;
+            backdrop-filter: blur(10px);
+        }
+
+        .top-navbar .dropdown-item {
+            border-radius: 10px;
+            padding: 0.75rem 1rem;
+            margin: 0.25rem 0;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            color: var(--text-primary);
+        }
+
+        .top-navbar .dropdown-item:hover {
+            background: var(--primary-color);
+            color: white;
+            transform: translateX(4px);
+        }
+
+        .top-navbar .dropdown-item.active {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .top-navbar .dropdown-item-text {
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            font-weight: 600;
+            padding: 0.5rem 1rem;
+        }
+
+        .top-navbar .dropdown-divider {
+            margin: 0.5rem 0;
+            border-color: var(--border-color);
+        }
+
+        /* User Profile Button */
+        .top-navbar .user-profile-btn {
+            background: white;
+            border: 2px solid var(--border-color);
+            border-radius: 50px;
+            padding: 0.5rem 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .top-navbar .user-profile-btn:hover {
+            border-color: var(--primary-color);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+        }
+
+        .top-navbar .user-profile-btn img {
+            width: 36px;
+            height: 36px;
+            border: 2px solid var(--primary-color);
         }
 
         /* Modern Sidebar */
@@ -58,9 +249,10 @@
             box-shadow: none;
             width: var(--sidebar-width);
             height: 100vh;
-            overflow-y: auto;
+            overflow: hidden;
             display: flex;
             flex-direction: column;
+            top: 70px; /* Adjust for top navbar */
         }
 
         .modern-sidebar .navbar-brand {
@@ -106,6 +298,7 @@
             box-shadow: 0 4px 12px rgba(0,0,0,0.1);
             border-radius: 8px;
             margin-left: 1rem;
+            z-index: 1060;
         }
 
         .modern-sidebar .dropdown-item {
@@ -121,11 +314,14 @@
             color: white;
         }
 
+
         /* Main Content */
         .main-content {
             margin-left: var(--sidebar-width);
-            min-height: 100vh;
+            margin-top: 70px; /* Account for top navbar */
+            min-height: calc(100vh - 70px);
             padding: 2rem;
+            overflow-x: hidden;
         }
 
         /* Modern Cards */
@@ -548,17 +744,82 @@
             color: white;
         }
 
+        /* Clickable Cards */
+        .clickable-card {
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .clickable-card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.15);
+        }
+
+        .clickable-card:active {
+            transform: translateY(-2px);
+        }
+
         /* Navigation sections */
         .nav-main {
             flex: 1;
             overflow-y: auto;
+            overflow-x: hidden;
             padding: 1rem 0;
+            scrollbar-width: thin;
+            scrollbar-color: #cbd5e0 #f7fafc;
+        }
+
+        /* Custom scrollbar for webkit browsers */
+        .nav-main::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .nav-main::-webkit-scrollbar-track {
+            background: #f7fafc;
+            border-radius: 3px;
+        }
+
+        .nav-main::-webkit-scrollbar-thumb {
+            background: #cbd5e0;
+            border-radius: 3px;
+        }
+
+        .nav-main::-webkit-scrollbar-thumb:hover {
+            background: #a0aec0;
         }
 
         .nav-bottom {
             flex-shrink: 0;
             border-top: 1px solid var(--border-color);
             padding: 1rem 0;
+            background: #f8f9fa;
+        }
+
+        /* Sidebar improvements */
+        .modern-sidebar .nav-item {
+            margin-bottom: 0.25rem;
+        }
+
+        .modern-sidebar .nav-link {
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .modern-sidebar .nav-link::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            height: 100%;
+            width: 3px;
+            background: var(--primary-color);
+            transform: scaleY(0);
+            transition: transform 0.3s ease;
+        }
+
+        .modern-sidebar .nav-link:hover::before,
+        .modern-sidebar .nav-link.active::before {
+            transform: scaleY(1);
         }
 
         .nav-bottom .nav-item {
@@ -620,11 +881,83 @@
     @include('layouts.admin_js_translations')
 </head>
 <body>
+    <!-- Top Navigation Bar -->
+    <nav class="top-navbar">
+        <div class="top-navbar-content">
+            <div class="top-navbar-left">
+                <button class="sidebar-toggle d-lg-none" type="button">
+                    <i class="bi bi-list"></i>
+                </button>
+                <h5 class="page-title mb-0">@yield('title', 'Admin Panel')</h5>
+            </div>
+            <div class="top-navbar-right">
+                <!-- Language Picker -->
+                <div class="dropdown">
+                    <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                        @if(app()->getLocale() == 'vi') {{ __('admin.vietnamese') }} @else {{ __('admin.english') }} @endif
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li>
+                            <a class="dropdown-item {{ app()->getLocale() == 'en' ? 'active' : '' }}"
+                               href="{{ request()->fullUrlWithQuery(['lang' => 'en']) }}">
+                                {{ __('admin.english') }}
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item {{ app()->getLocale() == 'vi' ? 'active' : '' }}"
+                               href="{{ request()->fullUrlWithQuery(['lang' => 'vi']) }}">
+                                {{ __('admin.vietnamese') }}
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- View Site Link -->
+                <a href="https://eproject-1-fe.izido.tech/" target="_blank" class="btn btn-outline-primary">
+                    <i class="bi bi-eye me-1"></i>{{ __('admin.view_site') }}
+                </a>
+
+                <!-- User Profile Dropdown -->
+                <div class="dropdown">
+                    <button class="user-profile-btn dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                        <img src="{{ auth()->user()?->avatar_url ?? 'https://placehold.co/600x400/EEE/31343C' }}"
+                             alt="{{ auth()->user()?->name }}"
+                             class="rounded-circle">
+                        <span class="d-none d-md-inline">{{ auth()->user()?->name ?? 'Admin' }}</span>
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li><span class="dropdown-item-text">{{ __('admin.role') }}: {{ ucfirst(auth()->user()?->role ?? 'admin') }}</span></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li>
+                            <a class="dropdown-item" href="{{ route('admin.profile.show') }}">
+                                <i class="bi bi-person me-2"></i>{{ __('admin.my_profile') }}
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item" href="{{ route('admin.profile.edit') }}">
+                                <i class="bi bi-pencil me-2"></i>{{ __('admin.edit_profile') }}
+                            </a>
+                        </li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li>
+                            <form action="{{ route('logout') }}" method="POST" class="d-inline">
+                                @csrf
+                                <button type="submit" class="dropdown-item">
+                                    <i class="bi bi-box-arrow-right me-2"></i>{{ __('admin.logout') }}
+                                </button>
+                            </form>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </nav>
+
     <!-- Modern Sidebar Navigation -->
     <nav class="navbar navbar-expand-lg modern-sidebar fixed-top">
-        <div class="container-fluid flex-column align-items-start p-0 h-100">
+        <div class="container-fluid flex-column align-items-start p-0 h-80">
             <a class="navbar-brand w-100 text-center d-flex align-items-center justify-content-center gap-2" href="{{ route('admin.dashboard') }}">
-                <img src="{{ asset('favicon_io/android-chrome-192x192.png') }}" alt="Global Heritage Logo" style="width: 80px; height: 80px; object-fit: contain;">
+                <img src="{{ asset('favicon_io/android-chrome-192x192.png') }}" alt="Global Heritage Logo" style="width: 60px; height: 60px; object-fit: contain;">
                 <span>Global Heritage</span>
             </a>
 
@@ -635,19 +968,6 @@
                         <a class="nav-link" href="{{ route('admin.dashboard') }}">
                             <i class="bi bi-speedometer2 me-2"></i>{{ __('admin.dashboard') }}
                         </a>
-                    </li>
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
-                            <i class="bi bi-file-text me-2"></i>{{ __('admin.posts') }}
-                        </a>
-                        <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="{{ route('admin.posts.index') }}">
-                                <i class="bi bi-list-ul me-2"></i>{{ __('admin.all_posts') }}
-                            </a></li>
-                            <li><a class="dropdown-item" href="{{ route('admin.posts.create') }}">
-                                <i class="bi bi-plus-circle me-2"></i>{{ __('admin.create_new_post') }}
-                            </a></li>
-                        </ul>
                     </li>
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
@@ -662,6 +982,19 @@
                             </a></li>
                         </ul>
                     </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                            <i class="bi bi-file-text me-2"></i>{{ __('admin.posts') }}
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="{{ route('admin.posts.index') }}">
+                                <i class="bi bi-list-ul me-2"></i>{{ __('admin.all_posts') }}
+                            </a></li>
+                            <li><a class="dropdown-item" href="{{ route('admin.posts.create') }}">
+                                <i class="bi bi-plus-circle me-2"></i>{{ __('admin.create_new_post') }}
+                            </a></li>
+                        </ul>
+                    </li>
                     <li class="nav-item">
                         <a class="nav-link" href="{{ route('admin.gallery.index') }}">
                             <i class="bi bi-images me-2"></i>{{ __('admin.gallery') }}
@@ -670,6 +1003,17 @@
                     <li class="nav-item">
                         <a class="nav-link" href="{{ route('admin.feedbacks.index') }}">
                             <i class="bi bi-chat-dots me-2"></i>{{ __('admin.feedbacks') }}
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ route('admin.contacts.index') }}">
+                            <i class="bi bi-envelope me-2"></i>Contact Messages
+                            @php
+                                $newContactsCount = \App\Models\Contact::where('status', 'new')->count();
+                            @endphp
+                            @if($newContactsCount > 0)
+                                <span class="badge bg-danger ms-2">{{ $newContactsCount }}</span>
+                            @endif
                         </a>
                     </li>
                     @if(auth()->user()?->isAdmin())
@@ -689,77 +1033,9 @@
                             </a>
                         </li>
                     @endif
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ route('admin.profile.show') }}">
-                            <i class="bi bi-person-circle me-2"></i>{{ __('admin.my_profile') }}
-                        </a>
-                    </li>
                 </ul>
             </div>
 
-            <!-- Bottom Navigation -->
-            <div class="nav-bottom w-100">
-                <ul class="navbar-nav flex-column w-100">
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
-                            @if(app()->getLocale() == 'vi') {{ __('admin.vietnamese') }} @else {{ __('admin.english') }} @endif
-                        </a>
-                        <ul class="dropdown-menu">
-                            <li>
-                                <a class="dropdown-item {{ app()->getLocale() == 'en' ? 'active' : '' }}"
-                                   href="{{ request()->fullUrlWithQuery(['lang' => 'en']) }}">
-                                    {{ __('admin.english') }}
-                                </a>
-                            </li>
-                            <li>
-                                <a class="dropdown-item {{ app()->getLocale() == 'vi' ? 'active' : '' }}"
-                                   href="{{ request()->fullUrlWithQuery(['lang' => 'vi']) }}">
-                                    {{ __('admin.vietnamese') }}
-                                </a>
-                            </li>
-                        </ul>
-                    </li>
-
-                    <li class="nav-item">
-                        <a class="nav-link" href="http://localhost:3000" target="_blank">
-                            {{ __('admin.view_site') }}
-                        </a>
-                    </li>
-
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
-                            <img src="{{ auth()->user()?->avatar_url }}"
-                                 alt="{{ auth()->user()?->name }}"
-                                 class="rounded-circle me-2"
-                                 style="width: 32px; height: 32px; object-fit: cover;">
-                            {{ auth()->user()?->name ?? 'Admin' }}
-                        </a>
-                        <ul class="dropdown-menu">
-                            <li><span class="dropdown-item-text">{{ __('admin.role') }}: {{ ucfirst(auth()->user()?->role ?? 'admin') }}</span></li>
-                            <li><hr class="dropdown-divider"></li>
-                            <li>
-                                <a class="dropdown-item" href="{{ route('admin.profile.show') }}">
-                                    <i class="bi bi-person me-2"></i>{{ __('admin.my_profile') }}
-                                </a>
-                            </li>
-                            <li>
-                                <a class="dropdown-item" href="{{ route('admin.profile.edit') }}">
-                                    <i class="bi bi-pencil me-2"></i>{{ __('admin.edit_profile') }}
-                                </a>
-                            </li>
-                            <li><hr class="dropdown-divider"></li>
-                            <li>
-                                <form action="{{ route('logout') }}" method="POST" class="d-inline">
-                                    @csrf
-                                    <button type="submit" class="dropdown-item">
-                                        <i class="bi bi-box-arrow-right me-2"></i>{{ __('admin.logout') }}
-                                    </button>
-                                </form>
-                            </li>
-                        </ul>
-                    </li>
-                </ul>
-            </div>
         </div>
     </nav>
 
@@ -789,6 +1065,38 @@
 
     <!-- CKEditor 5 Rich Text Editor -->
     <script src="https://cdn.ckeditor.com/ckeditor5/40.0.0/classic/ckeditor.js"></script>
+
+    <!-- Auto Filter Script -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Auto-submit form when dropdown changes
+            const autoFilterSelects = document.querySelectorAll('.auto-filter');
+            autoFilterSelects.forEach(select => {
+                select.addEventListener('change', function() {
+                    const form = this.closest('form');
+                    if (form) {
+                        form.submit();
+                    }
+                });
+            });
+
+            // Search input with debounce
+            const searchInputs = document.querySelectorAll('input[name="search"]');
+            searchInputs.forEach(input => {
+                let timeout;
+                input.addEventListener('input', function() {
+                    clearTimeout(timeout);
+                    const form = this.closest('form');
+                    if (form) {
+                        timeout = setTimeout(() => {
+                            form.submit();
+                        }, 500); // 500ms delay
+                    }
+                });
+            });
+
+        });
+    </script>
 
     @stack('scripts')
 </body>

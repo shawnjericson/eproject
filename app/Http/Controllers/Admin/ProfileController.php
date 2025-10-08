@@ -3,6 +3,10 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Admin\ProfileUpdateRequest;
+use App\Http\Requests\Admin\ProfilePasswordUpdateRequest;
+use App\Http\Requests\Admin\ProfileSecurityQuestionsUpdateRequest;
+use App\Http\Requests\Admin\ProfileAvatarUpdateRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -35,20 +39,12 @@ class ProfileController extends Controller
     /**
      * Update the user's profile information.
      */
-    public function update(Request $request)
+    public function update(ProfileUpdateRequest $request)
     {
         $user = Auth::user();
+        /** @var \App\Models\User $user */
         
-        $validated = $request->validate([
-            'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'email', 'max:255', Rule::unique('users')->ignore($user->id)],
-            'phone' => ['nullable', 'string', 'max:20'],
-            'bio' => ['nullable', 'string', 'max:1000'],
-            'address' => ['nullable', 'string', 'max:255'],
-            'date_of_birth' => ['nullable', 'date', 'before:today'],
-        ]);
-
-        $user->update($validated);
+        $user->update($request->validated());
 
         return redirect()->route('admin.profile.show')
             ->with('success', __('admin.profile_updated_successfully'));
@@ -57,13 +53,11 @@ class ProfileController extends Controller
     /**
      * Update the user's avatar.
      */
-    public function updateAvatar(Request $request)
+    public function updateAvatar(ProfileAvatarUpdateRequest $request)
     {
         $user = Auth::user();
+        /** @var \App\Models\User $user */
         
-        $request->validate([
-            'avatar' => ['required', 'image', 'mimes:jpeg,png,jpg,gif', 'max:2048'],
-        ]);
 
         try {
             // Delete old avatar if exists and not default
@@ -115,14 +109,11 @@ class ProfileController extends Controller
     /**
      * Update the user's password.
      */
-    public function updatePassword(Request $request)
+    public function updatePassword(ProfilePasswordUpdateRequest $request)
     {
         $user = Auth::user();
+        /** @var \App\Models\User $user */
         
-        $request->validate([
-            'current_password' => ['required', 'string'],
-            'new_password' => ['required', 'string', 'min:8', 'confirmed'],
-        ]);
 
         // Check if current password is correct
         if (!Hash::check($request->current_password, $user->password)) {
@@ -139,11 +130,56 @@ class ProfileController extends Controller
     }
 
     /**
+     * Show security questions setup form.
+     */
+    public function showSecurityQuestions()
+    {
+        $user = Auth::user();
+        return view('admin.profile.security-questions', compact('user'));
+    }
+
+    /**
+     * Update security questions.
+     */
+    public function updateSecurityQuestions(ProfileSecurityQuestionsUpdateRequest $request)
+    {
+        $user = Auth::user();
+        /** @var \App\Models\User $user */
+        
+
+        // Validate that if question is provided, answer must be provided too
+        if ($request->security_question_2 && !$request->security_answer_2) {
+            return redirect()->back()
+                ->withErrors(['security_answer_2' => 'Vui lòng cung cấp câu trả lời cho câu hỏi thứ 2.'])
+                ->withInput();
+        }
+
+        if ($request->security_question_3 && !$request->security_answer_3) {
+            return redirect()->back()
+                ->withErrors(['security_answer_3' => 'Vui lòng cung cấp câu trả lời cho câu hỏi thứ 3.'])
+                ->withInput();
+        }
+
+        $user->update([
+            'security_question_1' => $request->security_question_1,
+            'security_answer_1' => strtolower(trim($request->security_answer_1)),
+            'security_question_2' => $request->security_question_2,
+            'security_answer_2' => $request->security_answer_2 ? strtolower(trim($request->security_answer_2)) : null,
+            'security_question_3' => $request->security_question_3,
+            'security_answer_3' => $request->security_answer_3 ? strtolower(trim($request->security_answer_3)) : null,
+        ]);
+
+        return redirect()->back()
+            ->with('success', 'Câu hỏi bảo mật đã được cập nhật thành công.');
+    }
+
+    /**
      * Delete the user's avatar.
      */
     public function deleteAvatar()
     {
         $user = Auth::user();
+        /** @var \App\Models\User $user */
         
         if ($user->avatar && !filter_var($user->avatar, FILTER_VALIDATE_URL)) {
             Storage::disk('public')->delete($user->avatar);

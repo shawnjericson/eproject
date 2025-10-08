@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Admin\GalleryStoreRequest;
+use App\Http\Requests\Admin\GalleryUpdateRequest;
 use App\Models\Gallery;
 use App\Models\Monument;
 use App\Services\CloudinaryService;
@@ -48,15 +50,8 @@ class GalleryController extends Controller
         return view('admin.gallery.create', compact('monuments'));
     }
 
-    public function store(Request $request)
+    public function store(GalleryStoreRequest $request)
     {
-        $request->validate([
-            'monument_id' => 'required|exists:monuments,id',
-            'title' => 'required|string|max:255',
-            'description' => 'nullable|string',
-            'image' => 'required|image|mimes:jpeg,png,jpg,gif|max:10240', // 10MB
-        ]);
-
         $data = $request->only(['monument_id', 'title', 'description']);
 
         if ($request->hasFile('image')) {
@@ -99,15 +94,8 @@ class GalleryController extends Controller
         return view('admin.gallery.edit', compact('gallery', 'monuments'));
     }
 
-    public function update(Request $request, Gallery $gallery)
+    public function update(GalleryUpdateRequest $request, Gallery $gallery)
     {
-        $request->validate([
-            'monument_id' => 'required|exists:monuments,id',
-            'title' => 'required|string|max:255',
-            'description' => 'nullable|string',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:10240', // 10MB
-        ]);
-
         $data = $request->only(['monument_id', 'title', 'description']);
 
         if ($request->hasFile('image')) {

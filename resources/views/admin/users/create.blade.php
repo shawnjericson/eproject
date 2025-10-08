@@ -23,7 +23,7 @@
                     <div class="mb-3">
                         <label for="name" class="form-label">Full {{ __('admin.name') }} <span class="text-danger">*</span></label>
                         <input type="text" class="form-control @error('name') is-invalid @enderror" 
-                               id="name" name="name" value="{{ old('name') }}" required>
+                               id="name" name="name" value="{{ old('name') }}">
                         @error('name')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
@@ -32,7 +32,7 @@
                     <div class="mb-3">
                         <label for="email" class="form-label">{{ __('admin.email') }} Address <span class="text-danger">*</span></label>
                         <input type="email" class="form-control @error('email') is-invalid @enderror" 
-                               id="email" name="email" value="{{ old('email') }}" required>
+                               id="email" name="email" value="{{ old('email') }}">
                         @error('email')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
@@ -43,7 +43,7 @@
                             <div class="mb-3">
                                 <label for="password" class="form-label">Password <span class="text-danger">*</span></label>
                                 <input type="password" class="form-control @error('password') is-invalid @enderror" 
-                                       id="password" name="password" required>
+                                       id="password" name="password">
                                 @error('password')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
@@ -53,7 +53,7 @@
                             <div class="mb-3">
                                 <label for="password_confirmation" class="form-label">Confirm Password <span class="text-danger">*</span></label>
                                 <input type="password" class="form-control" 
-                                       id="password_confirmation" name="password_confirmation" required>
+                                       id="password_confirmation" name="password_confirmation">
                             </div>
                         </div>
                     </div>
@@ -63,7 +63,7 @@
                             <div class="mb-3">
                                 <label for="role" class="form-label">{{ __('admin.role') }} <span class="text-danger">*</span></label>
                                 <select class="form-select @error('role') is-invalid @enderror" 
-                                        id="role" name="role" required>
+                                        id="role" name="role">
                                     <option value="">Select {{ __('admin.role') }}</option>
                                     <option value="admin" {{ old('role') == 'admin' ? 'selected' : '' }}>Admin</option>
                                     <option value="moderator" {{ old('role') == 'moderator' ? 'selected' : '' }}>Moderator</option>
@@ -77,7 +77,7 @@
                             <div class="mb-3">
                                 <label for="status" class="form-label">{{ __('admin.status') }} <span class="text-danger">*</span></label>
                                 <select class="form-select @error('status') is-invalid @enderror" 
-                                        id="status" name="status" required>
+                                        id="status" name="status">
                                     <option value="">Select {{ __('admin.status') }}</option>
                                     <option value="active" {{ old('status') == 'active' ? 'selected' : '' }}>{{ __('admin.active') }}</option>
                                     <option value="inactive" {{ old('status') == 'inactive' ? 'selected' : '' }}>{{ __('admin.inactive') }}</option>

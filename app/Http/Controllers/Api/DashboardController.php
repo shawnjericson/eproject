@@ -13,26 +13,37 @@ class DashboardController extends Controller
 {
     public function stats()
     {
+        $user = auth()->user();
+        $isAdmin = $user->isAdmin();
+        
+        // Base queries - admins see all, moderators see only their own
+        $postsQuery = $isAdmin ? Post::query() : Post::where('created_by', $user->id);
+        $monumentsQuery = $isAdmin ? Monument::query() : Monument::where('created_by', $user->id);
+        
         $stats = [
-            'total_posts' => Post::count(),
-            'published_posts' => Post::published()->count(),
-            'pending_posts' => Post::where('status', 'pending')->count(),
-            'total_monuments' => Monument::count(),
-            'approved_monuments' => Monument::approved()->count(),
-            'pending_monuments' => Monument::where('status', 'pending')->count(),
-            'total_feedbacks' => Feedback::count(),
-            'total_users' => User::count(),
-            'admin_users' => User::where('role', 'admin')->count(),
-            'moderator_users' => User::where('role', 'moderator')->count(),
+            'total_posts' => $postsQuery->count(),
+            'published_posts' => $postsQuery->published()->count(),
+            'pending_posts' => $postsQuery->where('status', 'pending')->count(),
+            'total_monuments' => $monumentsQuery->count(),
+            'approved_monuments' => $monumentsQuery->approved()->count(),
+            'pending_monuments' => $monumentsQuery->where('status', 'pending')->count(),
+            'total_feedbacks' => Feedback::count(), // Feedbacks are global
         ];
+        
+        // Add user stats only for admins
+        if ($isAdmin) {
+            $stats['total_users'] = User::count();
+            $stats['admin_users'] = User::where('role', 'admin')->count();
+            $stats['moderator_users'] = User::where('role', 'moderator')->count();
+        }
 
-        // Recent activities
-        $recent_posts = Post::with('creator')
+        // Recent activities - filtered by role
+        $recent_posts = $postsQuery->with('creator')
                            ->orderBy('created_at', 'desc')
                            ->limit(5)
                            ->get();
 
-        $recent_monuments = Monument::with('creator')
+        $recent_monuments = $monumentsQuery->with('creator')
                                   ->orderBy('created_at', 'desc')
                                   ->limit(5)
                                   ->get();
@@ -42,20 +53,20 @@ class DashboardController extends Controller
                                   ->limit(5)
                                   ->get();
 
-        // Posts by status
+        // Posts by status - filtered by role
         $posts_by_status = [
-            'draft' => Post::where('status', 'draft')->count(),
-            'pending' => Post::where('status', 'pending')->count(),
-            'approved' => Post::where('status', 'approved')->count(),
-            'rejected' => Post::where('status', 'rejected')->count(),
+            'draft' => $postsQuery->where('status', 'draft')->count(),
+            'pending' => $postsQuery->where('status', 'pending')->count(),
+            'approved' => $postsQuery->where('status', 'approved')->count(),
+            'rejected' => $postsQuery->where('status', 'rejected')->count(),
         ];
 
-        // Monuments by zone
+        // Monuments by zone - filtered by role
         $monuments_by_zone = [
-            'East' => Monument::approved()->byZone('East')->count(),
-            'North' => Monument::approved()->byZone('North')->count(),
-            'West' => Monument::approved()->byZone('West')->count(),
-            'South' => Monument::approved()->byZone('South')->count(),
+            'East' => $monumentsQuery->approved()->byZone('East')->count(),
+            'North' => $monumentsQuery->approved()->byZone('North')->count(),
+            'West' => $monumentsQuery->approved()->byZone('West')->count(),
+            'South' => $monumentsQuery->approved()->byZone('South')->count(),
         ];
 
         return response()->json([

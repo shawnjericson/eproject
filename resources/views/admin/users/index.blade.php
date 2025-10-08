@@ -52,17 +52,17 @@
 <!-- Filters -->
 <div class="card-minimal mb-4">
     <div class="card-body">
-        <form method="GET" action="{{ route('admin.users.index') }}">
+        <form method="GET" action="{{ route('admin.users.index') }}" id="filterForm">
             <div class="row g-3">
                 <div class="col-md-3">
-                    <select name="role" class="form-select">
+                    <select name="role" class="form-select auto-filter">
                         <option value="">All Roles</option>
                         <option value="admin" {{ request('role') === 'admin' ? 'selected' : '' }}>Admin</option>
                         <option value="moderator" {{ request('role') === 'moderator' ? 'selected' : '' }}>Moderator</option>
                     </select>
                 </div>
                 <div class="col-md-3">
-                    <select name="status" class="form-select">
+                    <select name="status" class="form-select auto-filter">
                         <option value="">All Status</option>
                         <option value="active" {{ request('status') === 'active' ? 'selected' : '' }}>{{ __('admin.active') }}</option>
                         <option value="inactive" {{ request('status') === 'inactive' ? 'selected' : '' }}>{{ __('admin.inactive') }}</option>
@@ -72,7 +72,6 @@
                     <input type="text" name="search" class="form-control" placeholder="Search by name or email..." value="{{ request('search') }}">
                 </div>
                 <div class="col-md-2">
-                    <button type="submit" class="btn-minimal btn-primary me-2">{{ __('admin.filter') }}</button>
                     <a href="{{ route('admin.users.index') }}" class="btn-minimal">{{ __('admin.clear') }}</a>
                 </div>
             </div>

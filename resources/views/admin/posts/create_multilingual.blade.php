@@ -3,64 +3,59 @@
 @section('title', 'Create New Post')
 
 @section('content')
-<div class="container-fluid">
-    <div class="row">
-        <div class="col-12">
-            <div class="page-title-box d-sm-flex align-items-center justify-content-between">
-                <h4 class="mb-sm-0">Create New Post</h4>
-                <div class="page-title-right">
-                    <ol class="breadcrumb m-0">
-                        <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}">Dashboard</a></li>
-                        <li class="breadcrumb-item"><a href="{{ route('admin.posts.index') }}">Posts</a></li>
-                        <li class="breadcrumb-item active">Create</li>
-                    </ol>
-                </div>
-            </div>
+<div class="page-header">
+    <div class="d-flex justify-content-between align-items-center">
+        <div>
+            <h1 class="mb-2">
+                <i class="bi bi-file-text text-primary me-2"></i>Create New Post
+            </h1>
+            <p class="text-muted mb-0">Create a new blog post or article</p>
+        </div>
+        <div>
+            <a href="{{ route('admin.posts.index') }}" class="btn btn-modern-secondary">
+                <i class="bi bi-arrow-left me-2"></i>Back to Posts
+            </a>
         </div>
     </div>
+</div>
 
     <form action="{{ route('admin.posts.store') }}" method="POST" enctype="multipart/form-data" id="postForm">
         @csrf
         <div class="row">
             <div class="col-lg-8">
-                <!-- Language Selection -->
-                <div class="card">
+                <!-- Language Information -->
+                <div class="modern-card mb-4">
                     <div class="card-header">
-                        <h5 class="card-title mb-0">
-                            <i class="bi bi-translate text-primary"></i> Language Selection
+                        <h5 class="mb-0">
+                            <i class="bi bi-translate text-primary me-2"></i>Language Information
                         </h5>
                     </div>
                     <div class="card-body">
-                        <div class="mb-3">
-                            <label for="language" class="form-label">Primary Language <span class="text-danger">*</span></label>
-                            <select class="form-select @error('language') is-invalid @enderror" id="language" name="language" required>
-                                <option value="">Select Language</option>
-                                <option value="en" {{ old('language') == 'en' ? 'selected' : '' }}>English</option>
-                                <option value="vi" {{ old('language') == 'vi' ? 'selected' : '' }}>Tiếng Việt</option>
-                            </select>
-                            @error('language')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                            <div class="form-text">
-                                <i class="bi bi-info-circle"></i> 
-                                Choose the primary language for this post. You can add translations later.
+                        <div class="alert alert-info mb-0">
+                            <div class="d-flex align-items-center">
+                                <i class="bi bi-info-circle me-3 fs-4"></i>
+                                <div>
+                                    <h6 class="mb-1">Post will be created in: <strong>{{ app()->getLocale() == 'en' ? 'English' : 'Tiếng Việt' }}</strong></h6>
+                                    <p class="mb-0 small">The language is automatically set based on your current interface language. You can add translations later by editing this post.</p>
+                                </div>
                             </div>
                         </div>
+                        <input type="hidden" name="language" value="{{ app()->getLocale() }}">
                     </div>
                 </div>
 
                 <!-- Post Content -->
-                <div class="card">
+                <div class="modern-card mb-4">
                     <div class="card-header">
-                        <h5 class="card-title mb-0">
-                            <i class="bi bi-file-text text-primary"></i> Post Content
+                        <h5 class="mb-0">
+                            <i class="bi bi-file-text text-primary me-2"></i>Post Content
                         </h5>
                     </div>
                     <div class="card-body">
                         <div class="mb-3">
                             <label for="title" class="form-label">Title <span class="text-danger">*</span></label>
                             <input type="text" class="form-control @error('title') is-invalid @enderror" 
-                                   id="title" name="title" value="{{ old('title') }}" placeholder="Enter post title" required>
+                                   id="title" name="title" value="{{ old('title') }}" placeholder="Enter post title" >
                             @error('title')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
@@ -88,10 +83,10 @@
                 </div>
 
                 <!-- Featured Image -->
-                <div class="card">
+                <div class="modern-card mb-4">
                     <div class="card-header">
-                        <h5 class="card-title mb-0">
-                            <i class="bi bi-image text-primary"></i> Featured Image
+                        <h5 class="mb-0">
+                            <i class="bi bi-image text-primary me-2"></i>Featured Image
                         </h5>
                     </div>
                     <div class="card-body">
@@ -120,41 +115,46 @@
 
             <div class="col-lg-4">
                 <!-- Publishing Options -->
-                <div class="card">
+                <div class="modern-card mb-4">
                     <div class="card-header">
-                        <h5 class="card-title mb-0">
-                            <i class="bi bi-gear text-primary"></i> Publishing Options
+                        <h5 class="mb-0">
+                            <i class="bi bi-gear text-primary me-2"></i>Publishing Options
                         </h5>
                     </div>
                     <div class="card-body">
                         <div class="mb-3">
-                            <label for="status" class="form-label">Status <span class="text-danger">*</span></label>
-                            <select class="form-select @error('status') is-invalid @enderror" id="status" name="status" required>
-                                <option value="">Select Status</option>
-                                <option value="draft" {{ old('status') == 'draft' ? 'selected' : '' }}>Draft</option>
-                                <option value="pending" {{ old('status') == 'pending' ? 'selected' : '' }}>Pending Review</option>
-                                @if(auth()->user()->role === 'admin')
-                                    <option value="approved" {{ old('status') == 'approved' ? 'selected' : '' }}>Approved</option>
-                                @endif
-                            </select>
-                            @error('status')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="save_as_draft" name="save_as_draft" value="1" {{ old('save_as_draft') ? 'checked' : '' }}>
+                                <label class="form-check-label" for="save_as_draft">
+                                    <strong>Save as Draft</strong>
+                                    <br><small class="text-muted">If unchecked, the post will be saved as "Pending Review" for admin approval</small>
+                                </label>
+                            </div>
+                            <input type="hidden" name="status" id="status" value="{{ old('save_as_draft') ? 'draft' : 'pending' }}">
                         </div>
 
                         <div class="d-grid gap-2">
-                            <button type="submit" class="btn btn-primary">
-                                <i class="bi bi-check-circle"></i> Create Post
+                            <button type="submit" class="btn btn-modern-primary" id="submitBtn">
+                                <span class="btn-text">
+                                    <i class="bi bi-check-circle me-2"></i>Create Post
+                                </span>
+                                <span class="btn-loading" style="display: none;">
+                                    <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                                    Creating... Please wait
+                                </span>
                             </button>
-                            <a href="{{ route('admin.posts.index') }}" class="btn btn-secondary">
-                                <i class="bi bi-arrow-left"></i> Back to Posts
+                            <a href="{{ route('admin.posts.index') }}" class="btn btn-modern-secondary">
+                                <i class="bi bi-arrow-left me-2"></i>Back to Posts
                             </a>
+                            <small class="text-muted mt-2" id="uploadHint" style="display: none;">
+                                <i class="bi bi-info-circle"></i> Uploading image to Cloudinary... Please wait.
+                            </small>
                         </div>
                     </div>
                 </div>
 
                 <!-- Multilingual Info -->
-                <div class="card">
+                <!-- <div class="card">
                     <div class="card-header">
                         <h5 class="card-title mb-0">
                             <i class="bi bi-globe text-info"></i> Multilingual Support
@@ -171,10 +171,10 @@
                             </ul>
                         </div>
                     </div>
-                </div>
+                </div> -->
 
                 <!-- Help & Instructions -->
-                <div class="card">
+                <!-- <div class="card">
                     <div class="card-header">
                         <h5 class="card-title mb-0">
                             <i class="bi bi-question-circle text-info"></i> Instructions
@@ -192,7 +192,7 @@
                             </ul>
                         </div>
                     </div>
-                </div>
+                </div> -->
             </div>
         </div>
     </form>
@@ -273,6 +273,7 @@ document.addEventListener('DOMContentLoaded', function() {
     if (imageInput && imagePreview && previewImg) {
         imageInput.addEventListener('change', function(e) {
             const file = e.target.files[0];
+            // chặn không cho up file ngoài images
             if (file) {
                 const reader = new FileReader();
                 reader.onload = function(e) {
@@ -287,34 +288,66 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // Form validation and CKEditor sync
-    const form = document.getElementById('postForm');
-    if (form) {
-        form.addEventListener('submit', function(e) {
-            // Sync CKEditor data back to textarea before validation
-            if (contentEditor) {
-                const editorData = contentEditor.getData();
-                document.getElementById('post_content').value = editorData;
-            }
+    // const form = document.getElementById('postForm');
+    // const submitBtn = document.getElementById('submitBtn');
+    // let isSubmitting = false;
 
-            const language = document.getElementById('language').value;
-            const title = document.getElementById('title').value;
-            const content = document.getElementById('post_content').value;
-            const status = document.getElementById('status').value;
+    // if (form) {
+    //     form.addEventListener('submit', function(e) {
+    //         // Prevent double submission
+    //         if (isSubmitting) {
+    //             e.preventDefault();
+    //             return false;
+    //         }
 
-            if (!language || !title || !content.trim() || !status) {
-                e.preventDefault();
-                alert('Please fill in all required fields');
-                return false;
-            }
+    //         // Sync CKEditor data back to textarea before validation
+    //         if (contentEditor) {
+    //             const editorData = contentEditor.getData();
+    //             document.getElementById('post_content').value = editorData;
+    //         }
 
-            console.log('Form submission data:', {
-                language: language,
-                title: title,
-                content: content.substring(0, 50) + '...',
-                status: status
-            });
-        });
-    }
+    //         const language = document.getElementById('language').value;
+    //         const title = document.getElementById('title').value;
+    //         const content = document.getElementById('post_content').value;
+    //         const status = document.getElementById('status').value;
+
+    //         if (!language || !title || !content.trim() || !status) {
+    //             e.preventDefault();
+    //             alert('Please fill in all required fields');
+    //             return false;
+    //         }
+
+    //         // Check if there's an image
+    //         const imageInput = document.getElementById('image');
+    //         const hasImage = imageInput && imageInput.files.length > 0;
+
+    //         // Mark as submitting
+    //         isSubmitting = true;
+
+    //         // Disable button and show loading state
+    //         submitBtn.disabled = true;
+    //         submitBtn.querySelector('.btn-text').style.display = 'none';
+    //         submitBtn.querySelector('.btn-loading').style.display = 'inline-block';
+
+    //         // Show upload hint if there's an image
+    //         if (hasImage) {
+    //             document.getElementById('uploadHint').style.display = 'block';
+    //         }
+
+    //         console.log('Form submission data:', {
+    //             language: language,
+    //             title: title,
+    //             content: content.substring(0, 50) + '...',
+    //             status: status
+    //         });
+    //     });
+    // }
+
+    // Handle draft checkbox change
+    document.getElementById('save_as_draft').addEventListener('change', function() {
+        const statusField = document.getElementById('status');
+        statusField.value = this.checked ? 'draft' : 'pending';
+    });
 });
 </script>
 @endpush

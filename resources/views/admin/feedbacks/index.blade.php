@@ -59,10 +59,10 @@
 <!-- Filters -->
 <div class="card-minimal mb-4">
     <div class="card-body">
-        <form method="GET" action="{{ route('admin.feedbacks.index') }}">
+        <form method="GET" action="{{ route('admin.feedbacks.index') }}" id="filterForm">
             <div class="row g-3">
                 <div class="col-md-3">
-                    <select name="monument_id" class="form-select">
+                    <select name="monument_id" class="form-select auto-filter">
                         <option value="">All Monuments</option>
                         @foreach($monuments ?? [] as $monument)
                             <option value="{{ $monument->id }}" {{ request('monument_id') == $monument->id ? 'selected' : '' }}>
@@ -72,7 +72,7 @@
                     </select>
                 </div>
                 <div class="col-md-3">
-                    <select name="days" class="form-select">
+                    <select name="days" class="form-select auto-filter">
                         <option value="">All Time</option>
                         <option value="1" {{ request('days') == '1' ? 'selected' : '' }}>Today</option>
                         <option value="7" {{ request('days') == '7' ? 'selected' : '' }}>Last 7 days</option>
@@ -83,7 +83,6 @@
                     <input type="text" name="search" class="form-control" placeholder="Search by name, email, or message..." value="{{ request('search') }}">
                 </div>
                 <div class="col-md-2 d-flex gap-2">
-                    <button type="submit" class="btn-minimal btn-primary">{{ __('admin.filter') }}</button>
                     <a href="{{ route('admin.feedbacks.index') }}" class="btn-minimal">{{ __('admin.clear') }}</a>
                 </div>
             </div>

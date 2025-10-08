@@ -70,7 +70,7 @@
                         <form action="{{ route('admin.profile.avatar.delete') }}" method="POST" class="d-inline">
                             @csrf
                             @method('DELETE')
-                            <button type="submit" class="btn btn-outline-danger w-100" onclick="return confirm('{{ __('admin.confirm_delete') }}')">
+                            <button type="submit" class="btn btn-outline-danger w-100">
                                 <i class="bi bi-trash"></i> {{ __('admin.remove_avatar') }}
                             </button>
                         </form>
@@ -103,13 +103,7 @@
                             <!-- Full Name -->
                             <div class="col-md-6 mb-3">
                                 <label for="name" class="form-label">{{ __('admin.full_name') }} <span class="text-danger">*</span></label>
-                                <input type="text" 
-                                       class="form-control @error('name') is-invalid @enderror" 
-                                       id="name" 
-                                       name="name" 
-                                       value="{{ old('name', $user->name) }}"
-                                       placeholder="{{ __('admin.enter_full_name') }}"
-                                       required>
+                                <input type="text" class="form-control @error('name') is-invalid @enderror" id="name" name="name" value="{{ old('name', $user->name) }}" placeholder="{{ __('admin.enter_full_name') }}">
                                 @error('name')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
@@ -118,13 +112,7 @@
                             <!-- Email -->
                             <div class="col-md-6 mb-3">
                                 <label for="email" class="form-label">{{ __('admin.email_address') }} <span class="text-danger">*</span></label>
-                                <input type="email" 
-                                       class="form-control @error('email') is-invalid @enderror" 
-                                       id="email" 
-                                       name="email" 
-                                       value="{{ old('email', $user->email) }}"
-                                       placeholder="{{ __('admin.enter_email') }}"
-                                       required>
+                                <input type="email" class="form-control @error('email') is-invalid @enderror" id="email" name="email" value="{{ old('email', $user->email) }}" placeholder="{{ __('admin.enter_email') }}">
                                 @error('email')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
@@ -214,12 +202,7 @@
                             <!-- Current Password -->
                             <div class="col-12 mb-3">
                                 <label for="current_password" class="form-label">{{ __('admin.current_password') }} <span class="text-danger">*</span></label>
-                                <input type="password" 
-                                       class="form-control @error('current_password') is-invalid @enderror" 
-                                       id="current_password" 
-                                       name="current_password"
-                                       placeholder="{{ __('admin.enter_current_password') }}"
-                                       required>
+                                <input type="password" class="form-control @error('current_password') is-invalid @enderror" id="current_password" name="current_password" placeholder="{{ __('admin.enter_current_password') }}">
                                 @error('current_password')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
@@ -228,12 +211,7 @@
                             <!-- New Password -->
                             <div class="col-md-6 mb-3">
                                 <label for="new_password" class="form-label">{{ __('admin.new_password') }} <span class="text-danger">*</span></label>
-                                <input type="password" 
-                                       class="form-control @error('new_password') is-invalid @enderror" 
-                                       id="new_password" 
-                                       name="new_password"
-                                       placeholder="{{ __('admin.enter_new_password') }}"
-                                       required>
+                                <input type="password" class="form-control @error('new_password') is-invalid @enderror" id="new_password" name="new_password" placeholder="{{ __('admin.enter_new_password') }}">
                                 @error('new_password')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
@@ -242,12 +220,7 @@
                             <!-- Confirm Password -->
                             <div class="col-md-6 mb-3">
                                 <label for="new_password_confirmation" class="form-label">{{ __('admin.confirm_new_password') }} <span class="text-danger">*</span></label>
-                                <input type="password" 
-                                       class="form-control" 
-                                       id="new_password_confirmation" 
-                                       name="new_password_confirmation"
-                                       placeholder="{{ __('admin.confirm_password') }}"
-                                       required>
+                                <input type="password" class="form-control" id="new_password_confirmation" name="new_password_confirmation" placeholder="{{ __('admin.confirm_password') }}">
                             </div>
                         </div>
 

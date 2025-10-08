@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Admin\UserStoreRequest;
+use App\Http\Requests\Admin\UserUpdateRequest;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -50,16 +52,8 @@ class UserController extends Controller
         return view('admin.users.create');
     }
 
-    public function store(Request $request)
+    public function store(UserStoreRequest $request)
     {
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users',
-            'password' => 'required|string|min:8|confirmed',
-            'role' => 'required|in:admin,moderator',
-            'status' => 'required|in:active,inactive',
-        ]);
-
         User::create([
             'name' => $request->name,
             'email' => $request->email,
@@ -82,16 +76,8 @@ class UserController extends Controller
         return view('admin.users.edit', compact('user'));
     }
 
-    public function update(Request $request, User $user)
+    public function update(UserUpdateRequest $request, User $user)
     {
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => ['required', 'string', 'email', 'max:255', Rule::unique('users')->ignore($user->id)],
-            'password' => 'nullable|string|min:8|confirmed',
-            'role' => 'required|in:admin,moderator',
-            'status' => 'required|in:active,inactive',
-        ]);
-
         $data = $request->only(['name', 'email', 'role', 'status']);
 
         if ($request->filled('password')) {

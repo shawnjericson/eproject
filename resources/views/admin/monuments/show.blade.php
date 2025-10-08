@@ -18,8 +18,63 @@
     </div>
 </div>
 
+<!-- Language Switcher -->
+@if(count($availableLanguages) > 1)
+<div class="d-flex justify-content-end mb-4">
+    <div class="language-switcher bg-white rounded shadow-sm p-2 d-flex gap-2">
+        @foreach($availableLanguages as $lang)
+            <button
+                class="lang-btn {{ $loop->first ? 'active' : '' }}"
+                data-lang="{{ $lang }}"
+                onclick="switchLanguage('{{ $lang }}')">
+                @if($lang === 'vi')
+                    🇻🇳 Tiếng Việt
+                @else
+                    🇬🇧 English
+                @endif
+            </button>
+        @endforeach
+    </div>
+</div>
+@endif
+
 @push('styles')
 <style>
+/* Language Switcher */
+.language-switcher {
+    border: 1px solid #e9ecef;
+}
+
+.lang-btn {
+    padding: 0.5rem 1rem;
+    border: none;
+    border-radius: 6px;
+    background: #f8f9fa;
+    color: #495057;
+    font-weight: 500;
+    font-size: 0.875rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.lang-btn:hover {
+    background: #e9ecef;
+}
+
+.lang-btn.active {
+    background: #007bff;
+    color: white;
+}
+
+/* Content sections with language support */
+.lang-content {
+    display: none;
+}
+
+.lang-content.active {
+    display: block;
+}
+
 .content-section {
     background: white;
     border: 1px solid #e9ecef;
@@ -186,16 +241,35 @@
 </style>
 @endpush
 
-<!-- Monument Header -->
+<!-- Monument Header with Language Support -->
 <div class="card-minimal mb-4">
     <div class="card-body">
         <div class="d-flex justify-content-between align-items-start">
-            <div>
-                <h2 class="mb-2">{{ $monument->title }}</h2>
+            <div class="w-100">
+                <!-- Vietnamese Title (Default) -->
+                <div class="lang-content active" data-lang="vi">
+                    <h2 class="mb-2">{{ $monument->title }}</h2>
+                </div>
+
+                <!-- English Title -->
+                @php
+                    $enTranslation = $monument->translations->where('language', 'en')->first();
+                @endphp
+                @if($enTranslation)
+                <div class="lang-content" data-lang="en">
+                    <h2 class="mb-2">{{ $enTranslation->title }}</h2>
+                </div>
+                @endif
+
                 <div class="d-flex align-items-center gap-3">
                     <span class="badge bg-{{ $monument->status === 'approved' ? 'success' : ($monument->status === 'pending' ? 'warning' : 'secondary') }}">
                         {{ ucfirst($monument->status) }}
                     </span>
+                    @if($monument->is_world_wonder)
+                        <span class="badge bg-warning text-dark">
+                            <i class="bi bi-star-fill"></i> World Wonder
+                        </span>
+                    @endif
                     <span class="text-muted">
                         <i class="bi bi-geo-alt"></i> {{ $monument->zone }}
                     </span>
@@ -222,46 +296,102 @@
         </div>
         @endif
 
-        <!-- Short Description -->
+        <!-- Short Description with Language Support -->
         @if($monument->description)
         <div class="card-minimal mb-4">
             <div class="card-body">
-                <h3 class="mb-3">
-                    <i class="bi bi-info-circle text-primary"></i> Overview
-                </h3>
-                <p class="lead text-muted">{{ $monument->description }}</p>
+                <!-- Vietnamese Description -->
+                <div class="lang-content active" data-lang="vi">
+                    <h3 class="mb-3">
+                        <i class="bi bi-info-circle text-primary"></i> Sơ lược
+                    </h3>
+                    <p class="lead text-muted">{{ $monument->description }}</p>
+                </div>
+
+                <!-- English Description -->
+                @if($enTranslation && $enTranslation->description)
+                <div class="lang-content" data-lang="en">
+                    <h3 class="mb-3">
+                        <i class="bi bi-info-circle text-primary"></i> Overview
+                    </h3>
+                    <p class="lead text-muted">{{ $enTranslation->description }}</p>
+                </div>
+                @endif
             </div>
         </div>
         @endif
 
-        <!-- Main Content -->
+        <!-- Main Content with Language Support -->
         <div class="card-minimal mb-4">
             <div class="card-body">
-                <h3 class="mb-3">
-                    <i class="bi bi-book text-primary"></i> Full Article
-                </h3>
-                <div class="content-display">
-                    {!! $monument->content !!}
+                <!-- Vietnamese Content -->
+                <div class="lang-content active" data-lang="vi">
+                    <h3 class="mb-3">
+                        <i class="bi bi-book text-primary"></i> Nội dung đầy đủ
+                    </h3>
+                    <div class="content-display">
+                        {!! $monument->content !!}
+                    </div>
                 </div>
+
+                <!-- English Content -->
+                @if($enTranslation && $enTranslation->content)
+                <div class="lang-content" data-lang="en">
+                    <h3 class="mb-3">
+                        <i class="bi bi-book text-primary"></i> Full Article
+                    </h3>
+                    <div class="content-display">
+                        {!! $enTranslation->content !!}
+                    </div>
+                </div>
+                @endif
             </div>
         </div>
 
-        <!-- Location & Map -->
+        <!-- Location & Map with Language Support -->
         @if($monument->location || $monument->map_embed)
         <div class="card-minimal mb-4">
             <div class="card-body">
-                <h3 class="mb-3">
+                <!-- Vietnamese Title -->
+                <h3 class="mb-3 lang-content active" data-lang="vi">
+                    <i class="bi bi-geo-alt text-primary"></i> Vị trí & Bản đồ
+                </h3>
+                <!-- English Title -->
+                <h3 class="mb-3 lang-content" data-lang="en">
                     <i class="bi bi-geo-alt text-primary"></i> Location & Map
                 </h3>
 
             @if($monument->location)
             <div class="row mb-4">
                 <div class="col-md-6">
-                    <p class="mb-2"><strong>Address:</strong></p>
-                    <p class="text-muted">{{ $monument->location }}</p>
+                    <!-- Vietnamese -->
+                    <div class="lang-content active" data-lang="vi">
+                        <p class="mb-2"><strong>Địa chỉ:</strong></p>
+                        <p class="text-muted">
+                            @if($enTranslation && $enTranslation->location)
+                                {{ $monument->location }}
+                            @else
+                                {{ $monument->location }}
+                            @endif
+                        </p>
+                    </div>
+                    <!-- English -->
+                    <div class="lang-content" data-lang="en">
+                        <p class="mb-2"><strong>Address:</strong></p>
+                        <p class="text-muted">
+                            @if($enTranslation && $enTranslation->location)
+                                {{ $enTranslation->location }}
+                            @else
+                                {{ $monument->location }}
+                            @endif
+                        </p>
+                    </div>
                 </div>
                 <div class="col-md-6">
-                    <p class="mb-2"><strong>Zone:</strong></p>
+                    <!-- Vietnamese -->
+                    <p class="mb-2 lang-content active" data-lang="vi"><strong>Khu vực:</strong></p>
+                    <!-- English -->
+                    <p class="mb-2 lang-content" data-lang="en"><strong>Zone:</strong></p>
                     <span class="badge bg-primary">{{ $monument->zone }}</span>
                 </div>
             </div>
@@ -276,7 +406,12 @@
                     <div class="mt-2">
                         <small class="text-muted">
                             <i class="bi bi-info-circle"></i>
-                            Interactive Google Maps view of {{ $monument->title }}
+                            <span class="lang-content active" data-lang="vi">
+                                Bản đồ Google Maps tương tác của {{ $monument->title }}
+                            </span>
+                            <span class="lang-content" data-lang="en">
+                                Interactive Google Maps view of {{ $monument->title }}
+                            </span>
                         </small>
                     </div>
                 </div>
@@ -289,24 +424,38 @@
                 <div class="mt-3">
                     <small class="text-muted">
                         <i class="bi bi-info-circle"></i>
-                        Click and drag to explore the area. The map shows the approximate location of {{ $monument->title }}.
+                        <span class="lang-content active" data-lang="vi">
+                            Nhấp và kéo để khám phá khu vực. Bản đồ hiển thị vị trí gần đúng của {{ $monument->title }}.
+                        </span>
+                        <span class="lang-content" data-lang="en">
+                            Click and drag to explore the area. The map shows the approximate location of {{ $monument->title }}.
+                        </span>
                     </small>
                 </div>
             @endif
         </div>
         @endif
 
-        <!-- Gallery Images -->
+        <!-- Gallery Images with Language Support -->
         @if($monument->gallery->count() > 0)
         <div class="content-section">
             <div class="d-flex justify-content-between align-items-center mb-4">
-                <h3 class="mb-0">
+                <!-- Vietnamese Title -->
+                <h3 class="mb-0 lang-content active" data-lang="vi">
+                    <i class="bi bi-images text-primary"></i>
+                    Thư viện ảnh <span class="badge bg-primary ms-2">{{ $monument->gallery->count() }}</span>
+                </h3>
+                <!-- English Title -->
+                <h3 class="mb-0 lang-content" data-lang="en">
                     <i class="bi bi-images text-primary"></i>
                     Gallery <span class="badge bg-primary ms-2">{{ $monument->gallery->count() }}</span>
                 </h3>
+
                 <a href="{{ route('admin.gallery.create') }}?monument_id={{ $monument->id }}"
                    class="elegant-btn elegant-btn-primary">
-                    <i class="bi bi-plus-circle"></i> Add Images
+                    <i class="bi bi-plus-circle"></i>
+                    <span class="lang-content active" data-lang="vi">Thêm ảnh</span>
+                    <span class="lang-content" data-lang="en">Add Images</span>
                 </a>
             </div>
             <div class="row g-3">
@@ -326,13 +475,18 @@
                             <div class="gallery-actions">
                                 <div class="d-flex gap-1">
                                     <a href="{{ route('admin.gallery.edit', $gallery) }}"
-                                       class="gallery-btn flex-fill text-center">Edit</a>
+                                       class="gallery-btn flex-fill text-center">
+                                        <span class="lang-content active" data-lang="vi">Sửa</span>
+                                        <span class="lang-content" data-lang="en">Edit</span>
+                                    </a>
                                     <form action="{{ route('admin.gallery.destroy', $gallery) }}"
-                                          method="POST" class="flex-fill"
-                                          onsubmit="return confirm('Delete this image?')">
+                                          method="POST" class="flex-fill gallery-delete-form">
                                         @csrf
                                         @method('DELETE')
-                                        <button type="submit" class="gallery-btn gallery-btn-danger w-100">Delete</button>
+                                        <button type="submit" class="gallery-btn gallery-btn-danger w-100">
+                                            <span class="lang-content active" data-lang="vi">Xóa</span>
+                                            <span class="lang-content" data-lang="en">Delete</span>
+                                        </button>
                                     </form>
                                 </div>
                             </div>
@@ -344,21 +498,34 @@
         @else
         <div class="content-section text-center py-5">
             <i class="bi bi-images display-1 text-muted"></i>
-            <h5 class="mt-3">No gallery images</h5>
-            <p class="text-muted mb-4">Add some images to showcase this monument.</p>
+            <!-- Vietnamese -->
+            <h5 class="mt-3 lang-content active" data-lang="vi">Chưa có hình ảnh</h5>
+            <p class="text-muted mb-4 lang-content active" data-lang="vi">Thêm một số hình ảnh để giới thiệu di tích này.</p>
+            <!-- English -->
+            <h5 class="mt-3 lang-content" data-lang="en">No gallery images</h5>
+            <p class="text-muted mb-4 lang-content" data-lang="en">Add some images to showcase this monument.</p>
+
             <a href="{{ route('admin.gallery.create') }}?monument_id={{ $monument->id }}"
                class="elegant-btn elegant-btn-primary">
-                <i class="bi bi-plus"></i> Add Images
+                <i class="bi bi-plus"></i>
+                <span class="lang-content active" data-lang="vi">Thêm ảnh</span>
+                <span class="lang-content" data-lang="en">Add Images</span>
             </a>
         </div>
         @endif
 
-        <!-- Feedbacks -->
+        <!-- Feedbacks with Language Support -->
         @if($monument->feedbacks->count() > 0)
             <div class="content-section">
-                <h3 class="mb-3">
+                <!-- Vietnamese Title -->
+                <h3 class="mb-3 lang-content active" data-lang="vi">
+                    <i class="bi bi-chat-dots text-primary"></i> Phản hồi gần đây ({{ $monument->feedbacks->count() }})
+                </h3>
+                <!-- English Title -->
+                <h3 class="mb-3 lang-content" data-lang="en">
                     <i class="bi bi-chat-dots text-primary"></i> Recent Feedbacks ({{ $monument->feedbacks->count() }})
                 </h3>
+
                 @foreach($monument->feedbacks->take(5) as $feedback)
                     <div class="border-bottom pb-3 mb-3">
                         <div class="d-flex justify-content-between align-items-start">
@@ -376,7 +543,8 @@
                     <div class="text-center">
                         <a href="{{ route('admin.feedbacks.index') }}?monument_id={{ $monument->id }}"
                            class="elegant-btn">
-                            View All Feedbacks
+                            <span class="lang-content active" data-lang="vi">Xem tất cả phản hồi</span>
+                            <span class="lang-content" data-lang="en">View All Feedbacks</span>
                         </a>
                     </div>
                 @endif
@@ -389,42 +557,83 @@
     <div class="col-lg-4">
         <!-- Monument Information -->
         <div class="sidebar-card">
-            <div class="sidebar-card-header">
+            <!-- Vietnamese Header -->
+            <div class="sidebar-card-header lang-content active" data-lang="vi">
+                Thông tin Di tích
+            </div>
+            <!-- English Header -->
+            <div class="sidebar-card-header lang-content" data-lang="en">
                 Monument Information
             </div>
+
             <div class="sidebar-card-body">
+                <!-- Zone -->
                 <div class="info-item">
-                    <span class="info-label">Zone:</span>
+                    <span class="info-label lang-content active" data-lang="vi">Khu vực:</span>
+                    <span class="info-label lang-content" data-lang="en">Zone:</span>
                     <span class="status-badge bg-light text-dark">{{ $monument->zone }}</span>
                 </div>
+
+                <!-- Status -->
                 <div class="info-item">
-                    <span class="info-label">Trạng thái:</span>
-                    @if($monument->status == 'approved')
-                        <span class="status-badge bg-success text-white">Đã duyệt</span>
-                    @elseif($monument->status == 'pending')
-                        <span class="status-badge bg-warning text-dark">Đang chờ</span>
-                    @else
-                        <span class="status-badge bg-secondary text-white">Bản nháp</span>
-                    @endif
+                    <span class="info-label lang-content active" data-lang="vi">Trạng thái:</span>
+                    <span class="info-label lang-content" data-lang="en">Status:</span>
+
+                    <!-- Vietnamese Status -->
+                    <span class="lang-content active" data-lang="vi">
+                        @if($monument->status == 'approved')
+                            <span class="status-badge bg-success text-white">Đã duyệt</span>
+                        @elseif($monument->status == 'pending')
+                            <span class="status-badge bg-warning text-dark">Đang chờ</span>
+                        @else
+                            <span class="status-badge bg-secondary text-white">Bản nháp</span>
+                        @endif
+                    </span>
+
+                    <!-- English Status -->
+                    <span class="lang-content" data-lang="en">
+                        @if($monument->status == 'approved')
+                            <span class="status-badge bg-success text-white">Approved</span>
+                        @elseif($monument->status == 'pending')
+                            <span class="status-badge bg-warning text-dark">Pending</span>
+                        @else
+                            <span class="status-badge bg-secondary text-white">Draft</span>
+                        @endif
+                    </span>
                 </div>
+
+                <!-- Creator -->
                 <div class="info-item">
-                    <span class="info-label">Người tạo:</span>
+                    <span class="info-label lang-content active" data-lang="vi">Người tạo:</span>
+                    <span class="info-label lang-content" data-lang="en">Created by:</span>
                     <span class="info-value">{{ $monument->creator->name }}</span>
                 </div>
+
+                <!-- Created At -->
                 <div class="info-item">
-                    <span class="info-label">Ngày tạo at:</span>
+                    <span class="info-label lang-content active" data-lang="vi">Ngày tạo:</span>
+                    <span class="info-label lang-content" data-lang="en">Created at:</span>
                     <span class="info-value">{{ $monument->created_at->format('M d, Y H:i') }}</span>
                 </div>
+
+                <!-- Updated At -->
                 <div class="info-item">
-                    <span class="info-label">Updated at:</span>
+                    <span class="info-label lang-content active" data-lang="vi">Cập nhật:</span>
+                    <span class="info-label lang-content" data-lang="en">Updated at:</span>
                     <span class="info-value">{{ $monument->updated_at->format('M d, Y H:i') }}</span>
                 </div>
+
+                <!-- Gallery Images -->
                 <div class="info-item">
-                    <span class="info-label">Gallery Hình ảnh:</span>
+                    <span class="info-label lang-content active" data-lang="vi">Hình ảnh:</span>
+                    <span class="info-label lang-content" data-lang="en">Gallery Images:</span>
                     <span class="info-value">{{ $monument->gallery->count() }}</span>
                 </div>
+
+                <!-- Feedbacks -->
                 <div class="info-item">
-                    <span class="info-label">Feedbacks:</span>
+                    <span class="info-label lang-content active" data-lang="vi">Phản hồi:</span>
+                    <span class="info-label lang-content" data-lang="en">Feedbacks:</span>
                     <span class="info-value">{{ $monument->feedbacks->count() }}</span>
                 </div>
             </div>
@@ -432,39 +641,57 @@
 
         <!-- Quick Actions -->
         <div class="sidebar-card">
-            <div class="sidebar-card-header">
-                Quick Thao tác
+            <!-- Vietnamese Header -->
+            <div class="sidebar-card-header lang-content active" data-lang="vi">
+                Thao tác nhanh
             </div>
+            <!-- English Header -->
+            <div class="sidebar-card-header lang-content" data-lang="en">
+                Quick Actions
+            </div>
+
             <div class="sidebar-card-body">
                 <div class="d-grid gap-2">
+                    <!-- Edit Button -->
                     <a href="{{ route('admin.monuments.edit', $monument) }}" class="elegant-btn elegant-btn-primary">
-                        <i class="bi bi-pencil"></i> Sửa Monument
+                        <i class="bi bi-pencil"></i>
+                        <span class="lang-content active" data-lang="vi">Sửa Di tích</span>
+                        <span class="lang-content" data-lang="en">Edit Monument</span>
                     </a>
 
+                    <!-- Approve Button -->
                     @if($monument->status !== 'approved' && auth()->user()->isAdmin())
                         <form action="{{ route('admin.monuments.approve', $monument) }}" method="POST">
                             @csrf
                             <button type="submit" class="elegant-btn elegant-btn-success w-100">
-                                <i class="bi bi-check"></i> Approve Monument
+                                <i class="bi bi-check"></i>
+                                <span class="lang-content active" data-lang="vi">Duyệt Di tích</span>
+                                <span class="lang-content" data-lang="en">Approve Monument</span>
                             </button>
                         </form>
                     @endif
 
+                    <!-- Add Gallery Button -->
                     <a href="{{ route('admin.gallery.create') }}?monument_id={{ $monument->id }}"
                        class="elegant-btn">
-                        <i class="bi bi-images"></i> Add Gallery Hình ảnh
+                        <i class="bi bi-images"></i>
+                        <span class="lang-content active" data-lang="vi">Thêm Hình ảnh</span>
+                        <span class="lang-content" data-lang="en">Add Gallery Images</span>
                     </a>
 
                     <hr class="my-3">
 
+                    <!-- Delete Button -->
                     @if(auth()->user()->isAdmin() || ($monument->status !== 'approved' && auth()->user()->isModerator()))
                         <form action="{{ route('admin.monuments.destroy', $monument) }}"
                               method="POST"
-                              onsubmit="return confirm('Are you sure you want to delete this monument? This action cannot be undone.')">
+                              class="delete-form">
                             @csrf
                             @method('DELETE')
                             <button type="submit" class="elegant-btn elegant-btn-danger w-100">
-                                <i class="bi bi-trash"></i> Xóa Monument
+                                <i class="bi bi-trash"></i>
+                                <span class="lang-content active" data-lang="vi">Xóa Di tích</span>
+                                <span class="lang-content" data-lang="en">Delete Monument</span>
                             </button>
                         </form>
                     @endif
@@ -564,5 +791,75 @@ document.addEventListener('DOMContentLoaded', function() {
 </script>
 @endpush
 @endif
+
+@push('scripts')
+<script>
+// Language Switcher Function
+let currentLanguage = 'vi'; // Default language
+
+// Confirmation messages in different languages
+const confirmMessages = {
+    vi: {
+        deleteMonument: 'Bạn có chắc chắn muốn xóa di tích này? Hành động này không thể hoàn tác.',
+        deleteImage: 'Xóa hình ảnh này?'
+    },
+    en: {
+        deleteMonument: 'Are you sure you want to delete this monument? This action cannot be undone.',
+        deleteImage: 'Delete this image?'
+    }
+};
+
+function switchLanguage(lang) {
+    currentLanguage = lang;
+
+    // Update button states
+    document.querySelectorAll('.lang-btn').forEach(btn => {
+        if (btn.dataset.lang === lang) {
+            btn.classList.add('active');
+        } else {
+            btn.classList.remove('active');
+        }
+    });
+
+    // Update content visibility
+    document.querySelectorAll('.lang-content').forEach(content => {
+        if (content.dataset.lang === lang) {
+            content.classList.add('active');
+        } else {
+            content.classList.remove('active');
+        }
+    });
+
+    console.log('Switched to language:', lang);
+}
+
+// Initialize on page load
+document.addEventListener('DOMContentLoaded', function() {
+    // Set default language
+    switchLanguage('vi');
+
+    // Handle delete monument confirmation
+    const deleteForm = document.querySelector('.delete-form');
+    if (deleteForm) {
+        deleteForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            if (confirm(confirmMessages[currentLanguage].deleteMonument)) {
+                this.submit();
+            }
+        });
+    }
+
+    // Handle delete gallery image confirmations
+    document.querySelectorAll('.gallery-delete-form').forEach(form => {
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            if (confirm(confirmMessages[currentLanguage].deleteImage)) {
+                this.submit();
+            }
+        });
+    });
+});
+</script>
+@endpush
 
 @endsection

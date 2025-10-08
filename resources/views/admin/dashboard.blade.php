@@ -20,73 +20,83 @@
 
 <!-- Modern Stats Cards -->
 <div class="row mb-5">
-    <div class="col-xl-3 col-md-6 mb-4">
-        <div class="stat-card primary">
-            <div class="stat-icon">
-                <i class="bi bi-file-text"></i>
-            </div>
-            <div class="d-flex justify-content-between align-items-end">
-                <div>
-                    <h3 class="mb-0 fw-bold">{{ $stats['total_posts'] }}</h3>
-                    <p class="text-muted mb-0 small">{{ __('admin.total_posts') }}</p>
+    <div class="{{ $isAdmin ? 'col-xl-3' : 'col-xl-4' }} col-md-6 mb-4">
+        <a href="{{ route('admin.posts.index') }}" class="text-decoration-none">
+            <div class="stat-card primary clickable-card">
+                <div class="stat-icon">
+                    <i class="bi bi-file-text"></i>
                 </div>
-                <div class="text-success small">
-                    <i class="bi bi-arrow-up"></i> +12%
+                <div class="d-flex justify-content-between align-items-end">
+                    <div>
+                        <h3 class="mb-0 fw-bold">{{ $stats['total_posts'] }}</h3>
+                        <p class="text-muted mb-0 small">{{ __('admin.total_posts') }}</p>
+                    </div>
+                    <div class="text-success small">
+                        <i class="bi bi-arrow-up"></i> +12%
+                    </div>
                 </div>
             </div>
-        </div>
+        </a>
     </div>
 
-    <div class="col-xl-3 col-md-6 mb-4">
-        <div class="stat-card warning">
-            <div class="stat-icon">
-                <i class="bi bi-clock"></i>
-            </div>
-            <div class="d-flex justify-content-between align-items-end">
-                <div>
-                    <h3 class="mb-0 fw-bold">{{ $stats['pending_posts'] }}</h3>
-                    <p class="text-muted mb-0 small">Pending Posts</p>
+    <div class="{{ $isAdmin ? 'col-xl-3' : 'col-xl-4' }} col-md-6 mb-4">
+        <a href="{{ route('admin.posts.index', ['status' => 'pending']) }}" class="text-decoration-none">
+            <div class="stat-card warning clickable-card">
+                <div class="stat-icon">
+                    <i class="bi bi-clock"></i>
                 </div>
-                <div class="text-warning small">
-                    <i class="bi bi-dash"></i> 0%
+                <div class="d-flex justify-content-between align-items-end">
+                    <div>
+                        <h3 class="mb-0 fw-bold">{{ $stats['pending_posts'] }}</h3>
+                        <p class="text-muted mb-0 small">Pending Posts</p>
+                    </div>
+                    <div class="text-warning small">
+                        <i class="bi bi-dash"></i> 0%
+                    </div>
                 </div>
             </div>
-        </div>
+        </a>
     </div>
 
-    <div class="col-xl-3 col-md-6 mb-4">
-        <div class="stat-card success">
-            <div class="stat-icon">
-                <i class="bi bi-building"></i>
-            </div>
-            <div class="d-flex justify-content-between align-items-end">
-                <div>
-                    <h3 class="mb-0 fw-bold">{{ $stats['total_monuments'] }}</h3>
-                    <p class="text-muted mb-0 small">{{ __('admin.total_monuments') }}</p>
+    <div class="{{ $isAdmin ? 'col-xl-3' : 'col-xl-4' }} col-md-6 mb-4">
+        <a href="{{ route('admin.monuments.index') }}" class="text-decoration-none">
+            <div class="stat-card success clickable-card">
+                <div class="stat-icon">
+                    <i class="bi bi-building"></i>
                 </div>
-                <div class="text-success small">
-                    <i class="bi bi-arrow-up"></i> +8%
+                <div class="d-flex justify-content-between align-items-end">
+                    <div>
+                        <h3 class="mb-0 fw-bold">{{ $stats['total_monuments'] }}</h3>
+                        <p class="text-muted mb-0 small">{{ __('admin.total_monuments') }}</p>
+                    </div>
+                    <div class="text-success small">
+                        <i class="bi bi-arrow-up"></i> +8%
+                    </div>
                 </div>
             </div>
-        </div>
+        </a>
     </div>
 
+    @if($isAdmin)
     <div class="col-xl-3 col-md-6 mb-4">
-        <div class="stat-card danger">
-            <div class="stat-icon">
-                <i class="bi bi-people"></i>
-            </div>
-            <div class="d-flex justify-content-between align-items-end">
-                <div>
-                    <h3 class="mb-0 fw-bold">{{ $stats['total_users'] }}</h3>
-                    <p class="text-muted mb-0 small">{{ __('admin.total_users') }}</p>
+        <a href="{{ route('admin.users.index') }}" class="text-decoration-none">
+            <div class="stat-card danger clickable-card">
+                <div class="stat-icon">
+                    <i class="bi bi-people"></i>
                 </div>
-                <div class="text-success small">
-                    <i class="bi bi-arrow-up"></i> +5%
+                <div class="d-flex justify-content-between align-items-end">
+                    <div>
+                        <h3 class="mb-0 fw-bold">{{ $stats['total_users'] }}</h3>
+                        <p class="text-muted mb-0 small">{{ __('admin.total_users') }}</p>
+                    </div>
+                    <div class="text-success small">
+                        <i class="bi bi-arrow-up"></i> +5%
+                    </div>
                 </div>
             </div>
-        </div>
+        </a>
     </div>
+    @endif
 </div>
 
 <!-- Quick Actions -->
@@ -116,12 +126,14 @@
                             <small>Manage Gallery</small>
                         </a>
                     </div>
+                    @if($isAdmin)
                     <div class="col-md-3 mb-3">
                         <a href="{{ route('admin.users.index') }}" class="btn btn-modern-secondary w-100 py-3">
                             <i class="bi bi-people fs-4 d-block mb-2"></i>
                             <small>Manage Users</small>
                         </a>
                     </div>
+                    @endif
                 </div>
             </div>
         </div>
@@ -129,7 +141,7 @@
 </div>
 
 <!-- Recent Activity -->
-<div class="row">
+<!-- <div class="row">
     <div class="col-lg-8 mb-4">
         <div class="modern-card">
             <div class="card-header">
@@ -213,7 +225,7 @@
             </div>
         </div>
     </div>
-</div>
+</div> -->
 @endsection
 
 @push('scripts')

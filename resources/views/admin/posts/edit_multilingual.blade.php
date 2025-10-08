@@ -3,21 +3,24 @@
 @section('title', 'Edit Post')
 
 @section('content')
-<div class="container-fluid">
-    <div class="row">
-        <div class="col-12">
-            <div class="page-title-box d-sm-flex align-items-center justify-content-between">
-                <h4 class="mb-sm-0">Edit Post: {{ $post->title }}</h4>
-                <div class="page-title-right">
-                    <ol class="breadcrumb m-0">
-                        <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}">Dashboard</a></li>
-                        <li class="breadcrumb-item"><a href="{{ route('admin.posts.index') }}">Posts</a></li>
-                        <li class="breadcrumb-item active">Edit</li>
-                    </ol>
-                </div>
-            </div>
+<div class="page-header">
+    <div class="d-flex justify-content-between align-items-center">
+        <div>
+            <h1 class="mb-2">
+                <i class="bi bi-file-text text-primary me-2"></i>Edit Post: {{ Str::limit($post->title, 50) }}
+            </h1>
+            <p class="text-muted mb-0">Update post content and translations</p>
+        </div>
+        <div class="d-flex gap-2">
+            <a href="{{ route('admin.posts.show', $post) }}" class="btn btn-modern-secondary">
+                <i class="bi bi-eye me-2"></i>View
+            </a>
+            <a href="{{ route('admin.posts.index') }}" class="btn btn-modern-secondary">
+                <i class="bi bi-arrow-left me-2"></i>Back to Posts
+            </a>
         </div>
     </div>
+</div>
 
     <form action="{{ route('admin.posts.update', $post) }}" method="POST" enctype="multipart/form-data" id="postForm">
         @csrf
@@ -25,10 +28,10 @@
         <div class="row">
             <div class="col-lg-8">
                 <!-- Language Tabs -->
-                <div class="card">
+                <div class="modern-card mb-4">
                     <div class="card-header">
-                        <h5 class="card-title mb-0">
-                            <i class="bi bi-translate text-primary"></i> {{ __('admin.multilingual_content') }}
+                        <h5 class="mb-0">
+                            <i class="bi bi-translate text-primary me-2"></i>{{ __('admin.multilingual_content') }}
                         </h5>
                     </div>
                     <div class="card-body">
@@ -130,10 +133,10 @@
                 </div>
 
                 <!-- Featured Image -->
-                <div class="card">
+                <div class="modern-card mb-4">
                     <div class="card-header">
-                        <h5 class="card-title mb-0">
-                            <i class="bi bi-image text-primary"></i> Featured Image
+                        <h5 class="mb-0">
+                            <i class="bi bi-image text-primary me-2"></i>Featured Image
                         </h5>
                     </div>
                     <div class="card-body">
@@ -166,16 +169,16 @@
 
             <div class="col-lg-4">
                 <!-- Publishing Options -->
-                <div class="card">
+                <div class="modern-card mb-4">
                     <div class="card-header">
-                        <h5 class="card-title mb-0">
-                            <i class="bi bi-gear text-primary"></i> Publishing Options
+                        <h5 class="mb-0">
+                            <i class="bi bi-gear text-primary me-2"></i>Publishing Options
                         </h5>
                     </div>
                     <div class="card-body">
                         <div class="mb-3">
                             <label for="status" class="form-label">Status <span class="text-danger">*</span></label>
-                            <select class="form-select" id="status" name="status" required>
+                            <select class="form-select" id="status" name="status">
                                 <option value="">Select Status</option>
                                 <option value="draft" {{ old('status', $post->status) == 'draft' ? 'selected' : '' }}>Draft</option>
                                 <option value="pending" {{ old('status', $post->status) == 'pending' ? 'selected' : '' }}>Pending Review</option>
@@ -193,24 +196,24 @@
                         @endif
 
                         <div class="d-grid gap-2">
-                            <button type="submit" class="btn btn-primary">
-                                <i class="bi bi-check-circle"></i> Update Post
+                            <button type="submit" class="btn btn-modern-primary">
+                                <i class="bi bi-check-circle me-2"></i>Update Post
                             </button>
-                            <a href="{{ route('admin.posts.show', $post) }}" class="btn btn-info">
-                                <i class="bi bi-eye"></i> View Post
+                            <a href="{{ route('admin.posts.show', $post) }}" class="btn btn-modern-secondary">
+                                <i class="bi bi-eye me-2"></i>View Post
                             </a>
-                            <a href="{{ route('admin.posts.index') }}" class="btn btn-secondary">
-                                <i class="bi bi-arrow-left"></i> Back to Posts
+                            <a href="{{ route('admin.posts.index') }}" class="btn btn-modern-secondary">
+                                <i class="bi bi-arrow-left me-2"></i>Back to Posts
                             </a>
                         </div>
                     </div>
                 </div>
 
                 <!-- Post Information -->
-                <div class="card">
+                <div class="modern-card mb-4">
                     <div class="card-header">
-                        <h5 class="card-title mb-0">
-                            <i class="bi bi-info-circle text-info"></i> Post Information
+                        <h5 class="mb-0">
+                            <i class="bi bi-info-circle text-info me-2"></i>Post Information
                         </h5>
                     </div>
                     <div class="card-body">
@@ -236,10 +239,10 @@
                 </div>
 
                 <!-- Translation Status -->
-                <div class="card">
+                <div class="modern-card mb-4">
                     <div class="card-header">
-                        <h5 class="card-title mb-0">
-                            <i class="bi bi-translate text-success"></i> Translation Status
+                        <h5 class="mb-0">
+                            <i class="bi bi-translate text-success me-2"></i>Translation Status
                         </h5>
                     </div>
                     <div class="card-body">

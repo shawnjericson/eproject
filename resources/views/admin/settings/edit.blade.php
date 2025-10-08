@@ -3,91 +3,156 @@
 @section('title', 'Edit Setting')
 
 @section('content')
-<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-    <h1 class="h2">{{ __('admin.edit') }} Setting: {{ $setting->key }}</h1>
-    <div class="btn-toolbar mb-2 mb-md-0">
-        <a href="{{ route('admin.settings.index') }}" class="btn btn-secondary">
-            <i class="bi bi-arrow-left"></i> {{ __('admin.back') }} to Settings
-        </a>
+<div class="page-header">
+    <div class="d-flex justify-content-between align-items-center">
+        <div>
+            <h1 class="mb-2">
+                <i class="bi bi-pencil text-primary me-2"></i>Edit Setting: {{ ucwords(str_replace('_', ' ', $setting->key)) }}
+            </h1>
+            <p class="text-muted mb-0">{{ $setting->description ?? 'Configure this setting' }}</p>
+        </div>
+        <div class="d-flex gap-2">
+            <a href="{{ route('admin.settings.index') }}" class="btn btn-modern-secondary">
+                <i class="bi bi-arrow-left me-2"></i>Back to Settings
+            </a>
+        </div>
     </div>
 </div>
 
 <div class="row">
-    <div class="col-md-8">
-        <div class="card">
+    <div class="col-lg-8">
+        <div class="modern-card">
+            <div class="card-header">
+                <h5 class="mb-0">Setting Configuration</h5>
+            </div>
             <div class="card-body">
                 <form action="{{ route('admin.settings.update', $setting) }}" method="POST">
                     @csrf
                     @method('PUT')
 
-                    <div class="mb-3">
+                    <div class="mb-4">
                         <label for="key" class="form-label">Setting Key <span class="text-danger">*</span></label>
                         <input type="text" class="form-control @error('key') is-invalid @enderror" 
-                               id="key" name="key" value="{{ old('key', $setting->key) }}" required>
+                               id="key" name="key" value="{{ old('key', $setting->key) }}" readonly>
                         @error('key')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
-                        <div class="form-text">Use lowercase letters, numbers, and underscores only</div>
+                        <div class="form-text">Setting key cannot be changed after creation</div>
                     </div>
 
-                    <div class="mb-3">
+                    <div class="mb-4">
+                        <label for="description" class="form-label">Description</label>
+                        <textarea class="form-control @error('description') is-invalid @enderror" 
+                                  id="description" name="description" rows="2">{{ old('description', $setting->description) }}</textarea>
+                        @error('description')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
+
+                    <div class="mb-4">
                         <label for="value" class="form-label">Setting Value <span class="text-danger">*</span></label>
-                        <textarea class="form-control @error('value') is-invalid @enderror" 
-                                  id="value" name="value" rows="8" required>{{ old('value', $setting->value) }}</textarea>
+                        
+                        @if($setting->type == 'boolean')
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" id="value" name="value" 
+                                       value="true" {{ old('value', $setting->value) == 'true' ? 'checked' : '' }}>
+                                <label class="form-check-label" for="value">
+                                    {{ old('value', $setting->value) == 'true' ? 'Enabled' : 'Disabled' }}
+                                </label>
+                            </div>
+                        @elseif($setting->type == 'number')
+                            <input type="number" class="form-control @error('value') is-invalid @enderror" 
+                                   id="value" name="value" value="{{ old('value', $setting->value) }}"
+                                   @if($setting->min) min="{{ $setting->min }}" @endif
+                                   @if($setting->max) max="{{ $setting->max }}" @endif>
+                        @elseif($setting->type == 'email')
+                            <input type="email" class="form-control @error('value') is-invalid @enderror" 
+                                   id="value" name="value" value="{{ old('value', $setting->value) }}">
+                        @elseif($setting->type == 'textarea')
+                            <textarea class="form-control @error('value') is-invalid @enderror" 
+                                      id="value" name="value" rows="4">{{ old('value', $setting->value) }}</textarea>
+                        @else
+                            <input type="text" class="form-control @error('value') is-invalid @enderror" 
+                                   id="value" name="value" value="{{ old('value', $setting->value) }}">
+                        @endif
+                        
                         @error('value')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
-                        <div class="form-text">Enter the value for this setting. For JSON data, ensure proper formatting.</div>
+                        
+                        @if($setting->min || $setting->max)
+                            <div class="form-text">
+                                @if($setting->min && $setting->max)
+                                    Range: {{ $setting->min }} - {{ $setting->max }}
+                                @elseif($setting->min)
+                                    Minimum: {{ $setting->min }}
+                                @elseif($setting->max)
+                                    Maximum: {{ $setting->max }}
+                                @endif
+                            </div>
+                        @endif
                     </div>
 
                     <div class="d-flex justify-content-between">
-                        <button type="submit" class="btn btn-primary">Update Setting</button>
-                        <a href="{{ route('admin.settings.index') }}" class="btn btn-secondary">{{ __('admin.cancel') }}</a>
+                        <button type="submit" class="btn btn-modern-primary">
+                            <i class="bi bi-check-circle me-2"></i>Update Setting
+                        </button>
+                        <a href="{{ route('admin.settings.index') }}" class="btn btn-modern-secondary">Cancel</a>
                     </div>
                 </form>
             </div>
         </div>
     </div>
 
-    <div class="col-md-4">
-        <div class="card">
+    <div class="col-lg-4">
+        <div class="modern-card">
             <div class="card-header">
-                <h5>Setting Information</h5>
+                <h5 class="mb-0">Setting Information</h5>
             </div>
             <div class="card-body">
                 <ul class="list-unstyled">
-                    <li><strong>Key:</strong> <code>{{ $setting->key }}</code></li>
-                    <li><strong>{{ __('admin.created_at') }}:</strong> {{ $setting->created_at->format('M d, Y H:i') }}</li>
-                    <li><strong>Updated:</strong> {{ $setting->updated_at->format('M d, Y H:i') }}</li>
-                    <li><strong>Last modified:</strong> {{ $setting->updated_at->diffForHumans() }}</li>
+                    <li class="mb-2">
+                        <strong>Category:</strong> 
+                        <span class="badge bg-light text-dark">{{ ucfirst($setting->category ?? 'general') }}</span>
+                    </li>
+                    <li class="mb-2">
+                        <strong>Type:</strong> 
+                        <span class="badge bg-info">{{ ucfirst($setting->type ?? 'text') }}</span>
+                    </li>
+                    <li class="mb-2">
+                        <strong>Created:</strong> {{ $setting->created_at->format('M d, Y H:i') }}
+                    </li>
+                    <li class="mb-2">
+                        <strong>Updated:</strong> {{ $setting->updated_at->format('M d, Y H:i') }}
+                    </li>
+                    <li class="mb-2">
+                        <strong>Last modified:</strong> {{ $setting->updated_at->diffForHumans() }}
+                    </li>
                 </ul>
             </div>
         </div>
 
-        <div class="card mt-3">
+        <div class="modern-card mt-3">
             <div class="card-header">
-                <h5>Quick {{ __('admin.actions') }}</h5>
+                <h5 class="mb-0">Quick Actions</h5>
             </div>
             <div class="card-body">
                 <div class="d-grid gap-2">
                     @if($setting->key === 'maintenance_mode')
                         @if($setting->value === 'true')
-                            <button type="button" class="btn btn-success" onclick="toggleMaintenance('false')">
-                                <i class="bi bi-play"></i> Disable Maintenance
+                            <button type="button" class="btn btn-modern-success" onclick="toggleMaintenance('false')">
+                                <i class="bi bi-play me-2"></i>Disable Maintenance
                             </button>
                         @else
-                            <button type="button" class="btn btn-warning" onclick="toggleMaintenance('true')">
-                                <i class="bi bi-pause"></i> Enable Maintenance
+                            <button type="button" class="btn btn-modern-warning" onclick="toggleMaintenance('true')">
+                                <i class="bi bi-pause me-2"></i>Enable Maintenance
                             </button>
                         @endif
                     @endif
                     
-                    @if(str_contains($setting->value, '{') && str_contains($setting->value, '}'))
-                        <button type="button" class="btn btn-outline-info" onclick="formatJSON()">
-                            <i class="bi bi-code"></i> Format JSON
-                        </button>
-                        <button type="button" class="btn btn-outline-secondary" onclick="validateJSON()">
-                            <i class="bi bi-check-circle"></i> Validate JSON
+                    @if($setting->type == 'boolean')
+                        <button type="button" class="btn btn-modern-secondary" onclick="toggleBoolean()">
+                            <i class="bi bi-toggle-on me-2"></i>Toggle Value
                         </button>
                     @endif
                     
@@ -98,100 +163,75 @@
                           onsubmit="return confirm('Are you sure you want to delete this setting?')">
                         @csrf
                         @method('DELETE')
-                        <button type="submit" class="btn btn-danger w-100">
-                            <i class="bi bi-trash"></i> {{ __('admin.delete') }} Setting
+                        <button type="submit" class="btn btn-modern-danger w-100">
+                            <i class="bi bi-trash me-2"></i>Delete Setting
                         </button>
                     </form>
                 </div>
             </div>
         </div>
 
-        @if(str_contains($setting->value, '{') && str_contains($setting->value, '}'))
-            <div class="card mt-3">
-                <div class="card-header">
-                    <h5>JSON Preview</h5>
-                </div>
-                <div class="card-body">
-                    <pre id="jsonPreview" class="small bg-light p-2 rounded" style="max-height: 200px; overflow-y: auto;"></pre>
-                </div>
-            </div>
-        @endif
-
-        <div class="card mt-3">
+        <div class="modern-card mt-3">
             <div class="card-header">
-                <h5>Usage Tips</h5>
+                <h5 class="mb-0">Usage Tips</h5>
             </div>
             <div class="card-body">
                 <ul class="list-unstyled small">
-                    <li><i class="bi bi-lightbulb text-warning"></i> Test changes on staging first</li>
-                    <li><i class="bi bi-lightbulb text-warning"></i> {{ __('admin.back') }}up before major changes</li>
-                    <li><i class="bi bi-lightbulb text-warning"></i> Use proper JSON formatting</li>
-                    <li><i class="bi bi-lightbulb text-warning"></i> Document custom settings</li>
+                    <li class="mb-2">
+                        <i class="bi bi-lightbulb text-warning me-2"></i>
+                        Test changes on staging first
+                    </li>
+                    <li class="mb-2">
+                        <i class="bi bi-lightbulb text-warning me-2"></i>
+                        Backup before major changes
+                    </li>
+                    <li class="mb-2">
+                        <i class="bi bi-lightbulb text-warning me-2"></i>
+                        Use proper formatting for each type
+                    </li>
+                    <li class="mb-2">
+                        <i class="bi bi-lightbulb text-warning me-2"></i>
+                        Document custom settings
+                    </li>
                 </ul>
             </div>
         </div>
     </div>
 </div>
+@endsection
 
 @push('scripts')
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    const keyInput = document.getElementById('key');
     const valueInput = document.getElementById('value');
-    const jsonPreview = document.getElementById('jsonPreview');
     
-    // Auto-format key input
-    keyInput.addEventListener('input', function() {
-        this.value = this.value.toLowerCase().replace(/[^a-z0-9_]/g, '');
-    });
-    
-    // Update JSON preview
-    function updateJSONPreview() {
-        if (jsonPreview) {
-            try {
-                const parsed = JSON.parse(valueInput.value);
-                jsonPreview.textContent = JSON.stringify(parsed, null, 2);
-                valueInput.classList.remove('is-invalid');
-            } catch (e) {
-                jsonPreview.textContent = 'Invalid JSON: ' + e.message;
-                valueInput.classList.add('is-invalid');
-            }
-        }
-    }
-    
-    // Initial preview update
-    if (jsonPreview) {
-        updateJSONPreview();
-        valueInput.addEventListener('input', updateJSONPreview);
+    // Handle boolean toggle
+    if (valueInput && valueInput.type === 'checkbox') {
+        valueInput.addEventListener('change', function() {
+            const label = document.querySelector('label[for="value"]');
+            label.textContent = this.checked ? 'Enabled' : 'Disabled';
+        });
     }
     
     // Global functions for buttons
-    window.formatJSON = function() {
-        try {
-            const parsed = JSON.parse(valueInput.value);
-            valueInput.value = JSON.stringify(parsed, null, 2);
-            updateJSONPreview();
-        } catch (e) {
-            alert('Invalid JSON format: ' + e.message);
-        }
-    };
-    
-    window.validateJSON = function() {
-        try {
-            JSON.parse(valueInput.value);
-            alert('JSON is valid!');
-        } catch (e) {
-            alert('Invalid JSON: ' + e.message);
-        }
-    };
-    
     window.toggleMaintenance = function(value) {
         if (confirm('Are you sure you want to ' + (value === 'true' ? 'enable' : 'disable') + ' maintenance mode?')) {
-            valueInput.value = value;
+            if (valueInput.type === 'checkbox') {
+                valueInput.checked = value === 'true';
+                valueInput.dispatchEvent(new Event('change'));
+            } else {
+                valueInput.value = value;
+            }
             document.querySelector('form').submit();
+        }
+    };
+    
+    window.toggleBoolean = function() {
+        if (valueInput && valueInput.type === 'checkbox') {
+            valueInput.checked = !valueInput.checked;
+            valueInput.dispatchEvent(new Event('change'));
         }
     };
 });
 </script>
 @endpush
-@endsection

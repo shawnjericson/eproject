@@ -3,64 +3,75 @@
 @section('title', 'Create Monument')
 
 @section('content')
-<div class="container-fluid">
-    <div class="d-sm-flex align-items-center justify-content-between mb-4">
-        <h1 class="h3 mb-0 text-gray-800">
-            <i class="bi bi-building text-primary"></i> Create New Monument
-        </h1>
-        <a href="{{ route('admin.monuments.index') }}" class="btn btn-secondary">
-            <i class="bi bi-arrow-left"></i> Back to Monuments
-        </a>
-    </div>
-
-    @if ($errors->any())
-        <div class="alert alert-danger">
-            <ul class="mb-0">
-                @foreach ($errors->all() as $error)
-                    <li>{{ $error }}</li>
-                @endforeach
-            </ul>
+<div class="page-header">
+    <div class="d-flex justify-content-between align-items-center">
+        <div>
+            <h1 class="mb-2">Create New Monument
+            </h1>
+            <p class="text-muted mb-0">Add a new monument to the heritage collection</p>
         </div>
-    @endif
+        <div>
+            <a href="{{ route('admin.monuments.index') }}" class="btn btn-modern-secondary">
+                <i class="bi bi-arrow-left me-2"></i>Back to Monuments
+            </a>
+        </div>
+    </div>
+</div>
+
+@if ($errors->any())
+    <div class="modern-card mb-4">
+        <div class="card-body">
+            <div class="alert alert-danger mb-0">
+                <h6 class="alert-heading">
+                    <i class="bi bi-exclamation-triangle me-2"></i>Please fix the following errors:
+                </h6>
+                <ul class="mb-0 mt-2">
+                    @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        </div>
+    </div>
+@endif
 
     <form action="{{ route('admin.monuments.store') }}" method="POST" enctype="multipart/form-data" id="monumentForm">
         @csrf
         <div class="row">
             <div class="col-lg-8">
-                <!-- Language Selection -->
-                <div class="card">
+                <!-- Language Information -->
+                <div class="modern-card mb-4">
                     <div class="card-header">
-                        <h5 class="card-title mb-0">
-                            <i class="bi bi-translate text-primary"></i> Language Selection
+                        <h5 class="mb-0">
+                            <i class="bi bi-translate text-primary me-2"></i>Language Information
                         </h5>
                     </div>
                     <div class="card-body">
-                        <div class="mb-3">
-                            <label for="language" class="form-label">Primary Language <span class="text-danger">*</span></label>
-                            <select class="form-select @error('language') is-invalid @enderror" id="language" name="language" required>
-                                <option value="">Select Language</option>
-                                <option value="en" {{ old('language') == 'en' ? 'selected' : '' }}>English</option>
-                                <option value="vi" {{ old('language') == 'vi' ? 'selected' : '' }}>Tiếng Việt</option>
-                            </select>
-                            @error('language')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
+                        <div class="alert alert-info mb-0">
+                            <div class="d-flex align-items-center">
+                                <i class="bi bi-info-circle me-3 fs-4"></i>
+                                <div>
+                                    <h6 class="mb-1">Monument will be created in: <strong>{{ app()->getLocale() == 'en' ? 'English' : 'Tiếng Việt' }}</strong></h6>
+                                    <p class="mb-0 small">The language is automatically set based on your current interface language. You can add translations later by editing this monument.</p>
+                                </div>
+                            </div>
                         </div>
+                        <input type="hidden" name="language" value="{{ app()->getLocale() }}">
                     </div>
                 </div>
 
                 <!-- Basic Information -->
-                <div class="card">
+                <div class="modern-card mb-4">
                     <div class="card-header">
-                        <h5 class="card-title mb-0">
-                            <i class="bi bi-info-circle text-primary"></i> Basic Information
+                        <h5 class="mb-0">
+                            <i class="bi bi-info-circle text-primary me-2"></i>Basic Information
                         </h5>
                     </div>
                     <div class="card-body">
                         <div class="mb-3">
                             <label for="title" class="form-label">Title <span class="text-danger">*</span></label>
                             <input type="text" class="form-control @error('title') is-invalid @enderror" 
-                                   id="title" name="title" value="{{ old('title') }}" required>
+                                   id="title" name="title" value="{{ old('title') }}">
                             @error('title')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
@@ -77,7 +88,7 @@
 
                         <div class="mb-3">
                             <label for="zone" class="form-label">Zone <span class="text-danger">*</span></label>
-                            <select class="form-select @error('zone') is-invalid @enderror" id="zone" name="zone" required>
+                            <select class="form-select @error('zone') is-invalid @enderror" id="zone" name="zone">
                                 <option value="">Select Zone</option>
                                 <option value="East" {{ old('zone') == 'East' ? 'selected' : '' }}>East</option>
                                 <option value="North" {{ old('zone') == 'North' ? 'selected' : '' }}>North</option>
@@ -137,21 +148,14 @@
                 </div>
 
                 <!-- Content -->
-                <div class="card">
+                <div class="modern-card mb-4">
                     <div class="card-header">
-                        <h5 class="card-title mb-0">
-                            <i class="bi bi-file-text text-primary"></i> Content
+                        <h5 class="mb-0">
+                            <i class="bi bi-file-text text-primary me-2"></i>Content
                         </h5>
                     </div>
                     <div class="card-body">
-                        <div class="mb-3">
-                            <label for="history" class="form-label">History</label>
-                            <textarea class="form-control ckeditor @error('history') is-invalid @enderror" 
-                                      id="history" name="history" rows="8">{{ old('history') }}</textarea>
-                            @error('history')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>
+                        
 
                         <div class="mb-3">
                             <label for="monument_content" class="form-label">Main Content</label>
@@ -165,10 +169,10 @@
                 </div>
 
                 <!-- Map Integration -->
-                <div class="card">
+                <div class="modern-card mb-4">
                     <div class="card-header">
-                        <h5 class="card-title mb-0">
-                            <i class="bi bi-geo-alt text-primary"></i> Map Integration
+                        <h5 class="mb-0">
+                            <i class="bi bi-geo-alt text-primary me-2"></i>Map Integration
                         </h5>
                     </div>
                     <div class="card-body">
@@ -194,10 +198,10 @@
 
             <div class="col-lg-4">
                 <!-- Featured Image -->
-                <div class="card">
+                <div class="modern-card mb-4">
                     <div class="card-header">
-                        <h5 class="card-title mb-0">
-                            <i class="bi bi-image text-primary"></i> Featured Image
+                        <h5 class="mb-0">
+                            <i class="bi bi-image text-primary me-2"></i>Featured Image
                         </h5>
                     </div>
                     <div class="card-body">
@@ -218,10 +222,10 @@
                 </div>
 
                 <!-- Gallery Images -->
-                <div class="card">
+                <div class="modern-card mb-4">
                     <div class="card-header">
-                        <h5 class="card-title mb-0">
-                            <i class="bi bi-images text-primary"></i> Gallery Images
+                        <h5 class="mb-0">
+                            <i class="bi bi-images text-primary me-2"></i>Gallery Images
                         </h5>
                     </div>
                     <div class="card-body">
@@ -238,38 +242,46 @@
                 </div>
 
                 <!-- Status -->
-                <div class="card">
+                <div class="modern-card mb-4">
                     <div class="card-header">
-                        <h5 class="card-title mb-0">
-                            <i class="bi bi-gear text-primary"></i> Settings
+                        <h5 class="mb-0">
+                            <i class="bi bi-gear text-primary me-2"></i>Settings
                         </h5>
                     </div>
                     <div class="card-body">
                         <div class="mb-3">
-                            <label for="status" class="form-label">Status <span class="text-danger">*</span></label>
-                            <select class="form-select @error('status') is-invalid @enderror" id="status" name="status" required>
-                                <option value="draft" {{ old('status') == 'draft' ? 'selected' : '' }}>Draft</option>
-                                <option value="pending" {{ old('status') == 'pending' ? 'selected' : '' }}>Pending Review</option>
-                                <option value="approved" {{ old('status') == 'approved' ? 'selected' : '' }}>{{ __('admin.approve') }}d</option>
-                            </select>
-                            @error('status')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="save_as_draft" name="save_as_draft" value="1" {{ old('save_as_draft') ? 'checked' : '' }}>
+                                <label class="form-check-label" for="save_as_draft">
+                                    <strong>Save as Draft</strong>
+                                    <br><small class="text-muted">If unchecked, the monument will be saved as "Pending Review" for admin approval</small>
+                                </label>
+                            </div>
+                            <input type="hidden" name="status" id="status" value="{{ old('save_as_draft') ? 'draft' : 'pending' }}">
                         </div>
 
                         <div class="d-grid">
-                            <button type="submit" class="btn btn-primary">
-                                <i class="bi bi-save"></i> Create Monument
+                            <button type="submit" class="btn btn-modern-primary" id="submitBtn">
+                                <span class="btn-text">
+                                    <i class="bi bi-save me-2"></i>Create Monument
+                                </span>
+                                <span class="btn-loading" style="display: none;">
+                                    <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                                    Creating... Please wait
+                                </span>
                             </button>
+                            <small class="text-muted mt-2" id="uploadHint" style="display: none;">
+                                <i class="bi bi-info-circle"></i> Uploading images to Cloudinary... This may take a moment.
+                            </small>
                         </div>
                     </div>
                 </div>
 
                 <!-- Multilingual Info -->
-                <div class="card">
+                <div class="modern-card mb-4">
                     <div class="card-header">
-                        <h5 class="card-title mb-0">
-                            <i class="bi bi-globe text-info"></i> Multilingual Support
+                        <h5 class="mb-0">
+                            <i class="bi bi-globe text-info me-2"></i>Multilingual Support
                         </h5>
                     </div>
                     <div class="card-body">
@@ -376,8 +388,17 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Form validation and CKEditor sync
     const form = document.getElementById('monumentForm');
+    const submitBtn = document.getElementById('submitBtn');
+    let isSubmitting = false;
+
     if (form) {
         form.addEventListener('submit', function(e) {
+            // Prevent double submission
+            if (isSubmitting) {
+                e.preventDefault();
+                return false;
+            }
+
             // Sync CKEditor data back to textareas before validation
             Object.keys(editors).forEach(function(editorId) {
                 const editor = editors[editorId];
@@ -396,6 +417,23 @@ document.addEventListener('DOMContentLoaded', function() {
                 e.preventDefault();
                 alert('Please fill in all required fields');
                 return false;
+            }
+
+            // Check if there are gallery images
+            const galleryInput = document.getElementById('gallery_images');
+            const hasGalleryImages = galleryInput && galleryInput.files.length > 0;
+
+            // Mark as submitting
+            isSubmitting = true;
+
+            // Disable button and show loading state
+            submitBtn.disabled = true;
+            submitBtn.querySelector('.btn-text').style.display = 'none';
+            submitBtn.querySelector('.btn-loading').style.display = 'inline-block';
+
+            // Show upload hint if there are images
+            if (hasGalleryImages) {
+                document.getElementById('uploadHint').style.display = 'block';
             }
 
             console.log('Form submission data:', {

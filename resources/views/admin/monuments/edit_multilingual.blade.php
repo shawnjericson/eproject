@@ -3,30 +3,41 @@
 @section('title', 'Edit Monument')
 
 @section('content')
-<div class="container-fluid">
-    <div class="d-sm-flex align-items-center justify-content-between mb-4">
-        <h1 class="h3 mb-0 text-gray-800">
-            <i class="bi bi-building text-primary"></i> Edit Monument: {{ $monument->title }}
-        </h1>
+<div class="page-header">
+    <div class="d-flex justify-content-between align-items-center">
         <div>
-            <a href="{{ route('admin.monuments.show', $monument) }}" class="btn btn-info">
-                <i class="bi bi-eye"></i> View
+            <h1 class="mb-2">
+                Edit Monument: {{ Str::limit($monument->title, 50) }}
+            </h1>
+            <p class="text-muted mb-0">Update monument information and translations</p>
+        </div>
+        <div class="d-flex gap-2">
+            <a href="{{ route('admin.monuments.show', $monument) }}" class="btn btn-modern-secondary">
+                <i class="bi bi-eye me-2"></i>View
             </a>
-            <a href="{{ route('admin.monuments.index') }}" class="btn btn-secondary">
-                <i class="bi bi-arrow-left"></i> Back to Monuments
+            <a href="{{ route('admin.monuments.index') }}" class="btn btn-modern-secondary">
+                <i class="bi bi-arrow-left me-2"></i>Back to Monuments
             </a>
         </div>
     </div>
+</div>
 
-    @if ($errors->any())
-        <div class="alert alert-danger">
-            <ul class="mb-0">
-                @foreach ($errors->all() as $error)
-                    <li>{{ $error }}</li>
-                @endforeach
-            </ul>
+@if ($errors->any())
+    <div class="modern-card mb-4">
+        <div class="card-body">
+            <div class="alert alert-danger mb-0">
+                <h6 class="alert-heading">
+                    <i class="bi bi-exclamation-triangle me-2"></i>Please fix the following errors:
+                </h6>
+                <ul class="mb-0 mt-2">
+                    @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
         </div>
-    @endif
+    </div>
+@endif
 
     <form action="{{ route('admin.monuments.update', $monument) }}" method="POST" enctype="multipart/form-data" id="monumentForm">
         @csrf
@@ -34,10 +45,10 @@
         <div class="row">
             <div class="col-lg-8">
                 <!-- Language Tabs -->
-                <div class="card">
+                <div class="modern-card mb-4">
                     <div class="card-header">
-                        <h5 class="card-title mb-0">
-                            <i class="bi bi-translate text-primary"></i> {{ __('admin.multilingual_content') }}
+                        <h5 class="mb-0">
+                            <i class="bi bi-translate text-primary me-2"></i>{{ __('admin.multilingual_content') }}
                         </h5>
                     </div>
                     <div class="card-body">
@@ -151,10 +162,10 @@
                 </div>
 
                 <!-- Basic Settings -->
-                <div class="card">
+                <div class="modern-card mb-4">
                     <div class="card-header">
-                        <h5 class="card-title mb-0">
-                            <i class="bi bi-gear text-primary"></i> Basic Settings
+                        <h5 class="mb-0">
+                            <i class="bi bi-gear text-primary me-2"></i>Basic Settings
                         </h5>
                     </div>
                     <div class="card-body">
@@ -162,7 +173,7 @@
                             <div class="col-md-6">
                                 <div class="mb-3">
                                     <label for="zone" class="form-label">Zone <span class="text-danger">*</span></label>
-                                    <select class="form-select" id="zone" name="zone" required>
+                                    <select class="form-select" id="zone" name="zone">
                                         <option value="East" {{ $monument->zone == 'East' ? 'selected' : '' }}>East</option>
                                         <option value="North" {{ $monument->zone == 'North' ? 'selected' : '' }}>North</option>
                                         <option value="West" {{ $monument->zone == 'West' ? 'selected' : '' }}>West</option>
@@ -174,7 +185,7 @@
                             <div class="col-md-6">
                                 <div class="mb-3">
                                     <label for="status" class="form-label">Status <span class="text-danger">*</span></label>
-                                    <select class="form-select" id="status" name="status" required>
+                                    <select class="form-select" id="status" name="status">
                                         <option value="draft" {{ $monument->status == 'draft' ? 'selected' : '' }}>Draft</option>
                                         <option value="pending" {{ $monument->status == 'pending' ? 'selected' : '' }}>Pending Review</option>
                                         <option value="approved" {{ $monument->status == 'approved' ? 'selected' : '' }}>{{ __('admin.approve') }}d</option>
@@ -229,10 +240,10 @@
 
             <div class="col-lg-4">
                 <!-- Featured Image -->
-                <div class="card">
+                <div class="modern-card mb-4">
                     <div class="card-header">
-                        <h5 class="card-title mb-0">
-                            <i class="bi bi-image text-primary"></i> Featured Image
+                        <h5 class="mb-0">
+                            <i class="bi bi-image text-primary me-2"></i>Featured Image
                         </h5>
                     </div>
                     <div class="card-body">
@@ -256,10 +267,10 @@
                 </div>
 
                 <!-- Translation Status -->
-                <div class="card">
+                <div class="modern-card mb-4">
                     <div class="card-header">
-                        <h5 class="card-title mb-0">
-                            <i class="bi bi-translate text-info"></i> Translation Status
+                        <h5 class="mb-0">
+                            <i class="bi bi-translate text-info me-2"></i>Translation Status
                         </h5>
                     </div>
                     <div class="card-body">
@@ -281,18 +292,27 @@
                         </div>
                         
                         <div class="d-grid">
-                            <button type="submit" class="btn btn-primary">
-                                <i class="bi bi-save"></i> Update Monument
+                            <button type="submit" class="btn btn-modern-primary" id="submitBtn">
+                                <span class="btn-text">
+                                    <i class="bi bi-save me-2"></i>Update Monument
+                                </span>
+                                <span class="btn-loading" style="display: none;">
+                                    <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                                    Updating... Please wait
+                                </span>
                             </button>
+                            <small class="text-muted mt-2" id="uploadHint" style="display: none;">
+                                <i class="bi bi-info-circle"></i> Uploading images to Cloudinary... This may take a moment.
+                            </small>
                         </div>
                     </div>
                 </div>
 
                 <!-- Gallery Images -->
-                <div class="card">
+                <div class="modern-card mb-4">
                     <div class="card-header">
-                        <h5 class="card-title mb-0">
-                            <i class="bi bi-images text-primary"></i> Add Gallery Images
+                        <h5 class="mb-0">
+                            <i class="bi bi-images text-primary me-2"></i>Add Gallery Images
                         </h5>
                     </div>
                     <div class="card-body">
@@ -389,6 +409,49 @@ document.addEventListener('DOMContentLoaded', function() {
             } else {
                 imagePreview.style.display = 'none';
             }
+        });
+    }
+
+    // Form submission handling
+    const form = document.getElementById('monumentForm');
+    const submitBtn = document.getElementById('submitBtn');
+    let isSubmitting = false;
+
+    if (form && submitBtn) {
+        form.addEventListener('submit', function(e) {
+            // Prevent double submission
+            if (isSubmitting) {
+                e.preventDefault();
+                return false;
+            }
+
+            // Sync CKEditor data back to textareas
+            Object.keys(editors).forEach(function(editorId) {
+                const editor = editors[editorId];
+                const textarea = document.getElementById(editorId);
+                if (editor && textarea) {
+                    textarea.value = editor.getData();
+                }
+            });
+
+            // Check if there are gallery images
+            const galleryInput = document.getElementById('gallery_images');
+            const hasGalleryImages = galleryInput && galleryInput.files.length > 0;
+
+            // Mark as submitting
+            isSubmitting = true;
+
+            // Disable button and show loading state
+            submitBtn.disabled = true;
+            submitBtn.querySelector('.btn-text').style.display = 'none';
+            submitBtn.querySelector('.btn-loading').style.display = 'inline-block';
+
+            // Show upload hint if there are images
+            if (hasGalleryImages) {
+                document.getElementById('uploadHint').style.display = 'block';
+            }
+
+            console.log('Form submitting with gallery images:', hasGalleryImages);
         });
     }
 });

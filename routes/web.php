@@ -2,6 +2,8 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\LoginController;
+use App\Http\Controllers\Auth\RegisterController;
+use App\Http\Controllers\Auth\ForgotPasswordController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\PostController;
 use App\Http\Controllers\Admin\MonumentController;
@@ -11,6 +13,7 @@ use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\SiteSettingController;
 use App\Http\Controllers\Admin\ProfileController;
 use App\Http\Controllers\Admin\VisitorController;
+use App\Http\Controllers\Admin\ContactController;
 
 /*
 |--------------------------------------------------------------------------
@@ -28,10 +31,27 @@ Route::get('/', function () {
     return redirect()->route('login');
 })->name('home');
 
-// Authentication Routes
-Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
-Route::post('/login', [LoginController::class, 'login']);
-Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
+// CSRF Token Refresh Route
+Route::get('/csrf-token', function () {
+    return response()->json(['csrf_token' => csrf_token()]);
+});
+
+// Authentication Routes (with locale middleware)
+Route::middleware('locale')->group(function () {
+    Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
+    Route::post('/login', [LoginController::class, 'login']);
+    Route::get('/register', [RegisterController::class, 'showRegistrationForm'])->name('register');
+    Route::post('/register', [RegisterController::class, 'register']);
+    Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
+
+    // Forgot Password Routes
+    Route::get('/forgot-password', [ForgotPasswordController::class, 'showForgotPasswordForm'])->name('password.request');
+    Route::post('/forgot-password', [ForgotPasswordController::class, 'forgotPassword'])->name('password.email');
+    Route::get('/security-questions', [ForgotPasswordController::class, 'showSecurityQuestions'])->name('password.security-questions');
+    Route::post('/security-questions', [ForgotPasswordController::class, 'verifySecurityQuestions'])->name('password.verify-security');
+    Route::get('/reset-password', [ForgotPasswordController::class, 'showResetPasswordForm'])->name('password.reset');
+    Route::post('/reset-password', [ForgotPasswordController::class, 'resetPassword'])->name('password.update');
+});
 
 // Admin Routes
 Route::prefix('admin')->name('admin.')->middleware(['admin', 'locale'])->group(function () {
@@ -93,6 +113,15 @@ Route::prefix('admin')->name('admin.')->middleware(['admin', 'locale'])->group(f
         Route::get('visitors/export', [VisitorController::class, 'export'])->name('visitors.export');
     });
 
+    // Contact Messages Management
+    Route::prefix('contacts')->name('contacts.')->group(function () {
+        Route::get('/', [ContactController::class, 'index'])->name('index');
+        Route::get('/{contact}', [ContactController::class, 'show'])->name('show');
+        Route::post('/{contact}/reply', [ContactController::class, 'reply'])->name('reply');
+        Route::patch('/{contact}/status', [ContactController::class, 'updateStatus'])->name('updateStatus');
+        Route::delete('/{contact}', [ContactController::class, 'destroy'])->name('destroy');
+    });
+
     // Profile Management (Admin & Moderator)
     Route::prefix('profile')->name('profile.')->group(function () {
         Route::get('/', [ProfileController::class, 'show'])->name('show');
@@ -101,5 +130,7 @@ Route::prefix('admin')->name('admin.')->middleware(['admin', 'locale'])->group(f
         Route::post('/avatar', [ProfileController::class, 'updateAvatar'])->name('avatar.update');
         Route::delete('/avatar', [ProfileController::class, 'deleteAvatar'])->name('avatar.delete');
         Route::put('/password', [ProfileController::class, 'updatePassword'])->name('password.update');
+        Route::get('/security-questions', [ProfileController::class, 'showSecurityQuestions'])->name('security-questions');
+        Route::put('/security-questions', [ProfileController::class, 'updateSecurityQuestions'])->name('security-questions.update');
     });
 });

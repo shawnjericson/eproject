@@ -26,7 +26,7 @@
                     <div class="mb-3">
                         <label for="name" class="form-label">Full {{ __('admin.name') }} <span class="text-danger">*</span></label>
                         <input type="text" class="form-control @error('name') is-invalid @enderror" 
-                               id="name" name="name" value="{{ old('name', $user->name) }}" required>
+                               id="name" name="name" value="{{ old('name', $user->name) }}">
                         @error('name')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
@@ -35,7 +35,7 @@
                     <div class="mb-3">
                         <label for="email" class="form-label">{{ __('admin.email') }} Address <span class="text-danger">*</span></label>
                         <input type="email" class="form-control @error('email') is-invalid @enderror" 
-                               id="email" name="email" value="{{ old('email', $user->email) }}" required>
+                               id="email" name="email" value="{{ old('email', $user->email) }}">
                         @error('email')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
@@ -68,7 +68,7 @@
                             <div class="mb-3">
                                 <label for="role" class="form-label">{{ __('admin.role') }} <span class="text-danger">*</span></label>
                                 <select class="form-select @error('role') is-invalid @enderror" 
-                                        id="role" name="role" required>
+                                        id="role" name="role">
                                     <option value="">Select {{ __('admin.role') }}</option>
                                     <option value="admin" {{ old('role', $user->role) == 'admin' ? 'selected' : '' }}>Admin</option>
                                     <option value="moderator" {{ old('role', $user->role) == 'moderator' ? 'selected' : '' }}>Moderator</option>
@@ -82,7 +82,7 @@
                             <div class="mb-3">
                                 <label for="status" class="form-label">{{ __('admin.status') }} <span class="text-danger">*</span></label>
                                 <select class="form-select @error('status') is-invalid @enderror" 
-                                        id="status" name="status" required>
+                                        id="status" name="status">
                                     <option value="">Select {{ __('admin.status') }}</option>
                                     <option value="active" {{ old('status', $user->status) == 'active' ? 'selected' : '' }}>{{ __('admin.active') }}</option>
                                     <option value="inactive" {{ old('status', $user->status) == 'inactive' ? 'selected' : '' }}>{{ __('admin.inactive') }}</option>
@@ -231,14 +231,13 @@ document.addEventListener('DOMContentLoaded', function() {
     passwordInput.addEventListener('input', validatePassword);
     confirmPasswordInput.addEventListener('input', validatePassword);
     
-    // Make confirm password required when password is filled
+    // Keep UX hint without toggling 'required' attribute
     passwordInput.addEventListener('input', function() {
+        const hint = confirmPasswordInput.parentElement.querySelector('.form-text');
         if (this.value) {
-            confirmPasswordInput.required = true;
-            confirmPasswordInput.parentElement.querySelector('.form-text').textContent = 'Required when changing password';
+            if (hint) hint.textContent = 'Required when changing password';
         } else {
-            confirmPasswordInput.required = false;
-            confirmPasswordInput.parentElement.querySelector('.form-text').textContent = 'Required only if changing password';
+            if (hint) hint.textContent = 'Required only if changing password';
         }
     });
 });

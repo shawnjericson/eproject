@@ -46,7 +46,7 @@
                     <div class="mb-3">
                         <label for="title" class="form-label">{{ __('admin.image') }} {{ __('admin.title') }} <span class="text-danger">*</span></label>
                         <input type="text" class="form-control @error('title') is-invalid @enderror" 
-                               id="title" name="title" value="{{ old('title', $gallery->title) }}" required>
+                               id="title" name="title" value="{{ old('title', $gallery->title) }}">
                         @error('title')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror

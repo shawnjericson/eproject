@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Admin\MonumentStoreRequest;
+use App\Http\Requests\Admin\MonumentUpdateRequest;
 use App\Models\Monument;
 use App\Models\MonumentTranslation;
 use App\Services\CloudinaryService;
@@ -23,6 +25,11 @@ class MonumentController extends Controller
     public function index(Request $request)
     {
         $query = Monument::with(['creator', 'translations']);
+
+        // Filter by user role - moderators only see their own monuments
+        if (auth()->user()->isModerator()) {
+            $query->where('created_by', auth()->id());
+        }
 
         // Filter by status - only apply if status is provided
         if ($request->filled('status')) {
@@ -65,27 +72,12 @@ class MonumentController extends Controller
         return view('admin.monuments.create_multilingual', compact('zones'));
     }
 
-    public function store(Request $request)
+    public function store(MonumentStoreRequest $request)
     {
         Log::info('Monument store method called');
         Log::info('Request data:', $request->all());
 
-        $request->validate([
-            'language' => 'required|in:en,vi',
-            'title' => 'required|string|max:255',
-            'description' => 'nullable|string',
-            'history' => 'nullable|string',
-            'content' => 'nullable|string',
-            'location' => 'nullable|string|max:255',
-            'map_embed' => 'nullable|string',
-            'zone' => 'required|in:East,North,West,South,Central',
-            'latitude' => 'nullable|numeric|between:-90,90',
-            'longitude' => 'nullable|numeric|between:-180,180',
-            'is_world_wonder' => 'nullable|boolean',
-            'featured_image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:5120',
-            'gallery_images.*' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:5120',
-            'status' => 'required|in:draft,pending,approved',
-        ]);
+        // Validation handled by MonumentStoreRequest
 
         try {
             // Create main monument record with fallback data
@@ -197,8 +189,19 @@ class MonumentController extends Controller
 
     public function show(Monument $monument)
     {
-        $monument->load(['gallery', 'feedbacks']);
-        return view('admin.monuments.show', compact('monument'));
+        $monument->load(['gallery', 'feedbacks', 'translations', 'creator']);
+
+        // Get available languages
+        $availableLanguages = ['vi']; // Vietnamese is always available (base language)
+        if ($monument->translations->count() > 0) {
+            foreach ($monument->translations as $translation) {
+                if (!in_array($translation->language, $availableLanguages)) {
+                    $availableLanguages[] = $translation->language;
+                }
+            }
+        }
+
+        return view('admin.monuments.show', compact('monument', 'availableLanguages'));
     }
 
     public function edit(Monument $monument)
@@ -208,29 +211,9 @@ class MonumentController extends Controller
         return view('admin.monuments.edit_multilingual', compact('monument', 'zones'));
     }
 
-    public function update(Request $request, Monument $monument)
+    public function update(MonumentUpdateRequest $request, Monument $monument)
     {
-        // Validate the new form structure
-        $rules = [
-            'zone' => 'required|in:East,North,West,South,Central',
-            'latitude' => 'nullable|numeric|between:-90,90',
-            'longitude' => 'nullable|numeric|between:-180,180',
-            'is_world_wonder' => 'nullable|boolean',
-            'status' => 'required|in:draft,pending,approved',
-            'featured_image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:5120',
-            'gallery_images.*' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:5120',
-            'map_embed' => 'nullable|string',
-            // Validate translations
-            'translations' => 'required|array',
-            'translations.*.language' => 'required|in:en,vi',
-            'translations.*.title' => 'required|string|max:255',
-            'translations.*.description' => 'nullable|string',
-            'translations.*.history' => 'nullable|string',
-            'translations.*.content' => 'nullable|string',
-            'translations.*.location' => 'nullable|string|max:255',
-        ];
-
-        $request->validate($rules);
+        // Validation handled by MonumentUpdateRequest
 
         // Get Vietnamese translation (default language) for base monument data
         $viTranslation = collect($request->translations)->firstWhere('language', 'vi');
@@ -281,28 +264,43 @@ class MonumentController extends Controller
                 Log::info('Processing gallery images for edit:', ['count' => count($galleryFiles)]);
 
                 try {
-                    $batchResult = $this->cloudinaryService->uploadMultipleImages($galleryFiles, 'gallery');
+                    // Batch upload to Cloudinary
+                    $batchResult = $this->cloudinaryService->uploadMultipleImages($galleryFiles, 'monuments');
 
-                    if ($batchResult['success'] && !empty($batchResult['urls'])) {
-                        // Create gallery records for successful uploads
-                        foreach ($batchResult['urls'] as $index => $url) {
-                            $monument->gallery()->create([
-                                'title' => 'Gallery Image ' . ($monument->gallery()->count() + $index + 1),
-                                'image_path' => $url, // Store full Cloudinary URL
-                                'description' => '',
+                    Log::info('Batch upload result for edit:', [
+                        'uploaded' => $batchResult['uploaded_count'],
+                        'total' => $batchResult['total_count'],
+                        'errors' => $batchResult['errors']
+                    ]);
+
+                    // Save successful uploads to gallery table
+                    if ($batchResult['success'] && !empty($batchResult['results'])) {
+                        foreach ($batchResult['results'] as $index => $result) {
+                            $galleryRecord = $monument->gallery()->create([
+                                'title' => 'Gallery Image ' . ($monument->gallery()->count() + 1),
+                                'image_path' => $result['url'], // Store full Cloudinary URL
+                                'description' => 'Additional monument image',
+                            ]);
+
+                            Log::info('Gallery record created in edit:', [
+                                'id' => $galleryRecord->id,
+                                'url' => $result['url']
                             ]);
                         }
 
-                        Log::info('Gallery images added:', ['count' => count($batchResult['urls'])]);
+                        Log::info('Gallery images added successfully:', ['count' => count($batchResult['results'])]);
                     }
 
                     // Report any errors
                     if (!empty($batchResult['errors'])) {
-                        Log::warning('Some gallery images failed:', $batchResult['errors']);
+                        Log::warning('Some gallery images failed in edit:', $batchResult['errors']);
                         // Continue anyway - don't fail the whole update
                     }
                 } catch (\Exception $e) {
-                    Log::error('Gallery upload exception:', ['error' => $e->getMessage()]);
+                    Log::error('Gallery upload exception in edit:', [
+                        'error' => $e->getMessage(),
+                        'trace' => $e->getTraceAsString()
+                    ]);
                     // Continue anyway - don't fail the whole update
                 }
             }

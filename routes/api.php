@@ -7,6 +7,7 @@ use App\Http\Controllers\Api\PostController;
 use App\Http\Controllers\Api\MonumentController;
 use App\Http\Controllers\Api\GalleryController;
 use App\Http\Controllers\Api\FeedbackController;
+use App\Http\Controllers\Api\ContactController;
 use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\Api\SiteSettingController;
 use App\Http\Controllers\Api\DashboardController;
@@ -26,24 +27,33 @@ use App\Http\Controllers\Api\VisitorController;
 // Public routes
 Route::post('/login', [AuthController::class, 'login']);
 
-// Public content routes
-Route::get('/posts', [PostController::class, 'index']);
-Route::get('/posts/{post}', [PostController::class, 'show']);
-Route::get('/monuments', [MonumentController::class, 'index']);
-Route::get('/monuments/{monument}', [MonumentController::class, 'show']);
-Route::get('/monuments/zones', [MonumentController::class, 'zones']);
-Route::post('/monuments/{monument}/feedback', [MonumentController::class, 'submitFeedback']);
-Route::get('/gallery', [GalleryController::class, 'index']);
-Route::get('/gallery/categories', [GalleryController::class, 'categories']);
-Route::get('/feedback', [FeedbackController::class, 'index']); // Public - show all feedbacks
-Route::get('/feedback/{feedback}', [FeedbackController::class, 'show']); // Public - show single feedback
-Route::post('/feedback', [FeedbackController::class, 'store']);
-Route::get('/settings', [SiteSettingController::class, 'index']);
+// Public content routes (rate-limited)
+Route::middleware('throttle:60,1')->group(function () {
+    Route::get('/posts', [PostController::class, 'index']);
+    Route::get('/posts/{post}', [PostController::class, 'show']);
+    Route::get('/monuments', [MonumentController::class, 'index']);
+    Route::get('/monuments/{monument}', [MonumentController::class, 'show']);
+    Route::get('/monuments/zones', [MonumentController::class, 'zones']);
+    Route::post('/monuments/{monument}/feedback', [MonumentController::class, 'submitFeedback']);
+    Route::get('/gallery', [GalleryController::class, 'index']);
+    Route::get('/gallery/categories', [GalleryController::class, 'categories']);
+    Route::get('/feedback', [FeedbackController::class, 'index']); // Public - show all feedbacks
+    Route::get('/feedback/{feedback}', [FeedbackController::class, 'show']); // Public - show single feedback
+    Route::post('/feedback', [FeedbackController::class, 'store']);
+    Route::get('/settings', [SiteSettingController::class, 'index']);
+});
 
-// Visitor tracking routes
-Route::post('/visitor/track', [VisitorController::class, 'track']); // Track visitor by IP
-Route::get('/visitor/count', [VisitorController::class, 'count']); // Get current count
-Route::get('/visitor/stats', [VisitorController::class, 'stats']); // Get detailed stats
+// Visitor tracking routes (stricter rate limit)
+Route::middleware('throttle:20,1')->group(function () {
+    Route::post('/visitor/track', [VisitorController::class, 'track']); // Track visitor by IP
+    Route::get('/visitor/count', [VisitorController::class, 'count']); // Get current count
+    Route::get('/visitor/stats', [VisitorController::class, 'stats']); // Get detailed stats
+});
+
+// Contact routes (rate-limited)
+Route::middleware('throttle:10,1')->group(function () {
+    Route::post('/contact', [ContactController::class, 'store']); // Public - submit contact form
+});
 
 // Protected routes
 Route::middleware('auth:sanctum')->group(function () {
