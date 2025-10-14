@@ -14,7 +14,7 @@ class PostUpdateRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'status' => 'required|in:draft,pending,approved',
+            'status' => 'required|in:draft,pending,approved,rejected',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:5120',
             'translations' => 'required|array',
             'translations.*.language' => 'required|in:en,vi',

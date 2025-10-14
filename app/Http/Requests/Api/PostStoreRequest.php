@@ -18,7 +18,7 @@ class PostStoreRequest extends FormRequest
         $rules = [
             'language' => 'required|in:en,vi',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'status' => 'required|in:draft,pending,approved',
+            'status' => 'required|in:draft,pending,approved,rejected',
         ];
 
         if ($language === 'vi') {

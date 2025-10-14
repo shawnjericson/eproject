@@ -1,20 +1,20 @@
 @extends('layouts.admin')
 
-@section('title', 'Admin Settings')
+@section('title', __('admin.admin_settings'))
 
 @section('content')
 <div class="page-header">
     <div class="d-flex justify-content-between align-items-center">
         <div>
             <h1 class="mb-2">
-                <i class="bi bi-gear text-primary me-2"></i>Admin Settings
+                <i class="bi bi-gear text-primary me-2"></i>{{ __('admin.admin_settings') }}
             </h1>
-            <p class="text-muted mb-0">Configure system settings, permissions, and limits</p>
+            <p class="text-muted mb-0">{{ __('admin.configure_system_settings') }}</p>
         </div>
         <div class="d-flex gap-2">
-            <a href="{{ route('admin.settings.create') }}" class="btn btn-modern-primary">
-                <i class="bi bi-plus me-2"></i>Add New Setting
-            </a>
+            {{-- <a href="{{ route('admin.settings.create') }}" class="btn btn-modern-primary">
+                <i class="bi bi-plus me-2"></i>{{ __('admin.add_new') }} {{ __('admin.setting') }}
+            </a> --}}
         </div>
     </div>
 </div>
@@ -26,7 +26,7 @@
         <div class="modern-card">
             <div class="card-header">
                 <h5 class="mb-0">
-                    <i class="bi bi-cloud-upload text-primary me-2"></i>File Upload Settings
+                    <i class="bi bi-cloud-upload text-primary me-2"></i>{{ __('admin.file_upload_settings') }}
                 </h5>
             </div>
             <div class="card-body">
@@ -44,7 +44,7 @@
                                     <div class="setting-value">
                                         @if($setting->type == 'boolean')
                                             <span class="badge {{ $setting->value == 'true' ? 'bg-success' : 'bg-secondary' }}">
-                                                {{ $setting->value == 'true' ? 'Enabled' : 'Disabled' }}
+                                                {{ $setting->value == 'true' ? __('admin.enabled') : __('admin.disabled') }}
                                             </span>
                                         @else
                                             <code class="text-primary">{{ $setting->value }}</code>
@@ -52,16 +52,16 @@
                                     </div>
                                 </div>
                                 <div class="setting-actions">
-                                    <a href="{{ route('admin.settings.edit', $setting) }}" 
-                                       class="btn btn-sm btn-modern-secondary">
-                                        <i class="bi bi-pencil"></i>
-                                    </a>
+                                    {{--                                         {{-- <a href="{{ route('admin.settings.edit', $setting) }}" 
+                                           class="btn btn-sm btn-modern-secondary">
+                                            <i class="bi bi-pencil"></i>
+                                        </a> --}} --}}
                                 </div>
                             </div>
                         </div>
                     @endforeach
                 @else
-                    <p class="text-muted">No file upload settings configured.</p>
+                    <p class="text-muted">{{ __('admin.no_file_upload_settings_configured') }}</p>
                 @endif
             </div>
         </div>
@@ -72,7 +72,7 @@
         <div class="modern-card">
             <div class="card-header">
                 <h5 class="mb-0">
-                    <i class="bi bi-people text-primary me-2"></i>User Management Settings
+                    <i class="bi bi-people text-primary me-2"></i>{{ __('admin.user_management_settings') }}
                 </h5>
             </div>
             <div class="card-body">
@@ -90,7 +90,7 @@
                                     <div class="setting-value">
                                         @if($setting->type == 'boolean')
                                             <span class="badge {{ $setting->value == 'true' ? 'bg-success' : 'bg-secondary' }}">
-                                                {{ $setting->value == 'true' ? 'Enabled' : 'Disabled' }}
+                                                {{ $setting->value == 'true' ? __('admin.enabled') : __('admin.disabled') }}
                                             </span>
                                         @else
                                             <code class="text-primary">{{ $setting->value }}</code>
@@ -98,16 +98,16 @@
                                     </div>
                                 </div>
                                 <div class="setting-actions">
-                                    <a href="{{ route('admin.settings.edit', $setting) }}" 
-                                       class="btn btn-sm btn-modern-secondary">
-                                        <i class="bi bi-pencil"></i>
-                                    </a>
+                                    {{--                                         {{-- <a href="{{ route('admin.settings.edit', $setting) }}" 
+                                           class="btn btn-sm btn-modern-secondary">
+                                            <i class="bi bi-pencil"></i>
+                                        </a> --}} --}}
                                 </div>
                             </div>
                         </div>
                     @endforeach
                 @else
-                    <p class="text-muted">No user management settings configured.</p>
+                    <p class="text-muted">{{ __('admin.no_user_management_settings_configured') }}</p>
                 @endif
             </div>
         </div>
@@ -118,7 +118,7 @@
         <div class="modern-card">
             <div class="card-header">
                 <h5 class="mb-0">
-                    <i class="bi bi-file-text text-primary me-2"></i>Content Settings
+                    <i class="bi bi-file-text text-primary me-2"></i>{{ __('admin.content_settings') }}
                 </h5>
             </div>
             <div class="card-body">
@@ -136,7 +136,7 @@
                                     <div class="setting-value">
                                         @if($setting->type == 'boolean')
                                             <span class="badge {{ $setting->value == 'true' ? 'bg-success' : 'bg-secondary' }}">
-                                                {{ $setting->value == 'true' ? 'Enabled' : 'Disabled' }}
+                                                {{ $setting->value == 'true' ? __('admin.enabled') : __('admin.disabled') }}
                                             </span>
                                         @else
                                             <code class="text-primary">{{ $setting->value }}</code>
@@ -144,16 +144,16 @@
                                     </div>
                                 </div>
                                 <div class="setting-actions">
-                                    <a href="{{ route('admin.settings.edit', $setting) }}" 
-                                       class="btn btn-sm btn-modern-secondary">
-                                        <i class="bi bi-pencil"></i>
-                                    </a>
+                                    {{--                                         {{-- <a href="{{ route('admin.settings.edit', $setting) }}" 
+                                           class="btn btn-sm btn-modern-secondary">
+                                            <i class="bi bi-pencil"></i>
+                                        </a> --}} --}}
                                 </div>
                             </div>
                         </div>
                     @endforeach
                 @else
-                    <p class="text-muted">No content settings configured.</p>
+                    <p class="text-muted">{{ __('admin.no_content_settings_configured') }}</p>
                 @endif
             </div>
         </div>
@@ -164,7 +164,7 @@
         <div class="modern-card">
             <div class="card-header">
                 <h5 class="mb-0">
-                    <i class="bi bi-cpu text-primary me-2"></i>System Settings
+                    <i class="bi bi-cpu text-primary me-2"></i>{{ __('admin.system_settings') }}
                 </h5>
             </div>
             <div class="card-body">
@@ -182,7 +182,7 @@
                                     <div class="setting-value">
                                         @if($setting->type == 'boolean')
                                             <span class="badge {{ $setting->value == 'true' ? 'bg-success' : 'bg-secondary' }}">
-                                                {{ $setting->value == 'true' ? 'Enabled' : 'Disabled' }}
+                                                {{ $setting->value == 'true' ? __('admin.enabled') : __('admin.disabled') }}
                                             </span>
                                         @else
                                             <code class="text-primary">{{ $setting->value }}</code>
@@ -190,16 +190,16 @@
                                     </div>
                                 </div>
                                 <div class="setting-actions">
-                                    <a href="{{ route('admin.settings.edit', $setting) }}" 
-                                       class="btn btn-sm btn-modern-secondary">
-                                        <i class="bi bi-pencil"></i>
-                                    </a>
+                                    {{--                                         {{-- <a href="{{ route('admin.settings.edit', $setting) }}" 
+                                           class="btn btn-sm btn-modern-secondary">
+                                            <i class="bi bi-pencil"></i>
+                                        </a> --}} --}}
                                 </div>
                             </div>
                         </div>
                     @endforeach
                 @else
-                    <p class="text-muted">No system settings configured.</p>
+                    <p class="text-muted">{{ __('admin.no_system_settings_configured') }}</p>
                 @endif
             </div>
         </div>
@@ -210,7 +210,7 @@
 <div class="modern-card mb-4">
     <div class="card-header">
         <h5 class="mb-0">
-            <i class="bi bi-lightning text-primary me-2"></i>Quick Actions
+            <i class="bi bi-lightning text-primary me-2"></i>{{ __('admin.quick_actions') }}
         </h5>
     </div>
     <div class="card-body">
@@ -218,25 +218,25 @@
             <div class="col-md-3 mb-3">
                 <button class="btn btn-modern-secondary w-100 py-3" onclick="toggleMaintenanceMode()">
                     <i class="bi bi-tools fs-4 d-block mb-2"></i>
-                    <small>Toggle Maintenance Mode</small>
+                    <small>{{ __('admin.toggle_maintenance_mode') }}</small>
                 </button>
             </div>
             <div class="col-md-3 mb-3">
                 <button class="btn btn-modern-secondary w-100 py-3" onclick="resetToDefaults()">
                     <i class="bi bi-arrow-clockwise fs-4 d-block mb-2"></i>
-                    <small>Reset to Defaults</small>
+                    <small>{{ __('admin.reset_to_defaults') }}</small>
                 </button>
             </div>
             <div class="col-md-3 mb-3">
                 <button class="btn btn-modern-secondary w-100 py-3" onclick="exportSettings()">
                     <i class="bi bi-download fs-4 d-block mb-2"></i>
-                    <small>Export Settings</small>
+                    <small>{{ __('admin.export_settings') }}</small>
                 </button>
             </div>
             <div class="col-md-3 mb-3">
                 <button class="btn btn-modern-secondary w-100 py-3" onclick="importSettings()">
                     <i class="bi bi-upload fs-4 d-block mb-2"></i>
-                    <small>Import Settings</small>
+                    <small>{{ __('admin.import_settings') }}</small>
                 </button>
             </div>
         </div>
@@ -246,7 +246,7 @@
 <!-- All Settings Table -->
 <div class="modern-card">
     <div class="card-header">
-        <h5 class="mb-0">All Settings</h5>
+        <h5 class="mb-0">{{ __('admin.all_settings') }}</h5>
     </div>
     <div class="card-body">
         @if($settings->count() > 0)
@@ -277,7 +277,7 @@
                                     <div style="max-width: 200px; word-wrap: break-word;">
                                         @if($setting->type == 'boolean')
                                             <span class="badge {{ $setting->value == 'true' ? 'bg-success' : 'bg-secondary' }}">
-                                                {{ $setting->value == 'true' ? 'Enabled' : 'Disabled' }}
+                                                {{ $setting->value == 'true' ? __('admin.enabled') : __('admin.disabled') }}
                                             </span>
                                         @elseif(strlen($setting->value) > 50)
                                             <code class="text-primary">{{ Str::limit($setting->value, 50) }}</code>

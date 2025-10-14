@@ -89,18 +89,18 @@
                                 </div>
 
                                 <div class="mb-3">
-                                    <label for="location_en" class="form-label">Location (English)</label>
+                                    <label for="location_en" class="form-label">{{ __('admin.location_english') }}</label>
                                     <input type="text" class="form-control" id="location_en" name="translations[en][location]" 
                                            value="{{ $monument->translation('en') ? $monument->translation('en')->location : '' }}">
                                 </div>
 
                                 <div class="mb-3">
-                                    <label for="description_en" class="form-label">Description (English)</label>
+                                    <label for="description_en" class="form-label">{{ __('admin.description_english') }}</label>
                                     <textarea class="form-control" id="description_en" name="translations[en][description]" rows="3">{{ $monument->translation('en') ? $monument->translation('en')->description : '' }}</textarea>
                                 </div>
 
                                 <div class="mb-3">
-                                    <label for="history_en" class="form-label">History (English)</label>
+                                    <label for="history_en" class="form-label">{{ __('admin.history_english') }}</label>
                                     <textarea class="form-control ckeditor" id="history_en" name="translations[en][history]" rows="8">{{ $monument->translation('en') ? $monument->translation('en')->history : '' }}</textarea>
                                 </div>
 
@@ -115,17 +115,17 @@
                                 <input type="hidden" name="translations[vi][language]" value="vi">
 
                                 <div class="mb-3">
-                                    <label for="title_vi" class="form-label">Tiêu đề (Tiếng Việt) <span class="text-danger">*</span></label>
+                                    <label for="title_vi" class="form-label">{{ __('admin.title_vietnamese') }} <span class="text-danger">*</span></label>
                                     <input type="text" class="form-control @error('translations.vi.title') is-invalid @enderror" id="title_vi" name="translations[vi][title]"
                                            value="{{ old('translations.vi.title', $monument->title) }}">
-                                    <small class="text-muted">This is the default language. Required field.</small>
+                                    <small class="text-muted">{{ __('admin.default_language_required_field') }}</small>
                                     @error('translations.vi.title')
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
                                 </div>
 
                                 <div class="mb-3">
-                                    <label for="location_vi" class="form-label">Địa điểm (Tiếng Việt)</label>
+                                    <label for="location_vi" class="form-label">{{ __('admin.location_vietnamese') }}</label>
                                     <input type="text" class="form-control @error('translations.vi.location') is-invalid @enderror" id="location_vi" name="translations[vi][location]"
                                            value="{{ old('translations.vi.location', $monument->location) }}">
                                     @error('translations.vi.location')
@@ -134,7 +134,7 @@
                                 </div>
 
                                 <div class="mb-3">
-                                    <label for="description_vi" class="form-label">Mô tả (Tiếng Việt)</label>
+                                    <label for="description_vi" class="form-label">{{ __('admin.description_vietnamese') }}</label>
                                     <textarea class="form-control @error('translations.vi.description') is-invalid @enderror" id="description_vi" name="translations[vi][description]" rows="3">{{ old('translations.vi.description', $monument->description) }}</textarea>
                                     @error('translations.vi.description')
                                         <div class="invalid-feedback">{{ $message }}</div>
@@ -142,7 +142,7 @@
                                 </div>
 
                                 <div class="mb-3">
-                                    <label for="history_vi" class="form-label">Lịch sử (Tiếng Việt)</label>
+                                    <label for="history_vi" class="form-label">{{ __('admin.history_vietnamese') }}</label>
                                     <textarea class="form-control ckeditor @error('translations.vi.history') is-invalid @enderror" id="history_vi" name="translations[vi][history]" rows="8">{{ old('translations.vi.history', $monument->history) }}</textarea>
                                     @error('translations.vi.history')
                                         <div class="invalid-feedback">{{ $message }}</div>
@@ -150,7 +150,7 @@
                                 </div>
 
                                 <div class="mb-3">
-                                    <label for="content_vi" class="form-label">Nội dung (Tiếng Việt)</label>
+                                    <label for="content_vi" class="form-label">{{ __('admin.content_vietnamese') }}</label>
                                     <textarea class="form-control ckeditor @error('translations.vi.content') is-invalid @enderror" id="content_vi" name="translations[vi][content]" rows="15">{{ old('translations.vi.content', $monument->content) }}</textarea>
                                     @error('translations.vi.content')
                                         <div class="invalid-feedback">{{ $message }}</div>

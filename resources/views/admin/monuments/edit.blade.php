@@ -1,15 +1,15 @@
 @extends('layouts.admin')
 
-@section('title', 'Edit Monument')
+@section('title', __('admin.edit_monument'))
 
 @section('content')
 <div class="d-flex justify-content-between align-items-center pt-3 pb-2 mb-4">
     <div>
-        <h1 class="h3 mb-1">Edit Monument: {{ $monument->title }}</h1>
-        <p class="text-muted mb-0">Update comprehensive educational content about heritage monuments</p>
+        <h1 class="h3 mb-1">{{ __('admin.edit_monument') }}: {{ $monument->title }}</h1>
+        <p class="text-muted mb-0">{{ __('admin.update_monument_content') }}</p>
     </div>
     <a href="{{ route('admin.monuments.index') }}" class="btn-minimal">
-        Back to List
+        {{ __('admin.back_to_list') }}
     </a>
 </div>
 
@@ -24,15 +24,15 @@
             <!-- Basic Information -->
             <div class="editor-section">
                 <div class="editor-section-header">
-                    Basic Information
+                    {{ __('admin.basic_information') }}
                 </div>
                 <div class="editor-section-body">
                     <!-- Language Selection -->
                     <div class="mb-3">
-                        <label for="language" class="form-label">Language <span class="text-danger">*</span></label>
+                        <label for="language" class="form-label">{{ __('admin.language') }} <span class="text-danger">*</span></label>
                         <select class="form-select @error('language') is-invalid @enderror" id="language" name="language">
-                            <option value="en" {{ old('language', $monument->language ?? 'en') == 'en' ? 'selected' : '' }}>English</option>
-                            <option value="vi" {{ old('language', $monument->language) == 'vi' ? 'selected' : '' }}>Vietnamese</option>
+                            <option value="en" {{ old('language', $monument->language ?? 'en') == 'en' ? 'selected' : '' }}>{{ __('admin.english') }}</option>
+                            <option value="vi" {{ old('language', $monument->language) == 'vi' ? 'selected' : '' }}>{{ __('admin.vietnamese') }}</option>
                         </select>
                         @error('language')
                             <div class="invalid-feedback">{{ $message }}</div>
@@ -41,10 +41,10 @@
 
                     <!-- Monument Title -->
                     <div class="mb-3">
-                        <label for="title" class="form-label">Monument Title <span class="text-danger">*</span></label>
+                        <label for="title" class="form-label">{{ __('admin.monument_title') }} <span class="text-danger">*</span></label>
                         <input type="text" class="form-control @error('title') is-invalid @enderror"
                                id="title" name="title" value="{{ old('title', $monument->title) }}"
-                               placeholder="e.g., Angkor Wat – Kỳ quan bất tử của nền văn minh Khmer">
+                               placeholder="{{ __('admin.monument_title_placeholder') }}">
                         @error('title')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
@@ -52,14 +52,14 @@
 
                     <!-- Zone Selection -->
                     <div class="mb-3">
-                        <label for="zone" class="form-label">Geographic Zone <span class="text-danger">*</span></label>
+                        <label for="zone" class="form-label">{{ __('admin.geographic_zone') }} <span class="text-danger">*</span></label>
                         <select class="form-select @error('zone') is-invalid @enderror" id="zone" name="zone">
-                            <option value="">Select Zone</option>
-                            <option value="North" {{ old('zone', $monument->zone) == 'North' ? 'selected' : '' }}>North</option>
-                            <option value="South" {{ old('zone', $monument->zone) == 'South' ? 'selected' : '' }}>South</option>
-                            <option value="East" {{ old('zone', $monument->zone) == 'East' ? 'selected' : '' }}>East</option>
-                            <option value="West" {{ old('zone', $monument->zone) == 'West' ? 'selected' : '' }}>West</option>
-                            <option value="Central" {{ old('zone', $monument->zone) == 'Central' ? 'selected' : '' }}>Central</option>
+                            <option value="">{{ __('admin.select_zone') }}</option>
+                            <option value="North" {{ old('zone', $monument->zone) == 'North' ? 'selected' : '' }}>{{ __('admin.north') }}</option>
+                            <option value="South" {{ old('zone', $monument->zone) == 'South' ? 'selected' : '' }}>{{ __('admin.south') }}</option>
+                            <option value="East" {{ old('zone', $monument->zone) == 'East' ? 'selected' : '' }}>{{ __('admin.east') }}</option>
+                            <option value="West" {{ old('zone', $monument->zone) == 'West' ? 'selected' : '' }}>{{ __('admin.west') }}</option>
+                            <option value="Central" {{ old('zone', $monument->zone) == 'Central' ? 'selected' : '' }}>{{ __('admin.central') }}</option>
                         </select>
                         @error('zone')
                             <div class="invalid-feedback">{{ $message }}</div>
@@ -68,10 +68,10 @@
 
                     <!-- Location -->
                     <div class="mb-3">
-                        <label for="location" class="form-label">Specific Location</label>
+                        <label for="location" class="form-label">{{ __('admin.specific_location') }}</label>
                         <input type="text" class="form-control @error('location') is-invalid @enderror"
                                id="location" name="location" value="{{ old('location', $monument->location) }}"
-                               placeholder="e.g., Siem Reap Province, Cambodia">
+                               placeholder="{{ __('admin.location_placeholder') }}">
                         @error('location')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
@@ -80,7 +80,7 @@
                     <!-- Coordinates -->
                     <div class="row">
                         <div class="col-md-6 mb-3">
-                            <label for="latitude" class="form-label">Latitude <small class="text-muted">(Optional)</small></label>
+                            <label for="latitude" class="form-label">{{ __('admin.latitude') }} <small class="text-muted">({{ __('admin.optional') }})</small></label>
                             <input type="number" step="0.00000001" class="form-control @error('latitude') is-invalid @enderror"
                                    id="latitude" name="latitude" value="{{ old('latitude', $monument->latitude) }}"
                                    placeholder="e.g., 13.412469">
@@ -89,7 +89,7 @@
                             @enderror
                         </div>
                         <div class="col-md-6 mb-3">
-                            <label for="longitude" class="form-label">Longitude <small class="text-muted">(Optional)</small></label>
+                            <label for="longitude" class="form-label">{{ __('admin.longitude') }} <small class="text-muted">({{ __('admin.optional') }})</small></label>
                             <input type="number" step="0.00000001" class="form-control @error('longitude') is-invalid @enderror"
                                    id="longitude" name="longitude" value="{{ old('longitude', $monument->longitude) }}"
                                    placeholder="e.g., 103.866986">
@@ -113,8 +113,8 @@
                     <!-- Map Embed -->
                     <div class="mb-3">
                         <label for="map_embed" class="form-label">
-                            Google Maps Embed
-                            <small class="text-muted">(Optional)</small>
+                            {{ __('admin.google_maps_embed') }}
+                            <small class="text-muted">({{ __('admin.optional') }})</small>
                         </label>
                         <textarea class="form-control @error('map_embed') is-invalid @enderror"
                                   id="map_embed" name="map_embed" rows="3"
@@ -137,12 +137,12 @@
             <!-- Short Description -->
             <div class="editor-section">
                 <div class="editor-section-header">
-                    Short Description
-                    <small class="text-muted ms-2">Brief summary for previews and search results</small>
+                    {{ __('admin.short_description') }}
+                    <small class="text-muted ms-2">{{ __('admin.brief_summary_preview') }}</small>
                 </div>
                 <div class="editor-section-body">
                     <div class="mb-3">
-                        <label for="description" class="form-label">Brief Description <span class="text-danger">*</span></label>
+                        <label for="description" class="form-label">{{ __('admin.brief_description') }} <span class="text-danger">*</span></label>
                         <textarea class="form-control @error('description') is-invalid @enderror"
                                   id="description" name="description" rows="3"
                                   placeholder="Write a brief, engaging description of this monument (2-3 sentences)...">{{ old('description', $monument->description) }}</textarea>
@@ -159,13 +159,13 @@
             <!-- Main Article Content -->
             <div class="editor-section">
                 <div class="editor-section-header">
-                    Article Content
+                    {{ __('admin.article_content') }}
                     <small class="text-muted ms-2">Use headings (H2, H3, H4) to create automatic table of contents</small>
                 </div>
                 <div class="editor-section-body">
                     <!-- Content Editor -->
                     <div class="mb-3">
-                        <label for="content" class="form-label">Full Article Content <span class="text-danger">*</span></label>
+                        <label for="content" class="form-label">{{ __('admin.full_article_content') }} <span class="text-danger">*</span></label>
                         <div class="editor-toolbar">
                             <small class="text-muted">
                                 💡 <strong>Tips:</strong> Use <strong>Heading 2</strong> for main sections (Giới thiệu, Lịch sử, Kiến trúc...),
@@ -191,7 +191,7 @@
             <!-- Featured Image -->
             <div class="editor-section">
                 <div class="editor-section-header">
-                    Featured Image
+                    {{ __('admin.featured_image') }}
                 </div>
                 <div class="editor-section-body">
                     @if($monument->image)
@@ -204,7 +204,7 @@
                     @endif
                     <div class="mb-3">
                         <label for="image" class="form-label">
-                            @if($monument->image) Replace Featured Image @else Upload Featured Image @endif
+                            @if($monument->image) {{ __('admin.replace_featured_image') }} @else {{ __('admin.upload_featured_image') }} @endif
                         </label>
                         <input type="file" class="form-control @error('image') is-invalid @enderror"
                                id="image" name="image" accept="image/*">
@@ -224,11 +224,11 @@
             <!-- Gallery Images -->
             <div class="editor-section">
                 <div class="editor-section-header">
-                    Gallery Images
+                    {{ __('admin.gallery_images') }}
                 </div>
                 <div class="editor-section-body">
                     <div class="mb-3">
-                        <label class="form-label">Add Gallery Images</label>
+                        <label class="form-label">{{ __('admin.add_gallery_images') }}</label>
                         <input type="file" class="form-control @error('gallery_images.*') is-invalid @enderror"
                                name="gallery_images[]" multiple accept="image/*" id="gallery_images">
                         @error('gallery_images.*')
@@ -249,7 +249,7 @@
             <!-- Table of Contents Preview -->
             <div class="editor-section">
                 <div class="editor-section-header">
-                    Table of Contents Preview
+                    {{ __('admin.table_of_contents_preview') }}
                 </div>
                 <div class="editor-section-body">
                     <div class="toc-preview">
@@ -267,17 +267,17 @@
             <!-- Publishing Options -->
             <div class="editor-section">
                 <div class="editor-section-header">
-                    Publishing Options
+                    {{ __('admin.publishing_options') }}
                 </div>
                 <div class="editor-section-body">
                     <!-- Status -->
                     <div class="mb-3">
-                        <label for="status" class="form-label">Status</label>
+                        <label for="status" class="form-label">{{ __('admin.status') }}</label>
                         <select class="form-select @error('status') is-invalid @enderror" id="status" name="status">
-                            <option value="draft" {{ old('status', $monument->status) == 'draft' ? 'selected' : '' }}>Draft</option>
-                            <option value="pending" {{ old('status', $monument->status) == 'pending' ? 'selected' : '' }}>Pending Review</option>
+                            <option value="draft" {{ old('status', $monument->status) == 'draft' ? 'selected' : '' }}>{{ __('admin.draft') }}</option>
+                            <option value="pending" {{ old('status', $monument->status) == 'pending' ? 'selected' : '' }}>{{ __('admin.pending_review') }}</option>
                             @if(auth()->user()->isAdmin())
-                                <option value="approved" {{ old('status', $monument->status) == 'approved' ? 'selected' : '' }}>Published</option>
+                                <option value="approved" {{ old('status', $monument->status) == 'approved' ? 'selected' : '' }}>{{ __('admin.published') }}</option>
                             @endif
                         </select>
                         @error('status')
@@ -287,7 +287,7 @@
 
                     <!-- Tags -->
                     <div class="mb-3">
-                        <label for="tags" class="form-label">Tags</label>
+                        <label for="tags" class="form-label">{{ __('admin.tags') }}</label>
                         <input type="text" class="form-control @error('tags') is-invalid @enderror"
                                id="tags" name="tags" value="{{ old('tags', $monument->tags) }}"
                                placeholder="heritage, temple, ancient, architecture">
@@ -300,13 +300,13 @@
                     <!-- Save Buttons -->
                     <div class="d-grid gap-2">
                         <button type="submit" name="action" value="save" class="btn-minimal btn-primary">
-                            Update Monument Article
+                            {{ __('admin.update_monument_article') }}
                         </button>
                         <button type="submit" name="action" value="preview" class="btn-minimal">
-                            Update & Preview
+                            {{ __('admin.update_preview') }}
                         </button>
                         <a href="{{ route('admin.monuments.index') }}" class="btn-minimal">
-                            Cancel
+                            {{ __('admin.cancel') }}
                         </a>
                     </div>
                 </div>

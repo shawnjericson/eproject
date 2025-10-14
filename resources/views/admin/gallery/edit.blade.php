@@ -1,16 +1,16 @@
 @extends('layouts.admin')
 
-@section('title', 'Edit Gallery Image')
+@section('title', __('admin.edit_gallery_image'))
 
 @section('content')
 <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-4">
     <div>
-        <h1 class="h3 mb-1">Edit Gallery Image</h1>
+        <h1 class="h3 mb-1">{{ __('admin.edit_gallery_image') }}</h1>
         <p class="text-muted mb-0">{{ Str::limit($gallery->title, 60) }}</p>
     </div>
     <div class="d-flex gap-2">
         <a href="{{ route('admin.gallery.show', $gallery) }}" class="btn-minimal btn-primary">
-            <i class="bi bi-eye"></i> View
+            <i class="bi bi-eye"></i> {{ __('admin.view') }}
         </a>
         <a href="{{ route('admin.gallery.index') }}" class="btn-minimal">
             <i class="bi bi-arrow-left"></i> {{ __('admin.back') }}
@@ -27,7 +27,7 @@
                     @method('PUT')
 
                     <div class="mb-3">
-                        <label for="monument_id" class="form-label">Monument</label>
+                        <label for="monument_id" class="form-label">{{ __('admin.monument') }}</label>
                         <div class="input-group">
                             <input type="text" class="form-control"
                                    value="{{ $gallery->monument->title }} ({{ $gallery->monument->zone }})"
@@ -39,7 +39,7 @@
                         <input type="hidden" name="monument_id" value="{{ $gallery->monument_id }}">
                         <div class="form-text">
                             <i class="bi bi-info-circle"></i> {{ __('admin.monument_cannot_be_changed') }}
-                            To move this image to another monument, delete and recreate it.
+                            {{ __('admin.to_move_image_delete_recreate') }}
                         </div>
                     </div>
 
@@ -165,7 +165,7 @@
                                 </div>
                             </div>
                             <div>
-                                <div class="fw-bold">View Image</div>
+                                <div class="fw-bold">{{ __('admin.view') }} {{ __('admin.image') }}</div>
                                 <small class="text-muted">{{ __('admin.see_full_details') }}</small>
                             </div>
                         </div>
@@ -181,7 +181,7 @@
                                 </div>
                             </div>
                             <div>
-                                <div class="fw-bold">View Monument</div>
+                                <div class="fw-bold">{{ __('admin.view') }} {{ __('admin.monument') }}</div>
                                 <small class="text-muted">{{ Str::limit($gallery->monument->title, 25) }}</small>
                             </div>
                         </div>

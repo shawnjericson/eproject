@@ -41,7 +41,10 @@ class GalleryController extends Controller
         $galleries = $query->orderBy('created_at', 'desc')
                           ->paginate($perPage);
 
-        return response()->json($galleries);
+        return response()->json($galleries)
+            ->header('Access-Control-Allow-Origin', '*')
+            ->header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS')
+            ->header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With');
     }
 
     /**
@@ -57,7 +60,10 @@ class GalleryController extends Controller
 
         return response()->json([
             'categories' => array_merge(['all'], $categories)
-        ]);
+        ])
+            ->header('Access-Control-Allow-Origin', '*')
+            ->header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS')
+            ->header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With');
     }
 
     public function show(Gallery $gallery)

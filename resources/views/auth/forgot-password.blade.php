@@ -12,10 +12,10 @@
         <div class="relative z-10">
             <div class="w-40 h-40 bg-white rounded-full flex items-center justify-center mx-auto mb-8 shadow-lg">
                 <img src="{{ asset('favicon_io/android-chrome-192x192.png') }}"
-                     alt="Global Heritage Logo"
-                     class="w-40 h-40 object-contain rounded-xl">
+                    alt="Global Heritage Logo"
+                    class="w-40 h-40 object-contain rounded-xl">
             </div>
-            <h1 class="font-serif text-4xl font-bold mb-4 drop-shadow-lg">{{ __('admin.global_heritage') }}</h1>
+            <h1 class="font-serif text-4xl font-bold mb-4 drop-shadow-lg">Global Heritage</h1>
             <p class="text-lg opacity-95 leading-relaxed max-w-md mx-auto mb-10">{{ __('admin.tagline') }}</p>
         </div>
     </div>
@@ -53,15 +53,14 @@
                         </svg>
                     </div>
                     <input type="text"
-                           class="block w-full pl-12 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors @error('email') border-red-300 @enderror"
-                           id="email"
-                           name="email"
-                           value="{{ old('email') }}"
-                           placeholder="{{__('admin.forgotpassword_placeholder')}}"
-                           >
+                        class="block w-full pl-12 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors @error('email') border-red-300 @enderror"
+                        id="email"
+                        name="email"
+                        value="{{ old('email') }}"
+                        placeholder="{{__('admin.forgotpassword_placeholder')}}">
                 </div>
                 @error('email')
-                    <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
+                <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
                 @enderror
             </div>
 

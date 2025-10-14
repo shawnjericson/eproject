@@ -15,22 +15,9 @@ class Contact extends Model
         'subject',
         'message',
         'status',
-        'admin_reply',
-        'replied_at',
-        'replied_by',
     ];
 
-    protected $casts = [
-        'replied_at' => 'datetime',
-    ];
 
-    /**
-     * Get the user who replied to this contact
-     */
-    public function repliedBy()
-    {
-        return $this->belongsTo(User::class, 'replied_by');
-    }
 
     /**
      * Scope for new messages
@@ -48,13 +35,6 @@ class Contact extends Model
         return $query->where('status', 'read');
     }
 
-    /**
-     * Scope for replied messages
-     */
-    public function scopeReplied($query)
-    {
-        return $query->where('status', 'replied');
-    }
 
     /**
      * Mark as read
@@ -64,16 +44,4 @@ class Contact extends Model
         $this->update(['status' => 'read']);
     }
 
-    /**
-     * Mark as replied
-     */
-    public function markAsReplied($reply, $userId)
-    {
-        $this->update([
-            'status' => 'replied',
-            'admin_reply' => $reply,
-            'replied_at' => now(),
-            'replied_by' => $userId,
-        ]);
-    }
 }

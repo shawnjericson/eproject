@@ -1,17 +1,17 @@
 @extends('layouts.admin')
 
-@section('title', 'Feedback Details')
+@section('title', __('admin.feedback_details'))
 
 @section('content')
 <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-4">
     <div>
-        <h1 class="h3 mb-1">Feedback Details</h1>
-        <p class="text-muted mb-0">From {{ $feedback->name }}</p>
+        <h1 class="h3 mb-1">{{ __('admin.feedback_details') }}</h1>
+        <p class="text-muted mb-0">{{ __('admin.from') }} {{ $feedback->name }}</p>
     </div>
     <div class="d-flex gap-2">
         <a href="mailto:{{ $feedback->email }}?subject=Re: Your feedback about {{ $feedback->monument ? $feedback->monument->title : 'our website' }}"
            class="btn-minimal btn-primary">
-            <i class="bi bi-reply"></i> Reply
+            <i class="bi bi-reply"></i> {{ __('admin.reply') }}
         </a>
         <a href="{{ route('admin.feedbacks.index') }}" class="btn-minimal">
             <i class="bi bi-arrow-left"></i> {{ __('admin.back') }}
@@ -24,8 +24,8 @@
         <div class="card-minimal">
             <div class="card-header">
                 <div class="d-flex justify-content-between align-items-center">
-                    <h5 class="mb-0">Feedback Message</h5>
-                    <small class="text-muted">{{ $feedback->created_at->format('M d, Y H:i') }}</small>
+                    <h5 class="mb-0">{{ __('admin.feedback_message') }}</h5>
+                    <small class="text-muted">{{ $feedback->created_at->locale(app()->getLocale())->translatedFormat('M d, Y H:i') }}</small>
                 </div>
             </div>
             <div class="card-body">
@@ -50,7 +50,7 @@
 
                 @if($feedback->monument)
                     <div class="mt-4">
-                        <h6>Related Monument</h6>
+                        <h6>{{ __('admin.related_monument') }}</h6>
                         <div class="card-minimal bg-light">
                             <div class="card-body">
                                 <div class="row">
@@ -70,7 +70,7 @@
                                         <h6>{{ $feedback->monument->title }}</h6>
                                         <p class="text-muted mb-2">{{ Str::limit($feedback->monument->description, 150) }}</p>
                                         <div class="d-flex gap-2 mb-2">
-                                            <span class="badge bg-info">{{ $feedback->monument->zone }}</span>
+                                            <span class="badge bg-info">{{ __('admin.zones.' . strtolower($feedback->monument->zone)) }}</span>
                                             @if($feedback->monument->status == 'approved')
                                                 <span class="badge bg-success">{{ __('admin.approved') }}</span>
                                             @elseif($feedback->monument->status == 'pending')
@@ -81,7 +81,7 @@
                                         </div>
                                         <a href="{{ route('admin.monuments.show', $feedback->monument) }}"
                                            class="btn-minimal btn-primary">
-                                            <i class="bi bi-building"></i> {{ __('admin.view') }} Monument
+                                            <i class="bi bi-building"></i> {{ __('admin.view') }} {{ __('admin.monument') }}
                                         </a>
                                     </div>
                                 </div>
@@ -96,7 +96,7 @@
     <div class="col-md-4">
         <div class="card-minimal">
             <div class="card-header">
-                <h5>Feedback Details</h5>
+                <h5>{{ __('admin.feedback_details') }}</h5>
             </div>
             <div class="card-body">
                 <ul class="list-unstyled">
@@ -110,20 +110,20 @@
                         </a>
                     </li>
                     <li class="mb-2">
-                        <strong>Monument:</strong> 
+                        <strong>{{ __('admin.monument') }}:</strong> 
                         @if($feedback->monument)
                             <a href="{{ route('admin.monuments.show', $feedback->monument) }}" class="text-decoration-none">
                                 {{ $feedback->monument->title }}
                             </a>
                         @else
-                            <span class="text-muted">General Feedback</span>
+                            <span class="text-muted">{{ __('admin.general_feedback') }}</span>
                         @endif
                     </li>
                     <li class="mb-2">
-                        <strong>Submitted:</strong> {{ $feedback->created_at->format('M d, Y H:i') }}
+                        <strong>{{ __('admin.submitted') }}:</strong> {{ $feedback->created_at->format('M d, Y H:i') }}
                     </li>
                     <li class="mb-2">
-                        <strong>Time ago:</strong> {{ $feedback->created_at->diffForHumans() }}
+                        <strong>{{ __('admin.time_ago') }}:</strong> {{ $feedback->created_at->diffForHumans() }}
                     </li>
                 </ul>
             </div>
@@ -143,13 +143,13 @@
                     @if($feedback->monument)
                         <a href="{{ route('admin.monuments.show', $feedback->monument) }}"
                            class="btn-minimal">
-                            <i class="bi bi-building"></i> {{ __('admin.view') }} Related Monument
+                            <i class="bi bi-building"></i> {{ __('admin.view') }} {{ __('admin.related_monument') }}
                         </a>
                     @endif
 
                     <a href="{{ route('admin.feedbacks.index') }}?search={{ urlencode($feedback->email) }}"
                        class="btn-minimal">
-                        <i class="bi bi-search"></i> More from this User
+                        <i class="bi bi-search"></i> {{ __('admin.more_from_this_user') }}
                     </a>
 
                     <hr>
@@ -160,7 +160,7 @@
                         @csrf
                         @method('DELETE')
                         <button type="submit" class="btn-minimal btn-danger w-100">
-                            <i class="bi bi-trash"></i> {{ __('admin.delete') }} Feedback
+                            <i class="bi bi-trash"></i> {{ __('admin.delete') }} {{ __('admin.feedback') }}
                         </button>
                     </form>
                 </div>
@@ -179,7 +179,7 @@
         @if($userFeedbacks->count() > 0)
             <div class="card-minimal mt-3">
                 <div class="card-header">
-                    <h5>Other Feedbacks from {{ $feedback->name }}</h5>
+                    <h5>{{ __('admin.other_feedbacks_from') }} {{ $feedback->name }}</h5>
                 </div>
                 <div class="card-body">
                     @foreach($userFeedbacks as $userFeedback)

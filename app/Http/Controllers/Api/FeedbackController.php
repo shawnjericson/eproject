@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Feedback;
+use App\Services\NotificationService;
 use Illuminate\Http\Request;
 
 class FeedbackController extends Controller
@@ -63,6 +64,9 @@ class FeedbackController extends Controller
 
         $feedback = Feedback::create($feedbackData);
         $feedback->load('monument');
+
+        // Note: Feedback notifications are handled by sidebar badge only
+        // No need to create UserNotification entries
 
         return response()->json($feedback, 201);
     }

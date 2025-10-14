@@ -24,7 +24,7 @@ class PostStoreRequest extends FormRequest
             'description' => 'nullable|string',
             'content' => "required|string|max:{$maxContentLength}",
             'image' => "nullable|image|mimes:{$allowedTypes}|max:{$maxImageSize}",
-            'status' => 'required|in:draft,pending,approved',
+            'status' => 'required|in:draft,pending,approved,rejected',
         ];
     }
 

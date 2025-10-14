@@ -1,6 +1,6 @@
 @extends('layouts.admin')
 
-@section('title', 'Visitor Statistics')
+@section('title', __('admin.visitor_statistics'))
 
 @section('content')
 <div class="container-fluid">
@@ -8,13 +8,13 @@
     <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
             <h1 class="h3 mb-2 text-gray-800">
-                <i class="bi bi-eye"></i> Visitor Statistics
+                <i class="bi bi-eye"></i> {{ __('admin.visitor_statistics') }}
             </h1>
-            <p class="text-muted">Track and analyze website visitors</p>
+            <p class="text-muted">{{ __('admin.track_analyze_website_visitors') }}</p>
         </div>
         <div>
             <button class="btn btn-primary" onclick="refreshStats()">
-                <i class="bi bi-arrow-clockwise"></i> Refresh
+                <i class="bi bi-arrow-clockwise"></i> {{ __('admin.refresh') }}
             </button>
         </div>
     </div>
@@ -28,7 +28,7 @@
                     <div class="row no-gutters align-items-center">
                         <div class="col mr-2">
                             <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
-                                Total Visitors
+                                {{ __('admin.total_visitors') }}
                             </div>
                             <div class="h5 mb-0 font-weight-bold text-gray-800" id="totalVisitors">
                                 <span class="spinner-border spinner-border-sm"></span>
@@ -49,7 +49,7 @@
                     <div class="row no-gutters align-items-center">
                         <div class="col mr-2">
                             <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
-                                Unique IPs
+                                {{ __('admin.unique_ips') }}
                             </div>
                             <div class="h5 mb-0 font-weight-bold text-gray-800" id="uniqueIps">
                                 <span class="spinner-border spinner-border-sm"></span>
@@ -70,7 +70,7 @@
                     <div class="row no-gutters align-items-center">
                         <div class="col mr-2">
                             <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
-                                Total Visits
+                                {{ __('admin.total_visits') }}
                             </div>
                             <div class="h5 mb-0 font-weight-bold text-gray-800" id="totalVisits">
                                 <span class="spinner-border spinner-border-sm"></span>
@@ -88,9 +88,9 @@
     <!-- Recent Visitors Table -->
     <div class="card shadow mb-4">
         <div class="card-header py-3 d-flex justify-content-between align-items-center">
-            <h6 class="m-0 font-weight-bold text-primary">Recent Visitors</h6>
+            <h6 class="m-0 font-weight-bold text-primary">{{ __('admin.recent_visitors') }}</h6>
             <button class="btn btn-sm btn-outline-danger" onclick="confirmClearLogs()">
-                <i class="bi bi-trash"></i> Clear Old Logs
+                <i class="bi bi-trash"></i> {{ __('admin.clear_old_logs') }}
             </button>
         </div>
         <div class="card-body">
@@ -98,17 +98,17 @@
                 <table class="table table-bordered" id="visitorsTable" width="100%" cellspacing="0">
                     <thead>
                         <tr>
-                            <th>ID</th>
-                            <th>IP Address</th>
-                            <th>User Agent</th>
-                            <th>Visited At</th>
-                            <th>Actions</th>
+                            <th>{{ __('admin.id') }}</th>
+                            <th>{{ __('admin.ip_address') }}</th>
+                            <th>{{ __('admin.user_agent') }}</th>
+                            <th>{{ __('admin.visited_at') }}</th>
+                            <th>{{ __('admin.actions') }}</th>
                         </tr>
                     </thead>
                     <tbody id="visitorsTableBody">
                         <tr>
                             <td colspan="5" class="text-center">
-                                <span class="spinner-border spinner-border-sm"></span> Loading...
+                                <span class="spinner-border spinner-border-sm"></span> {{ __('admin.loading') }}...
                             </td>
                         </tr>
                     </tbody>
@@ -121,6 +121,20 @@
 @push('scripts')
 <script>
     const API_BASE = '{{ url('/api') }}';
+    const TRANSLATIONS = {
+        failedToLoadStatistics: @json(__('admin.failed_to_load_statistics')),
+        noVisitorsYet: @json(__('admin.no_visitors_yet')),
+        nA: @json(__('admin.n_a')),
+        failedToLoadVisitors: @json(__('admin.failed_to_load_visitors')),
+        statisticsRefreshed: @json(__('admin.statistics_refreshed')),
+        confirmDeleteVisitorLog: @json(__('admin.confirm_delete_visitor_log')),
+        visitorLogDeleted: @json(__('admin.visitor_log_deleted')),
+        failedToDeleteVisitorLog: @json(__('admin.failed_to_delete_visitor_log')),
+        confirmClearLogsOlderThan90Days: @json(__('admin.confirm_clear_logs_older_than_90_days')),
+        deleted: @json(__('admin.deleted')),
+        oldLogs: @json(__('admin.old_logs')),
+        failedToClearOldLogs: @json(__('admin.failed_to_clear_old_logs'))
+    };
 
     // Load statistics on page load
     document.addEventListener('DOMContentLoaded', function() {
@@ -139,7 +153,7 @@
             document.getElementById('totalVisits').textContent = data.total_visits.toLocaleString();
         } catch (error) {
             console.error('Error loading stats:', error);
-            showError('Failed to load statistics');
+            showError(TRANSLATIONS.failedToLoadStatistics);
         }
     }
 
@@ -152,7 +166,7 @@
             const tbody = document.getElementById('visitorsTableBody');
             
             if (data.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="5" class="text-center">No visitors yet</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="5" class="text-center">' + TRANSLATIONS.noVisitorsYet + '</td></tr>';
                 return;
             }
 
@@ -160,7 +174,7 @@
                 <tr>
                     <td>${visitor.id}</td>
                     <td><code>${visitor.ip_address}</code></td>
-                    <td><small>${visitor.user_agent || 'N/A'}</small></td>
+                    <td><small>${visitor.user_agent || TRANSLATIONS.nA}</small></td>
                     <td>${new Date(visitor.visited_at).toLocaleString()}</td>
                     <td>
                         <button class="btn btn-sm btn-danger" onclick="deleteVisitor(${visitor.id})">
@@ -172,7 +186,7 @@
         } catch (error) {
             console.error('Error loading visitors:', error);
             document.getElementById('visitorsTableBody').innerHTML = 
-                '<tr><td colspan="5" class="text-center text-danger">Failed to load visitors</td></tr>';
+                '<tr><td colspan="5" class="text-center text-danger">' + TRANSLATIONS.failedToLoadVisitors + '</td></tr>';
         }
     }
 
@@ -180,12 +194,12 @@
     function refreshStats() {
         loadStats();
         loadRecentVisitors();
-        showSuccess('Statistics refreshed');
+        showSuccess(TRANSLATIONS.statisticsRefreshed);
     }
 
     // Delete visitor log
     async function deleteVisitor(id) {
-        if (!confirm('Are you sure you want to delete this visitor log?')) {
+        if (!confirm(TRANSLATIONS.confirmDeleteVisitorLog)) {
             return;
         }
 
@@ -199,11 +213,11 @@
             });
 
             if (response.ok) {
-                showSuccess('Visitor log deleted');
+                showSuccess(TRANSLATIONS.visitorLogDeleted);
                 loadRecentVisitors();
                 loadStats();
             } else {
-                showError('Failed to delete visitor log');
+                showError(TRANSLATIONS.failedToDeleteVisitorLog);
             }
         } catch (error) {
             console.error('Error deleting visitor:', error);
@@ -213,7 +227,7 @@
 
     // Confirm clear old logs
     function confirmClearLogs() {
-        if (confirm('Are you sure you want to clear logs older than 90 days?')) {
+        if (confirm(TRANSLATIONS.confirmClearLogsOlderThan90Days)) {
             clearOldLogs();
         }
     }
@@ -232,15 +246,15 @@
             const data = await response.json();
 
             if (response.ok) {
-                showSuccess(`Deleted ${data.deleted} old logs`);
+                showSuccess(TRANSLATIONS.deleted + ' ' + data.deleted + ' ' + TRANSLATIONS.oldLogs);
                 loadRecentVisitors();
                 loadStats();
             } else {
-                showError('Failed to clear old logs');
+                showError(TRANSLATIONS.failedToClearOldLogs);
             }
         } catch (error) {
             console.error('Error clearing logs:', error);
-            showError('Failed to clear old logs');
+            showError(TRANSLATIONS.failedToClearOldLogs);
         }
     }
 

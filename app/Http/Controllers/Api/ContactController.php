@@ -77,7 +77,7 @@ class ContactController extends Controller
     public function index()
     {
         try {
-            $contacts = Contact::with('repliedBy')
+            $contacts = Contact::query()
                 ->orderBy('created_at', 'desc')
                 ->paginate(20);
 
@@ -102,7 +102,7 @@ class ContactController extends Controller
     public function show($id)
     {
         try {
-            $contact = Contact::with('repliedBy')->findOrFail($id);
+            $contact = Contact::findOrFail($id);
 
             // Mark as read if it's new
             if ($contact->status === 'new') {

@@ -1,6 +1,6 @@
 @extends('layouts.admin')
 
-@section('title', 'Dashboard')
+@section('title', __('admin.dashboard'))
 
 @section('content')
 <div class="page-header">
@@ -19,7 +19,23 @@
 </div>
 
 <!-- Modern Stats Cards -->
+
 <div class="row mb-5">
+    <div class="{{ $isAdmin ? 'col-xl-3' : 'col-xl-4' }} col-md-6 mb-4">
+        <a href="{{ route('admin.monuments.index') }}" class="text-decoration-none">
+            <div class="stat-card success clickable-card">
+                <div class="stat-icon">
+                    <i class="bi bi-building"></i>
+                </div>
+                <div class="d-flex justify-content-between align-items-end">
+                    <div>
+                        <h3 class="mb-0 fw-bold">{{ $stats['total_monuments'] }}</h3>
+                        <p class="text-muted mb-0 small">{{ __('admin.total_monuments') }}</p>
+                    </div>
+                </div>
+            </div>
+        </a>
+    </div>
     <div class="{{ $isAdmin ? 'col-xl-3' : 'col-xl-4' }} col-md-6 mb-4">
         <a href="{{ route('admin.posts.index') }}" class="text-decoration-none">
             <div class="stat-card primary clickable-card">
@@ -30,9 +46,6 @@
                     <div>
                         <h3 class="mb-0 fw-bold">{{ $stats['total_posts'] }}</h3>
                         <p class="text-muted mb-0 small">{{ __('admin.total_posts') }}</p>
-                    </div>
-                    <div class="text-success small">
-                        <i class="bi bi-arrow-up"></i> +12%
                     </div>
                 </div>
             </div>
@@ -48,29 +61,7 @@
                 <div class="d-flex justify-content-between align-items-end">
                     <div>
                         <h3 class="mb-0 fw-bold">{{ $stats['pending_posts'] }}</h3>
-                        <p class="text-muted mb-0 small">Pending Posts</p>
-                    </div>
-                    <div class="text-warning small">
-                        <i class="bi bi-dash"></i> 0%
-                    </div>
-                </div>
-            </div>
-        </a>
-    </div>
-
-    <div class="{{ $isAdmin ? 'col-xl-3' : 'col-xl-4' }} col-md-6 mb-4">
-        <a href="{{ route('admin.monuments.index') }}" class="text-decoration-none">
-            <div class="stat-card success clickable-card">
-                <div class="stat-icon">
-                    <i class="bi bi-building"></i>
-                </div>
-                <div class="d-flex justify-content-between align-items-end">
-                    <div>
-                        <h3 class="mb-0 fw-bold">{{ $stats['total_monuments'] }}</h3>
-                        <p class="text-muted mb-0 small">{{ __('admin.total_monuments') }}</p>
-                    </div>
-                    <div class="text-success small">
-                        <i class="bi bi-arrow-up"></i> +8%
+                        <p class="text-muted mb-0 small">{{ __('admin.pending_posts') }}</p>
                     </div>
                 </div>
             </div>
@@ -89,9 +80,6 @@
                         <h3 class="mb-0 fw-bold">{{ $stats['total_users'] }}</h3>
                         <p class="text-muted mb-0 small">{{ __('admin.total_users') }}</p>
                     </div>
-                    <div class="text-success small">
-                        <i class="bi bi-arrow-up"></i> +5%
-                    </div>
                 </div>
             </div>
         </a>
@@ -104,33 +92,33 @@
     <div class="col-12">
         <div class="modern-card">
             <div class="card-header">
-                <h5 class="mb-0"><i class="bi bi-lightning me-2"></i>Quick Actions</h5>
+                <h5 class="mb-0"><i class="bi bi-lightning me-2"></i>{{ __('admin.quick_actions') }}</h5>
             </div>
             <div class="card-body">
                 <div class="row">
                     <div class="col-md-3 mb-3">
-                        <a href="{{ route('admin.posts.create') }}" class="btn btn-modern-primary w-100 py-3">
+                        <a href="{{ route('admin.monuments.create') }}" class="btn btn-modern-primary w-100 py-3">
                             <i class="bi bi-plus-circle fs-4 d-block mb-2"></i>
-                            <small>Create New Post</small>
+                            <small>{{ __('admin.create_new_monument') }}</small>
                         </a>
                     </div>
                     <div class="col-md-3 mb-3">
-                        <a href="{{ route('admin.monuments.create') }}" class="btn btn-modern-secondary w-100 py-3">
+                        <a href="{{ route('admin.posts.create') }}" class="btn btn-modern-secondary w-100 py-3">
                             <i class="bi bi-plus-circle fs-4 d-block mb-2"></i>
-                            <small>Create New Monument</small>
+                            <small>{{ __('admin.create_new_post') }}</small>
                         </a>
                     </div>
                     <div class="col-md-3 mb-3">
                         <a href="{{ route('admin.gallery.index') }}" class="btn btn-modern-secondary w-100 py-3">
                             <i class="bi bi-images fs-4 d-block mb-2"></i>
-                            <small>Manage Gallery</small>
+                            <small>{{ __('admin.gallery_management') }}</small>
                         </a>
                     </div>
                     @if($isAdmin)
                     <div class="col-md-3 mb-3">
                         <a href="{{ route('admin.users.index') }}" class="btn btn-modern-secondary w-100 py-3">
                             <i class="bi bi-people fs-4 d-block mb-2"></i>
-                            <small>Manage Users</small>
+                            <small>{{ __('admin.users_management') }}</small>
                         </a>
                     </div>
                     @endif
@@ -178,7 +166,7 @@
                         <i class="bi bi-file-text text-muted" style="font-size: 3rem;"></i>
                         <p class="text-muted mt-2">{{ __('admin.no_posts_yet') }} {{ __('admin.create_first_post') }}</p>
                         <a href="{{ route('admin.posts.create') }}" class="btn btn-modern-primary">
-                            <i class="bi bi-plus-lg me-2"></i>Create Post
+                            <i class="bi bi-plus-lg me-2"></i>{{ __('admin.create_post') }}
                         </a>
                     </div>
                 @endif
@@ -189,7 +177,7 @@
     <div class="col-lg-4 mb-4">
         <div class="modern-card">
             <div class="card-header">
-                <h5 class="mb-0"><i class="bi bi-building me-2"></i>Recent Monuments</h5>
+                <h5 class="mb-0"><i class="bi bi-building me-2"></i>{{ __('admin.recent_monuments') }}</h5>
             </div>
             <div class="card-body">
                 @if($recent_monuments->count() > 0)
@@ -200,17 +188,17 @@
                                 <div>
                                     <h6 class="mb-1 fw-semibold">{{ $monument->title }}</h6>
                                     <small class="text-muted">
-                                        <i class="bi bi-geo-alt me-1"></i>{{ $monument->zone }}
+                                        <i class="bi bi-geo-alt me-1"></i>{{ __('admin.zones.' . strtolower($monument->zone)) }}
                                     </small>
                                 </div>
-                                <small class="text-muted">{{ $monument->created_at->format('M d') }}</small>
+                                <small class="text-muted">{{ $monument->created_at->locale(app()->getLocale())->translatedFormat('M d') }}</small>
                             </div>
                         </div>
                         @endforeach
                     </div>
                     <div class="text-center mt-3">
                         <a href="{{ route('admin.monuments.index') }}" class="btn btn-modern-secondary btn-sm">
-                            View All <i class="bi bi-arrow-right ms-1"></i>
+                            {{ __('admin.view_all') }} <i class="bi bi-arrow-right ms-1"></i>
                         </a>
                     </div>
                 @else
@@ -218,7 +206,7 @@
                         <i class="bi bi-building text-muted" style="font-size: 2rem;"></i>
                         <p class="text-muted mt-2 small">{{ __('admin.no_monuments_yet') }}</p>
                         <a href="{{ route('admin.monuments.create') }}" class="btn btn-modern-primary btn-sm">
-                            <i class="bi bi-plus-lg me-1"></i>Create Monument
+                            <i class="bi bi-plus-lg me-1"></i>{{ __('admin.create_monument') }}
                         </a>
                     </div>
                 @endif
@@ -230,34 +218,34 @@
 
 @push('scripts')
 <script>
-function updateClock() {
-    const now = new Date();
-    const timeString = now.toLocaleTimeString('en-US', {
-        hour12: false,
-        hour: '2-digit',
-        minute: '2-digit',
-        second: '2-digit'
-    });
+    function updateClock() {
+        const now = new Date();
+        const timeString = now.toLocaleTimeString('en-US', {
+            hour12: false,
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit'
+        });
 
-    const hour = now.getHours();
-    let greeting = '';
+        const hour = now.getHours();
+        let greeting = '';
 
-    if (hour >= 5 && hour < 12) {
-        greeting = '🌅 Good Morning';
-    } else if (hour >= 12 && hour < 17) {
-        greeting = '☀️ Good Afternoon';
-    } else if (hour >= 17 && hour < 21) {
-        greeting = '🌆 Good Evening';
-    } else {
-        greeting = '🌙 Good Night';
+        if (hour >= 5 && hour < 12) {
+            greeting = "🌅 {{ __('admin.good_morning') }}";
+        } else if (hour >= 12 && hour < 17) {
+            greeting = "☀️ {{ __('admin.good_afternoon') }}";
+        } else if (hour >= 17 && hour < 21) {
+            greeting = "🌆 {{ __('admin.good_evening') }}";
+        } else {
+            greeting = "🌙 {{ __('admin.good_night') }}";
+        }
+
+        document.getElementById('current-time').textContent = timeString;
+        document.getElementById('time-greeting').textContent = greeting;
     }
 
-    document.getElementById('current-time').textContent = timeString;
-    document.getElementById('time-greeting').textContent = greeting;
-}
-
-// Update clock immediately and then every second
-updateClock();
-setInterval(updateClock, 1000);
+    // Update clock immediately and then every second
+    updateClock();
+    setInterval(updateClock, 1000);
 </script>
 @endpush

@@ -24,7 +24,7 @@ class SettingsService
     {
         $result = SiteSetting::set($key, $value);
         Cache::forget("setting.{$key}");
-        return $result;
+        return $result !== null;
     }
 
     /**
@@ -152,9 +152,14 @@ class SettingsService
     /**
      * System Settings
      */
-    public static function isMaintenanceMode(): bool
+    public static function isMaintenanceModeEnabled(): bool
     {
         return self::get('maintenance_mode', 'false') === 'true';
+    }
+
+    public static function isMaintenanceMode(): bool
+    {
+        return self::isMaintenanceModeEnabled();
     }
 
     public static function getApiRateLimit(): int
@@ -241,3 +246,4 @@ class SettingsService
         }
     }
 }
+

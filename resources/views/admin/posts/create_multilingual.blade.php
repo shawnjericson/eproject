@@ -27,7 +27,7 @@
                 <div class="modern-card mb-4">
                     <div class="card-header">
                         <h5 class="mb-0">
-                            <i class="bi bi-translate text-primary me-2"></i>Language Information
+                            <i class="bi bi-translate text-primary me-2"></i>{{ __('admin.language_information') }}
                         </h5>
                     </div>
                     <div class="card-body">
@@ -35,8 +35,8 @@
                             <div class="d-flex align-items-center">
                                 <i class="bi bi-info-circle me-3 fs-4"></i>
                                 <div>
-                                    <h6 class="mb-1">Post will be created in: <strong>{{ app()->getLocale() == 'en' ? 'English' : 'Tiếng Việt' }}</strong></h6>
-                                    <p class="mb-0 small">The language is automatically set based on your current interface language. You can add translations later by editing this post.</p>
+                                    <h6 class="mb-1">{{ __('admin.post_will_be_created_in') }}: <strong>{{ app()->getLocale() == 'en' ? __('admin.english') : __('admin.vietnamese') }}</strong></h6>
+                                    <p class="mb-0 small">{{ __('admin.language_auto_set_hint') }}</p>
                                 </div>
                             </div>
                         </div>

@@ -18,7 +18,7 @@ class MonumentUpdateRequest extends FormRequest
             'latitude' => 'nullable|numeric|between:-90,90',
             'longitude' => 'nullable|numeric|between:-180,180',
             'is_world_wonder' => 'nullable|boolean',
-            'status' => 'required|in:draft,pending,approved',
+            'status' => 'required|in:draft,pending,approved,rejected',
             'featured_image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:5120',
             'gallery_images.*' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:5120',
             'map_embed' => 'nullable|string',

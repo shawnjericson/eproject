@@ -1,15 +1,15 @@
 @extends('layouts.admin')
 
-@section('title', 'Contact Messages')
+@section('title', __('admin.contact_messages'))
 
 @section('content')
 <!-- Header -->
 <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-4">
     <div>
         <h1 class="h3 mb-1">
-            <i class="bi bi-envelope"></i> Contact Messages
+            <i class="bi bi-envelope"></i> {{ __('admin.contact_messages') }}
         </h1>
-        <p class="text-muted mb-0">Manage contact form submissions</p>
+        <p class="text-muted mb-0">{{ __('admin.manage_contact_form_submissions') }}</p>
     </div>
 </div>
 
@@ -17,23 +17,19 @@
 <div class="filter-buttons mb-4">
     <a href="{{ route('admin.contacts.index') }}"
        class="filter-btn {{ !request('status') ? 'active' : '' }}">
-        All ({{ $contacts->total() }})
+        {{ __('admin.all') }} ({{ $contacts->total() }})
     </a>
     <a href="{{ route('admin.contacts.index', ['status' => 'new']) }}"
        class="filter-btn filter-btn-new {{ request('status') === 'new' ? 'active' : '' }}">
-        <i class="bi bi-circle-fill"></i> New ({{ $newCount }})
+        <i class="bi bi-circle-fill"></i> {{ __('admin.new') }} ({{ $newCount }})
     </a>
     <a href="{{ route('admin.contacts.index', ['status' => 'read']) }}"
        class="filter-btn filter-btn-read {{ request('status') === 'read' ? 'active' : '' }}">
-        <i class="bi bi-eye"></i> Read ({{ $readCount }})
-    </a>
-    <a href="{{ route('admin.contacts.index', ['status' => 'replied']) }}"
-       class="filter-btn filter-btn-replied {{ request('status') === 'replied' ? 'active' : '' }}">
-        <i class="bi bi-reply"></i> Replied ({{ $repliedCount }})
+        <i class="bi bi-eye"></i> {{ __('admin.read') }} ({{ $readCount }})
     </a>
     <a href="{{ route('admin.contacts.index', ['status' => 'archived']) }}"
        class="filter-btn filter-btn-archived {{ request('status') === 'archived' ? 'active' : '' }}">
-        <i class="bi bi-archive"></i> Archived ({{ $archivedCount }})
+        <i class="bi bi-archive"></i> {{ __('admin.archived') }} ({{ $archivedCount }})
     </a>
 </div>
 
@@ -56,15 +52,18 @@
         <form method="GET" action="{{ route('admin.contacts.index') }}">
             <div class="row g-3">
                 <div class="col-md-10">
-                    <input type="text"
-                           name="search"
-                           class="form-control"
-                           placeholder="Search by name, email, or subject..."
-                           value="{{ request('search') }}">
+                    <div class="position-relative">
+                        <input type="text"
+                               name="search"
+                               class="form-control search-input"
+                               placeholder="{{ __('admin.search_by_name_email_subject') }}"
+                               value="{{ request('search') }}">
+                        <i class="bi bi-search position-absolute top-50 end-0 translate-middle-y me-3 text-muted"></i>
+                    </div>
                 </div>
                 <div class="col-md-2">
                     <button type="submit" class="btn-minimal btn-primary w-100">
-                        <i class="bi bi-search"></i> Search
+                        <i class="bi bi-search"></i> {{ __('admin.search') }}
                     </button>
                 </div>
             </div>
@@ -82,13 +81,13 @@
             <table class="table-minimal">
                 <thead>
                     <tr>
-                        <th style="width: 60px;">ID</th>
-                        <th>Name</th>
-                        <th>Email</th>
-                        <th>Subject</th>
-                        <th style="width: 120px;">Status</th>
-                        <th style="width: 180px;">Date</th>
-                        <th style="width: 180px;">Actions</th>
+                        <th style="width: 60px;">{{ __('admin.id') }}</th>
+                        <th>{{ __('admin.name') }}</th>
+                        <th>{{ __('admin.email') }}</th>
+                        <th>{{ __('admin.subject') }}</th>
+                        <th style="width: 120px;">{{ __('admin.status') }}</th>
+                        <th style="width: 180px;">{{ __('admin.date') }}</th>
+                        <th style="width: 180px;">{{ __('admin.actions') }}</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -118,19 +117,19 @@
                         <td>
                             @if($contact->status === 'new')
                                 <span class="status-badge status-new">
-                                    <i class="bi bi-circle-fill"></i> New
+                                    <i class="bi bi-circle-fill"></i> {{ __('admin.new') }}
                                 </span>
                             @elseif($contact->status === 'read')
                                 <span class="status-badge status-read">
-                                    <i class="bi bi-eye"></i> Read
+                                    <i class="bi bi-eye"></i> {{ __('admin.read') }}
                                 </span>
                             @elseif($contact->status === 'replied')
                                 <span class="status-badge status-replied">
-                                    <i class="bi bi-reply"></i> Replied
+                                    <i class="bi bi-reply"></i> {{ __('admin.replied') }}
                                 </span>
                             @else
                                 <span class="status-badge status-archived">
-                                    <i class="bi bi-archive"></i> Archived
+                                    <i class="bi bi-archive"></i> {{ __('admin.archived') }}
                                 </span>
                             @endif
                         </td>
@@ -144,16 +143,16 @@
                             <div class="action-buttons">
                                 <a href="{{ route('admin.contacts.show', $contact) }}"
                                    class="btn-minimal btn-primary"
-                                   title="View">
+                                   title="{{ __('admin.view') }}">
                                     <i class="bi bi-eye"></i>
                                 </a>
                                 <form action="{{ route('admin.contacts.destroy', $contact) }}"
                                       method="POST"
                                       class="d-inline"
-                                      onsubmit="return confirm('Are you sure you want to delete this message?');">
+                                      onsubmit="return confirm('{{ __('admin.confirm_delete_message') }}');">
                                     @csrf
                                     @method('DELETE')
-                                    <button type="submit" class="btn-minimal btn-danger" title="Delete">
+                                    <button type="submit" class="btn-minimal btn-danger" title="{{ __('admin.delete') }}">
                                         <i class="bi bi-trash"></i>
                                     </button>
                                 </form>
@@ -165,10 +164,10 @@
                         <td colspan="7" class="text-center py-5">
                             <div class="empty-state">
                                 <i class="bi bi-inbox"></i>
-                                <p>No contact messages found.</p>
+                                <p>{{ __('admin.no_contact_messages_found') }}</p>
                                 @if(request('search'))
                                     <a href="{{ route('admin.contacts.index') }}" class="btn-minimal btn-primary">
-                                        Clear Search
+                                        {{ __('admin.clear_search') }}
                                     </a>
                                 @endif
                             </div>

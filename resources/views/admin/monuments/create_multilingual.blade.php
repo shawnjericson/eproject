@@ -1,18 +1,18 @@
 @extends('layouts.admin')
 
-@section('title', 'Create Monument')
+@section('title', __('admin.create_new_monument'))
 
 @section('content')
 <div class="page-header">
     <div class="d-flex justify-content-between align-items-center">
         <div>
-            <h1 class="mb-2">Create New Monument
+            <h1 class="mb-2">{{ __('admin.create_new_monument') }}
             </h1>
-            <p class="text-muted mb-0">Add a new monument to the heritage collection</p>
+            <p class="text-muted mb-0">{{ __('admin.add_new_monument_to_heritage') }}</p>
         </div>
         <div>
             <a href="{{ route('admin.monuments.index') }}" class="btn btn-modern-secondary">
-                <i class="bi bi-arrow-left me-2"></i>Back to Monuments
+                <i class="bi bi-arrow-left me-2"></i>{{ __('admin.back_to_monuments') }}
             </a>
         </div>
     </div>
@@ -23,7 +23,7 @@
         <div class="card-body">
             <div class="alert alert-danger mb-0">
                 <h6 class="alert-heading">
-                    <i class="bi bi-exclamation-triangle me-2"></i>Please fix the following errors:
+                    <i class="bi bi-exclamation-triangle me-2"></i>{{ __('admin.please_fix_errors') }}:
                 </h6>
                 <ul class="mb-0 mt-2">
                     @foreach ($errors->all() as $error)
@@ -43,7 +43,7 @@
                 <div class="modern-card mb-4">
                     <div class="card-header">
                         <h5 class="mb-0">
-                            <i class="bi bi-translate text-primary me-2"></i>Language Information
+                            <i class="bi bi-translate text-primary me-2"></i>{{ __('admin.language_information') }}
                         </h5>
                     </div>
                     <div class="card-body">
@@ -51,8 +51,8 @@
                             <div class="d-flex align-items-center">
                                 <i class="bi bi-info-circle me-3 fs-4"></i>
                                 <div>
-                                    <h6 class="mb-1">Monument will be created in: <strong>{{ app()->getLocale() == 'en' ? 'English' : 'Tiếng Việt' }}</strong></h6>
-                                    <p class="mb-0 small">The language is automatically set based on your current interface language. You can add translations later by editing this monument.</p>
+                                    <h6 class="mb-1">{{ __('admin.monument_will_be_created_in') }}: <strong>{{ app()->getLocale() == 'en' ? __('admin.english') : __('admin.vietnamese') }}</strong></h6>
+                                    <p class="mb-0 small">{{ __('admin.language_auto_set_hint') }}</p>
                                 </div>
                             </div>
                         </div>
@@ -64,12 +64,12 @@
                 <div class="modern-card mb-4">
                     <div class="card-header">
                         <h5 class="mb-0">
-                            <i class="bi bi-info-circle text-primary me-2"></i>Basic Information
+                            <i class="bi bi-info-circle text-primary me-2"></i>{{ __('admin.basic_information') }}
                         </h5>
                     </div>
                     <div class="card-body">
                         <div class="mb-3">
-                            <label for="title" class="form-label">Title <span class="text-danger">*</span></label>
+                            <label for="title" class="form-label">{{ __('admin.title') }} <span class="text-danger">*</span></label>
                             <input type="text" class="form-control @error('title') is-invalid @enderror" 
                                    id="title" name="title" value="{{ old('title') }}">
                             @error('title')
@@ -78,7 +78,7 @@
                         </div>
 
                         <div class="mb-3">
-                            <label for="location" class="form-label">Location</label>
+                            <label for="location" class="form-label">{{ __('admin.location') }}</label>
                             <input type="text" class="form-control @error('location') is-invalid @enderror" 
                                    id="location" name="location" value="{{ old('location') }}">
                             @error('location')
@@ -87,14 +87,14 @@
                         </div>
 
                         <div class="mb-3">
-                            <label for="zone" class="form-label">Zone <span class="text-danger">*</span></label>
+                            <label for="zone" class="form-label">{{ __('admin.monument_zone') }} <span class="text-danger">*</span></label>
                             <select class="form-select @error('zone') is-invalid @enderror" id="zone" name="zone">
-                                <option value="">Select Zone</option>
-                                <option value="East" {{ old('zone') == 'East' ? 'selected' : '' }}>East</option>
-                                <option value="North" {{ old('zone') == 'North' ? 'selected' : '' }}>North</option>
-                                <option value="West" {{ old('zone') == 'West' ? 'selected' : '' }}>West</option>
-                                <option value="South" {{ old('zone') == 'South' ? 'selected' : '' }}>South</option>
-                                <option value="Central" {{ old('zone') == 'Central' ? 'selected' : '' }}>Central</option>
+                                <option value="">{{ __('admin.select_zone') }}</option>
+                                <option value="East" {{ old('zone') == 'East' ? 'selected' : '' }}>{{ __('admin.zones.east') }}</option>
+                                <option value="North" {{ old('zone') == 'North' ? 'selected' : '' }}>{{ __('admin.zones.north') }}</option>
+                                <option value="West" {{ old('zone') == 'West' ? 'selected' : '' }}>{{ __('admin.zones.west') }}</option>
+                                <option value="South" {{ old('zone') == 'South' ? 'selected' : '' }}>{{ __('admin.zones.south') }}</option>
+                                <option value="Central" {{ old('zone') == 'Central' ? 'selected' : '' }}>{{ __('admin.zones.central') }}</option>
                             </select>
                             @error('zone')
                                 <div class="invalid-feedback">{{ $message }}</div>
@@ -104,21 +104,21 @@
                         <!-- Coordinates -->
                         <div class="row">
                             <div class="col-md-6 mb-3">
-                                <label for="latitude" class="form-label">Latitude <small class="text-muted">(Optional)</small></label>
+                                <label for="latitude" class="form-label">{{ __('admin.latitude') }} <small class="text-muted">({{ __('admin.optional') }})</small></label>
                                 <input type="number" step="0.00000001" class="form-control @error('latitude') is-invalid @enderror"
                                        id="latitude" name="latitude" value="{{ old('latitude') }}"
                                        placeholder="e.g., 13.412469">
-                                <small class="text-muted">Range: -90 to 90</small>
+                                <small class="text-muted">{{ __('admin.range') }}: -90 {{ __('admin.to') }} 90</small>
                                 @error('latitude')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
                             </div>
                             <div class="col-md-6 mb-3">
-                                <label for="longitude" class="form-label">Longitude <small class="text-muted">(Optional)</small></label>
+                                <label for="longitude" class="form-label">{{ __('admin.longitude') }} <small class="text-muted">({{ __('admin.optional') }})</small></label>
                                 <input type="number" step="0.00000001" class="form-control @error('longitude') is-invalid @enderror"
                                        id="longitude" name="longitude" value="{{ old('longitude') }}"
                                        placeholder="e.g., 103.866986">
-                                <small class="text-muted">Range: -180 to 180</small>
+                                <small class="text-muted">{{ __('admin.range') }}: -180 {{ __('admin.to') }} 180</small>
                                 @error('longitude')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
@@ -130,14 +130,14 @@
                             <div class="form-check">
                                 <input class="form-check-input" type="checkbox" id="is_world_wonder" name="is_world_wonder" value="1" {{ old('is_world_wonder') ? 'checked' : '' }}>
                                 <label class="form-check-label" for="is_world_wonder">
-                                     <strong>Mark as World Wonder</strong>
-                                    <br><small class="text-muted">This monument will be displayed in the special World Wonders section on the frontend</small>
+                                     <strong>{{ __('admin.mark_as_world_wonder') }}</strong>
+                                    <br><small class="text-muted">{{ __('admin.world_wonder_hint') }}</small>
                                 </label>
                             </div>
                         </div>
 
                         <div class="mb-3">
-                            <label for="description" class="form-label">Description</label>
+                            <label for="description" class="form-label">{{ __('admin.description') }}</label>
                             <textarea class="form-control @error('description') is-invalid @enderror" 
                                       id="description" name="description" rows="3">{{ old('description') }}</textarea>
                             @error('description')
@@ -151,14 +151,14 @@
                 <div class="modern-card mb-4">
                     <div class="card-header">
                         <h5 class="mb-0">
-                            <i class="bi bi-file-text text-primary me-2"></i>Content
+                            <i class="bi bi-file-text text-primary me-2"></i>{{ __('admin.content') }}
                         </h5>
                     </div>
                     <div class="card-body">
                         
 
                         <div class="mb-3">
-                            <label for="monument_content" class="form-label">Main Content</label>
+                            <label for="monument_content" class="form-label">{{ __('admin.main_content') }}</label>
                             <textarea class="form-control ckeditor @error('content') is-invalid @enderror" 
                                       id="monument_content" name="content" rows="15">{{ old('content') }}</textarea>
                             @error('content')
@@ -169,15 +169,15 @@
                 </div>
 
                 <!-- Map Integration -->
-                <div class="modern-card mb-4">
+                <!-- <div class="modern-card mb-4">
                     <div class="card-header">
                         <h5 class="mb-0">
-                            <i class="bi bi-geo-alt text-primary me-2"></i>Map Integration
+                            <i class="bi bi-geo-alt text-primary me-2"></i>{{ __('admin.map_integration') }}
                         </h5>
                     </div>
-                    <div class="card-body">
+                        <div class="card-body">
                         <div class="mb-3">
-                            <label for="map_embed" class="form-label">Google Maps Embed Code</label>
+                            <label for="map_embed" class="form-label">{{ __('admin.google_maps_embed_code') }}</label>
                             <textarea class="form-control @error('map_embed') is-invalid @enderror" 
                                       id="map_embed" name="map_embed" rows="3" 
                                       placeholder="{{ __('admin.paste_google_maps_embed') }}">{{ old('map_embed') }}</textarea>
@@ -185,15 +185,15 @@
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
                             <div class="form-text">
-                                <strong>How to get embed code:</strong><br>
-                                1. Go to <a href="https://maps.google.com" target="_blank">Google Maps</a><br>
+                                <strong>{{ __('admin.how_to_get_embed_code') }}:</strong><br>
+                                1. {{ __('admin.go_to_google_maps') }}<br>
                                 2. {{ __('admin.search_for_location') }}<br>
-                                3. Click "Share" → "Embed a map"<br>
-                                4. Copy the iframe code and paste here
+                                3. {{ __('admin.click_share_embed') }}<br>
+                                4. {{ __('admin.copy_iframe_paste') }}
                             </div>
                         </div>
                     </div>
-                </div>
+                </div> -->
             </div>
 
             <div class="col-lg-4">
@@ -201,18 +201,18 @@
                 <div class="modern-card mb-4">
                     <div class="card-header">
                         <h5 class="mb-0">
-                            <i class="bi bi-image text-primary me-2"></i>Featured Image
+                            <i class="bi bi-image text-primary me-2"></i>{{ __('admin.featured_image') }}
                         </h5>
                     </div>
                     <div class="card-body">
                         <div class="mb-3">
-                            <label for="featured_image" class="form-label">Upload Image</label>
+                            <label for="featured_image" class="form-label">{{ __('admin.upload_image') }}</label>
                             <input type="file" class="form-control @error('featured_image') is-invalid @enderror"
                                    id="featured_image" name="featured_image" accept="image/*">
                             @error('featured_image')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
-                            <div class="form-text">Maximum file size: 5MB. Supported formats: JPEG, PNG, GIF, WebP</div>
+                            <div class="form-text">{{ __('admin.max_file_size') }}: 5MB. {{ __('admin.supported_formats') }}: JPEG, PNG, GIF, WebP</div>
                         </div>
                         
                         <div id="imagePreview" style="display: none;">
@@ -225,18 +225,18 @@
                 <div class="modern-card mb-4">
                     <div class="card-header">
                         <h5 class="mb-0">
-                            <i class="bi bi-images text-primary me-2"></i>Gallery Images
+                            <i class="bi bi-images text-primary me-2"></i>{{ __('admin.gallery_images') }}
                         </h5>
                     </div>
                     <div class="card-body">
                         <div class="mb-3">
-                            <label for="gallery_images" class="form-label">Upload Multiple Images</label>
+                            <label for="gallery_images" class="form-label">{{ __('admin.upload_multiple_images') }}</label>
                             <input type="file" class="form-control @error('gallery_images.*') is-invalid @enderror"
                                    id="gallery_images" name="gallery_images[]" accept="image/*" multiple>
                             @error('gallery_images.*')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
-                            <div class="form-text">You can select multiple images at once. Max 5MB per image.</div>
+                            <div class="form-text">{{ __('admin.select_multiple_images_hint') }}. {{ __('admin.max_5mb_per_image') }}.</div>
                         </div>
                     </div>
                 </div>
@@ -245,7 +245,7 @@
                 <div class="modern-card mb-4">
                     <div class="card-header">
                         <h5 class="mb-0">
-                            <i class="bi bi-gear text-primary me-2"></i>Settings
+                            <i class="bi bi-gear text-primary me-2"></i>{{ __('admin.settings') }}
                         </h5>
                     </div>
                     <div class="card-body">
@@ -253,8 +253,8 @@
                             <div class="form-check">
                                 <input class="form-check-input" type="checkbox" id="save_as_draft" name="save_as_draft" value="1" {{ old('save_as_draft') ? 'checked' : '' }}>
                                 <label class="form-check-label" for="save_as_draft">
-                                    <strong>Save as Draft</strong>
-                                    <br><small class="text-muted">If unchecked, the monument will be saved as "Pending Review" for admin approval</small>
+                                    <strong>{{ __('admin.save_as_draft') }}</strong>
+                                    <br><small class="text-muted">{{ __('admin.save_as_draft_hint') }}</small>
                                 </label>
                             </div>
                             <input type="hidden" name="status" id="status" value="{{ old('save_as_draft') ? 'draft' : 'pending' }}">
@@ -263,15 +263,15 @@
                         <div class="d-grid">
                             <button type="submit" class="btn btn-modern-primary" id="submitBtn">
                                 <span class="btn-text">
-                                    <i class="bi bi-save me-2"></i>Create Monument
+                                    <i class="bi bi-save me-2"></i>{{ __('admin.create_monument') }}
                                 </span>
                                 <span class="btn-loading" style="display: none;">
                                     <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
-                                    Creating... Please wait
+                                    {{ __('admin.creating') }}... {{ __('admin.please_wait') }}
                                 </span>
                             </button>
                             <small class="text-muted mt-2" id="uploadHint" style="display: none;">
-                                <i class="bi bi-info-circle"></i> Uploading images to Cloudinary... This may take a moment.
+                                <i class="bi bi-info-circle"></i> {{ __('admin.uploading_images_hint') }}
                             </small>
                         </div>
                     </div>
@@ -281,17 +281,17 @@
                 <div class="modern-card mb-4">
                     <div class="card-header">
                         <h5 class="mb-0">
-                            <i class="bi bi-globe text-info me-2"></i>Multilingual Support
+                            <i class="bi bi-globe text-info me-2"></i>{{ __('admin.multilingual_support') }}
                         </h5>
                     </div>
                     <div class="card-body">
                         <div class="alert alert-info">
-                            <h6><i class="bi bi-lightbulb"></i> How it works:</h6>
+                            <h6><i class="bi bi-lightbulb"></i> {{ __('admin.how_it_works') }}:</h6>
                             <ul class="mb-0">
-                                <li><strong>Step 1:</strong> Create monument in your primary language</li>
-                                <li><strong>Step 2:</strong> After saving, use "Edit" to add translations</li>
-                                <li><strong>Step 3:</strong> Each language has separate content</li>
-                                <li><strong>Benefit:</strong> Clean database structure and easy management</li>
+                                <li><strong>{{ __('admin.step_1') }}:</strong> {{ __('admin.create_monument_primary_language') }}</li>
+                                <li><strong>{{ __('admin.step_2') }}:</strong> {{ __('admin.after_saving_use_edit') }}</li>
+                                <li><strong>{{ __('admin.step_3') }}:</strong> {{ __('admin.each_language_separate_content') }}</li>
+                                <li><strong>{{ __('admin.benefit') }}:</strong> {{ __('admin.clean_database_structure') }}</li>
                             </ul>
                         </div>
                     </div>
@@ -415,7 +415,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
             if (!language || !title || !zone || !status) {
                 e.preventDefault();
-                alert('Please fill in all required fields');
+                alert("{{ __('admin.please_fill_required_fields') }}");
                 return false;
             }
 

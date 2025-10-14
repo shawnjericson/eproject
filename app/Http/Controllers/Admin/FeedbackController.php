@@ -48,7 +48,23 @@ class FeedbackController extends Controller
 
     public function show(Feedback $feedback)
     {
+        // Mark as viewed when admin views the feedback
+        if ($feedback->status === 'approved' && !$feedback->viewed_at) {
+            $feedback->markAsViewed();
+        }
+        
         return view('admin.feedbacks.show', compact('feedback'));
+    }
+
+    public function markAllAsViewed()
+    {
+        $updated = Feedback::where('status', 'approved')->unviewed()->update(['viewed_at' => now()]);
+        
+        return response()->json([
+            'success' => true, 
+            'updated' => $updated,
+            'message' => "Marked {$updated} feedbacks as viewed"
+        ]);
     }
 
     public function destroy(Feedback $feedback)

@@ -10,7 +10,7 @@ use Laravel\Sanctum\HasApiTokens;
 
 class User extends Authenticatable
 {
-    use HasApiTokens, HasFactory, Notifiable;
+    use HasApiTokens, HasFactory ;
 
     /**
      * The attributes that are mass assignable.
@@ -71,6 +71,22 @@ class User extends Authenticatable
     public function monuments()
     {
         return $this->hasMany(Monument::class, 'created_by');
+    }
+
+    /**
+     * Get the notifications for this user.
+     */
+    public function userNotifications()
+    {
+        return $this->hasMany(UserNotification::class);
+    }
+
+    /**
+     * Get unread notifications count.
+     */
+    public function getUnreadNotificationsCountAttribute(): int
+    {
+        return $this->userNotifications()->unread()->count();
     }
 
     /**

@@ -23,7 +23,10 @@ class PostController extends Controller
     }
     public function index(Request $request)
     {
-        $query = Post::with(['creator', 'translations']);
+        // Add caching for better performance
+        $cacheKey = 'admin_posts_' . $request->get('page', 1) . '_' . $request->get('status', 'all') . '_' . $request->get('author', 'all') . '_' . $request->get('search', '');
+        
+        $query = Post::with(['creator:id,name', 'translations']);
 
         // Filter by user role - moderators only see their own posts
         if (auth()->user()->isModerator()) {
@@ -33,6 +36,11 @@ class PostController extends Controller
         // Filter by status - only apply if status is provided
         if ($request->filled('status')) {
             $query->where('status', $request->status);
+        }
+
+        // Filter by author - only apply if author is provided
+        if ($request->filled('author')) {
+            $query->where('created_by', $request->author);
         }
 
         // Search - works independently of filters
@@ -50,9 +58,20 @@ class PostController extends Controller
             });
         }
 
-        $posts = $query->orderBy('created_at', 'desc')->paginate(10);
+        // Select only necessary columns for list view
+        $posts = $query->select([
+            'id', 'title', 'description', 'image', 'status', 'created_at', 
+            'updated_at', 'created_by', 'published_at'
+        ])
+        ->orderBy('created_at', 'desc')
+        ->paginate(10);
+        
+        // Get current locale for displaying content
+        $currentLocale = app()->getLocale();
 
-        return view('admin.posts.index', compact('posts'));
+        return response()
+            ->view('admin.posts.index', compact('posts', 'currentLocale'))
+            ->header('Cache-Control', 'private, max-age=60'); // Cache for 1 minute
     }
 
     public function create()
@@ -65,10 +84,28 @@ class PostController extends Controller
         // Create the main post
         $postData = [
             'title' => $request->title, // Fallback title
+            'description' => $request->description, // Fallback description
             'content' => $request->content, // Fallback content
             'status' => $request->status,
             'created_by' => auth()->id(),
         ];
+
+        // Apply approval requirements based on settings
+        $user = auth()->user();
+        if ($request->status === 'pending') {
+            // Check if approval is required based on settings
+            if (\App\Services\SettingsService::isPostApprovalRequired()) {
+                // Approval required - only admin content is auto-approved
+                if ($user->role === 'admin') {
+                    $postData['status'] = 'approved';
+                } else {
+                    $postData['status'] = 'pending';
+                }
+            } else {
+                // No approval required - auto-approve all content
+                $postData['status'] = 'approved';
+            }
+        }
 
         if ($request->hasFile('image')) {
             try {
@@ -102,13 +139,29 @@ class PostController extends Controller
             'content' => $request->content,
         ]);
 
+        // Send notification to admin when moderator creates content that needs approval
+        if ($user->role === 'moderator' && $post->status === 'pending') {
+            $admin = \App\Models\User::where('role', 'admin')->first();
+            if ($admin) {
+                try {
+                    \App\Services\NotificationService::postCreatedByModerator(
+                        $admin,
+                        $post,
+                        $user
+                    );
+                } catch (\Exception $e) {
+                    \Log::error('Failed to send moderator creation notification: ' . $e->getMessage());
+                }
+            }
+        }
+
         return redirect()->route('admin.posts.index')->with('success', 'Post created successfully!');
     }
 
     public function show(Post $post)
     {
         $post->load(['creator', 'translations']);
-        return view('admin.posts.show_professional', compact('post'));
+        return view('admin.posts.show', compact('post'));
     }
 
     public function edit(Post $post)
@@ -172,7 +225,7 @@ class PostController extends Controller
         return redirect()->route('admin.posts.index')->with('success', 'Post updated successfully!');
     }
 
-    public function destroy(Post $post)
+    public function destroy(Request $request, Post $post)
     {
         $user = auth()->user();
 
@@ -181,13 +234,28 @@ class PostController extends Controller
             abort(403, 'Cannot delete approved content. Only administrators can delete approved content.');
         }
 
-        // Only delete local images, not Cloudinary URLs
-        if ($post->image && !filter_var($post->image, FILTER_VALIDATE_URL)) {
-            Storage::disk('public')->delete($post->image);
+        // Validate deletion reason
+        $request->validate([
+            'deletion_reason' => 'required|string|max:500'
+        ]);
+
+        // Send notification to post creator
+        if ($post->creator && $post->creator->email) {
+            try {
+                \App\Services\NotificationService::postDeleted(
+                    $post->creator, 
+                    $post, 
+                    $request->deletion_reason, 
+                    $user
+                );
+            } catch (\Exception $e) {
+                \Log::error('Failed to send post deletion notification: ' . $e->getMessage());
+            }
         }
 
+        // Soft delete the post (don't delete images, just mark as deleted)
         $post->delete();
-        return redirect()->route('admin.posts.index')->with('success', 'Post deleted successfully!');
+        return redirect()->route('admin.posts.index')->with('success', 'Post moved to trash successfully!');
     }
 
     /**
@@ -222,9 +290,9 @@ class PostController extends Controller
     {
         $user = auth()->user();
 
-        // Only admin can approve content
+        // Only Admin can approve posts
         if ($user->role !== 'admin') {
-            abort(403, 'Only administrators can approve content.');
+            abort(403, 'Only administrators can approve posts.');
         }
 
         $post->update([
@@ -233,5 +301,69 @@ class PostController extends Controller
         ]);
 
         return redirect()->back()->with('success', 'Post approved successfully!');
+    }
+
+    public function reject(Request $request, Post $post)
+    {
+        $user = auth()->user();
+
+        // Only Admin can reject posts
+        if ($user->role !== 'admin') {
+            abort(403, 'Only administrators can reject posts.');
+        }
+
+        $request->validate([
+            'rejection_reason' => 'required|string|max:500'
+        ]);
+
+        $post->update([
+            'status' => 'rejected',
+            'rejection_reason' => $request->rejection_reason,
+            'rejected_at' => now(),
+            'rejected_by' => auth()->id()
+        ]);
+
+        // Send notification to post creator
+        if ($post->creator && $post->creator->email) {
+            try {
+                \App\Services\NotificationService::postRejected(
+                    $post->creator, 
+                    $post, 
+                    $request->rejection_reason, 
+                    $user
+                );
+            } catch (\Exception $e) {
+                \Log::error('Failed to send post rejection notification: ' . $e->getMessage());
+            }
+        }
+
+        return redirect()->back()->with('success', 'Post rejected successfully!');
+    }
+
+    public function restore($id)
+    {
+        $post = Post::withTrashed()->findOrFail($id);
+        $post->restore();
+
+        return redirect()->back()->with('success', 'Post restored successfully!');
+    }
+
+    public function forceDelete($id)
+    {
+        $post = Post::withTrashed()->findOrFail($id);
+        
+        // Only admins can permanently delete
+        if (auth()->user()->role !== 'admin') {
+            abort(403, 'Only administrators can permanently delete posts.');
+        }
+
+        // Now we can delete images since it's permanent
+        if ($post->image && !filter_var($post->image, FILTER_VALIDATE_URL)) {
+            Storage::disk('public')->delete($post->image);
+        }
+
+        $post->forceDelete();
+
+        return redirect()->back()->with('success', 'Post permanently deleted!');
     }
 }

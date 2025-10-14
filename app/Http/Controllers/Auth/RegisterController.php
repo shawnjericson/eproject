@@ -4,12 +4,13 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
-use App\Models\Contact;
+use App\Services\NotificationService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 
 class RegisterController extends Controller
 {
@@ -44,17 +45,13 @@ class RegisterController extends Controller
         // Notify user with a friendly message
         $userNotice = __('Your account has been created and is pending admin approval. You will be able to sign in once approved.');
 
-        // Create an admin contact message to alert administrators
+
+        // Send notification to all admins about new user registration
         try {
-            Contact::create([
-                'name' => $user->name,
-                'email' => $user->email,
-                'subject' => 'New registration pending approval',
-                'message' => "A new user has registered and is awaiting approval.\n\nName: {$user->name}\nEmail: {$user->email}",
-                'status' => 'new',
-            ]);
+            NotificationService::notifyAdminsAboutNewUser($user);
         } catch (\Exception $e) {
-            // Silently ignore contact creation failure to not block registration
+            // Silently ignore notification failure to not block registration
+            Log::warning('Failed to send user registration notification: ' . $e->getMessage());
         }
 
         return redirect()->route('login')->with('success', $userNotice);
@@ -65,9 +62,14 @@ class RegisterController extends Controller
      */
     protected function validator(array $data)
     {
+        // Trim email before validation
+        if (isset($data['email'])) {
+            $data['email'] = trim($data['email']);
+        }
+        
         return Validator::make($data, [
             'name' => ['required', 'string', 'max:255', 'min:3'],
-            'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
+            'email' => ['required', 'string', 'email:rfc,dns', 'max:255', 'unique:users'],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
             'terms' => ['required', 'accepted'],
         ], [
@@ -89,8 +91,8 @@ class RegisterController extends Controller
     protected function create(array $data)
     {
         return User::create([
-            'name' => $data['name'],
-            'email' => $data['email'],
+            'name' => trim($data['name']),
+            'email' => trim($data['email']),
             'password' => Hash::make($data['password']),
             'role' => 'moderator',
             'status' => 'inactive',

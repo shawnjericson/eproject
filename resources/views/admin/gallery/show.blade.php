@@ -1,11 +1,11 @@
 @extends('layouts.admin')
 
-@section('title', 'Gallery Image Details')
+@section('title', __('admin.gallery_image_details'))
 
 @section('content')
 <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-4">
     <div>
-        <h1 class="h3 mb-1">Gallery Image Details</h1>
+        <h1 class="h3 mb-1">{{ __('admin.gallery_image_details') }}</h1>
         <p class="text-muted mb-0">{{ Str::limit($gallery->title, 80) }}</p>
     </div>
     <div class="d-flex gap-2">
@@ -38,7 +38,7 @@
                 @endif
 
                 <div class="mt-4">
-                    <h6>Monument Information</h6>
+                    <h6>{{ __('admin.monument_information') }}</h6>
                     <div class="card-minimal bg-light">
                         <div class="card-body">
                             <div class="row">
@@ -70,7 +70,7 @@
                                     <div class="mt-2">
                                         <a href="{{ route('admin.monuments.show', $gallery->monument) }}"
                                            class="btn-minimal btn-primary">
-                                            <i class="bi bi-building"></i> {{ __('admin.view') }} Monument
+                                            <i class="bi bi-building"></i> {{ __('admin.view') }} {{ __('admin.monument') }}
                                         </a>
                                     </div>
                                 </div>
@@ -123,12 +123,12 @@
                     </a>
 
                     <a href="{{ route('admin.monuments.show', $gallery->monument) }}" class="btn-minimal">
-                        <i class="bi bi-building"></i> {{ __('admin.view') }} Monument
+                        <i class="bi bi-building"></i> {{ __('admin.view') }} {{ __('admin.monument') }}
                     </a>
 
                     <a href="{{ $gallery->image_url }}"
                        target="_blank" class="btn-minimal">
-                        <i class="bi bi-download"></i> {{ __('admin.view') }} Full Size
+                        <i class="bi bi-download"></i> {{ __('admin.view') }} {{ __('admin.full_size') }}
                     </a>
                     
                     <hr>

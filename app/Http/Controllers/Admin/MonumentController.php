@@ -24,7 +24,10 @@ class MonumentController extends Controller
 
     public function index(Request $request)
     {
-        $query = Monument::with(['creator', 'translations']);
+        // Add caching for better performance
+        $cacheKey = 'admin_monuments_' . $request->get('page', 1) . '_' . $request->get('status', 'all') . '_' . $request->get('zone', 'all') . '_' . $request->get('author', 'all') . '_' . $request->get('search', '');
+        
+        $query = Monument::with(['creator:id,name', 'translations']);
 
         // Filter by user role - moderators only see their own monuments
         if (auth()->user()->isModerator()) {
@@ -39,6 +42,11 @@ class MonumentController extends Controller
         // Filter by zone - only apply if zone is provided
         if ($request->filled('zone')) {
             $query->where('zone', $request->zone);
+        }
+
+        // Filter by author - only apply if author is provided
+        if ($request->filled('author')) {
+            $query->where('created_by', $request->author);
         }
 
         // Search - works independently of filters
@@ -61,9 +69,20 @@ class MonumentController extends Controller
             });
         }
 
-        $monuments = $query->orderBy('created_at', 'desc')->paginate(10);
+        // Select only necessary columns for list view
+        $monuments = $query->select([
+            'id', 'title', 'description', 'image', 'location', 'zone', 
+            'status', 'created_at', 'updated_at', 'created_by', 'is_world_wonder'
+        ])
+        ->orderBy('created_at', 'desc')
+        ->paginate(10);
+        
+        // Get current locale for displaying content
+        $currentLocale = app()->getLocale();
 
-        return view('admin.monuments.index', compact('monuments'));
+        return response()
+            ->view('admin.monuments.index', compact('monuments', 'currentLocale'))
+            ->header('Cache-Control', 'private, max-age=60'); // Cache for 1 minute
     }
 
     public function create()
@@ -95,6 +114,23 @@ class MonumentController extends Controller
                 'status' => $request->status ?: 'draft',
                 'created_by' => auth()->id() ?: 1,
             ];
+
+            // Apply approval requirements based on settings
+            $user = auth()->user();
+            if ($monumentData['status'] === 'pending') {
+                // Check if approval is required based on settings
+                if (\App\Services\SettingsService::isMonumentApprovalRequired()) {
+                    // Approval required - only admin content is auto-approved
+                    if ($user->role === 'admin') {
+                        $monumentData['status'] = 'approved';
+                    } else {
+                        $monumentData['status'] = 'pending';
+                    }
+                } else {
+                    // No approval required - auto-approve all content
+                    $monumentData['status'] = 'approved';
+                }
+            }
 
             Log::info('Monument data prepared:', $monumentData);
 
@@ -174,6 +210,22 @@ class MonumentController extends Controller
             }
         }
 
+            // Send notification to admin when moderator creates content that needs approval
+            if ($user->role === 'moderator' && $monument->status === 'pending') {
+                $admin = \App\Models\User::where('role', 'admin')->first();
+                if ($admin) {
+                    try {
+                        \App\Services\NotificationService::monumentCreatedByModerator(
+                            $admin,
+                            $monument,
+                            $user
+                        );
+                    } catch (\Exception $e) {
+                        \Log::error('Failed to send moderator creation notification: ' . $e->getMessage());
+                    }
+                }
+            }
+
             Log::info('Monument creation completed successfully:', ['monument_id' => $monument->id]);
             return redirect()->route('admin.monuments.show', $monument)->with('success', 'Monument created successfully with Cloudinary images!');
 
@@ -191,17 +243,7 @@ class MonumentController extends Controller
     {
         $monument->load(['gallery', 'feedbacks', 'translations', 'creator']);
 
-        // Get available languages
-        $availableLanguages = ['vi']; // Vietnamese is always available (base language)
-        if ($monument->translations->count() > 0) {
-            foreach ($monument->translations as $translation) {
-                if (!in_array($translation->language, $availableLanguages)) {
-                    $availableLanguages[] = $translation->language;
-                }
-            }
-        }
-
-        return view('admin.monuments.show', compact('monument', 'availableLanguages'));
+        return view('admin.monuments.show', compact('monument'));
     }
 
     public function edit(Monument $monument)
@@ -334,7 +376,7 @@ class MonumentController extends Controller
         return redirect()->route('admin.monuments.show', $monument)->with('success', 'Monument updated successfully!');
     }
 
-    public function destroy(Monument $monument)
+    public function destroy(Request $request, Monument $monument)
     {
         $user = auth()->user();
 
@@ -343,6 +385,100 @@ class MonumentController extends Controller
             abort(403, 'Cannot delete approved content. Only administrators can delete approved content.');
         }
 
+        // Validate deletion reason
+        $request->validate([
+            'deletion_reason' => 'required|string|max:500'
+        ]);
+
+        // Send notification to monument creator
+        if ($monument->creator && $monument->creator->email) {
+            try {
+                \App\Services\NotificationService::monumentDeleted(
+                    $monument->creator, 
+                    $monument, 
+                    $request->deletion_reason, 
+                    $user
+                );
+            } catch (\Exception $e) {
+                \Log::error('Failed to send monument deletion notification: ' . $e->getMessage());
+            }
+        }
+
+        // Soft delete the monument (don't delete images, just mark as deleted)
+        $monument->delete();
+
+        return redirect()->route('admin.monuments.index')->with('success', 'Monument moved to trash successfully!');
+    }
+
+    public function approve(Monument $monument)
+    {
+        $user = auth()->user();
+
+        // Only Admin can approve monuments
+        if ($user->role !== 'admin') {
+            abort(403, 'Only administrators can approve monuments.');
+        }
+
+        $monument->update(['status' => 'approved']);
+
+        return redirect()->back()->with('success', 'Monument approved successfully!');
+    }
+
+    public function reject(Request $request, Monument $monument)
+    {
+        $user = auth()->user();
+
+        // Only Admin can reject monuments
+        if ($user->role !== 'admin') {
+            abort(403, 'Only administrators can reject monuments.');
+        }
+
+        $request->validate([
+            'rejection_reason' => 'required|string|max:500'
+        ]);
+
+        $monument->update([
+            'status' => 'rejected',
+            'rejection_reason' => $request->rejection_reason,
+            'rejected_at' => now(),
+            'rejected_by' => auth()->id()
+        ]);
+
+        // Send notification to monument creator
+        if ($monument->creator && $monument->creator->email) {
+            try {
+                \App\Services\NotificationService::monumentRejected(
+                    $monument->creator,
+                    $monument,
+                    $request->rejection_reason,
+                    $user
+                );
+            } catch (\Exception $e) {
+                \Log::error('Failed to send monument rejection notification: ' . $e->getMessage());
+            }
+        }
+
+        return redirect()->back()->with('success', 'Monument rejected successfully!');
+    }
+
+    public function restore($id)
+    {
+        $monument = Monument::withTrashed()->findOrFail($id);
+        $monument->restore();
+
+        return redirect()->back()->with('success', 'Monument restored successfully!');
+    }
+
+    public function forceDelete($id)
+    {
+        $monument = Monument::withTrashed()->findOrFail($id);
+        
+        // Only admins can permanently delete
+        if (auth()->user()->role !== 'admin') {
+            abort(403, 'Only administrators can permanently delete monuments.');
+        }
+
+        // Now we can delete images since it's permanent
         if ($monument->image) {
             Storage::disk('public')->delete($monument->image);
         }
@@ -354,22 +490,8 @@ class MonumentController extends Controller
             }
         }
 
-        $monument->delete();
+        $monument->forceDelete();
 
-        return redirect()->route('admin.monuments.index')->with('success', 'Monument deleted successfully!');
-    }
-
-    public function approve(Monument $monument)
-    {
-        $user = auth()->user();
-
-        // Only admin can approve content
-        if ($user->role !== 'admin') {
-            abort(403, 'Only administrators can approve content.');
-        }
-
-        $monument->update(['status' => 'approved']);
-
-        return redirect()->back()->with('success', 'Monument approved successfully!');
+        return redirect()->back()->with('success', 'Monument permanently deleted!');
     }
 }

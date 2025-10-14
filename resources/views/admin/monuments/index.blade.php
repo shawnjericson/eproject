@@ -20,27 +20,43 @@
             <div class="row g-3">
                 <div class="col-md-3">
                     <select name="status" class="form-select auto-filter">
-                        <option value="">All Status</option>
+                        <option value="">{{ __('admin.all_status') }}</option>
                         <option value="draft" {{ request('status') === 'draft' ? 'selected' : '' }}>{{ __('admin.draft') }}</option>
                         <option value="pending" {{ request('status') === 'pending' ? 'selected' : '' }}>{{ __('admin.pending') }}</option>
                         <option value="approved" {{ request('status') === 'approved' ? 'selected' : '' }}>{{ __('admin.approved') }}</option>
+                        <option value="rejected" {{ request('status') === 'rejected' ? 'selected' : '' }}>{{ __('admin.rejected') }}</option>
                     </select>
-                </div>
-                <div class="col-md-3">
-                    <select name="zone" class="form-select auto-filter">
-                        <option value="">All Zones</option>
-                        <option value="East" {{ request('zone') === 'East' ? 'selected' : '' }}>East</option>
-                        <option value="North" {{ request('zone') === 'North' ? 'selected' : '' }}>North</option>
-                        <option value="West" {{ request('zone') === 'West' ? 'selected' : '' }}>West</option>
-                        <option value="South" {{ request('zone') === 'South' ? 'selected' : '' }}>South</option>
-                        <option value="Central" {{ request('zone') === 'Central' ? 'selected' : '' }}>Central</option>
-                    </select>
-                </div>
-                <div class="col-md-4">
-                    <input type="text" name="search" class="form-control" placeholder="Search monuments..." value="{{ request('search') }}">
                 </div>
                 <div class="col-md-2">
-                    <a href="{{ route('admin.monuments.index') }}" class="btn-minimal">{{ __('admin.clear') }}</a>
+                    <select name="zone" class="form-select auto-filter">
+                        <option value="">{{ __('admin.all_zones') }}</option>
+                        <option value="East" {{ request('zone') === 'East' ? 'selected' : '' }}>{{ __('admin.zones.east') }}</option>
+                        <option value="North" {{ request('zone') === 'North' ? 'selected' : '' }}>{{ __('admin.zones.north') }}</option>
+                        <option value="West" {{ request('zone') === 'West' ? 'selected' : '' }}>{{ __('admin.zones.west') }}</option>
+                        <option value="South" {{ request('zone') === 'South' ? 'selected' : '' }}>{{ __('admin.zones.south') }}</option>
+                        <option value="Central" {{ request('zone') === 'Central' ? 'selected' : '' }}>{{ __('admin.zones.central') }}</option>
+                    </select>
+                </div>
+                @if(auth()->user()->isAdmin())
+                <div class="col-md-2">
+                    <select name="author" class="form-select auto-filter">
+                        <option value="">{{ __('admin.all_authors') }}</option>
+                        @foreach(\App\Models\User::whereIn('role', ['admin', 'moderator'])->get() as $user)
+                            <option value="{{ $user->id }}" {{ request('author') == $user->id ? 'selected' : '' }}>
+                                {{ $user->name }} ({{ ucfirst($user->role) }})
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+                @endif
+                <div class="col-md-{{ auth()->user()->isAdmin() ? '3' : '5' }}">
+                    <div class="position-relative">
+                        <input type="text" name="search" class="form-control search-input" placeholder="{{ __('admin.monument_placeholder') }}" value="{{ request('search') }}">
+                        <i class="bi bi-search position-absolute top-50 end-0 translate-middle-y me-3 text-muted"></i>
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <a href="{{ route('admin.monuments.index') }}" class="btn-minimal">{{ __('admin.reset') }}</a>
                 </div>
             </div>
         </form>
@@ -54,12 +70,12 @@
             <table class="table table-minimal">
                 <thead>
                     <tr>
-                        <th>{{ __('admin.title') }}</th>
-                        <th>Zone</th>
-                        <th>{{ __('admin.status') }}</th>
-                        <th>{{ __('admin.author') }}</th>
-                        <th>{{ __('admin.created_at') }}</th>
-                        <th>{{ __('admin.actions') }}</th>
+                        <th style="width: 35%;">{{ __('admin.title') }}</th>
+                        <th style="width: 12%;">{{ __('admin.monument_zone') }}</th>
+                        <th style="width: 12%;">{{ __('admin.status') }}</th>
+                        <th style="width: 15%;">{{ __('admin.author') }}</th>
+                        <th style="width: 12%;">{{ __('admin.created_at') }}</th>
+                        <th style="width: 14%;">{{ __('admin.actions') }}</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -72,18 +88,53 @@
                                              class="rounded me-2" style="width: 50px; height: 50px; object-fit: cover;">
                                     @endif
                                     <div>
-                                        <h6 class="mb-0">{{ Str::limit($monument->title, 50) }}</h6>
-                                        <small class="text-muted">{{ Str::limit($monument->description, 80) }}</small>
+                                        @php
+                                            // For Vietnamese (vi), use base monument data
+                                            // For other languages, use translations
+                                            if ($currentLocale === 'vi') {
+                                                $localizedTitle = $monument->title;
+                                                $localizedDescription = $monument->description;
+                                                $hasTranslation = true; // Vietnamese is always available as base language
+                                            } else {
+                                                $localizedTitle = $monument->getTitle($currentLocale);
+                                                $localizedDescription = $monument->getDescription($currentLocale);
+                                                $hasTranslation = $monument->translation($currentLocale);
+                                            }
+                                        @endphp
+                                        
+                                        <h6 class="mb-0">
+                                            {{ Str::limit($localizedTitle, 50) }}
+                                            @if(!$hasTranslation && $currentLocale !== 'vi')
+                                                @if($currentLocale === 'vi')
+                                                    <small class="text-warning ms-1" title="Bài viết này chưa có định dạng tiếng Việt">
+                                                        <i class="bi bi-exclamation-triangle"></i>
+                                                    </small>
+                                                @else
+                                                    <small class="text-warning ms-1" title="Sorry this writing have not update your language">
+                                                        <i class="bi bi-exclamation-triangle"></i>
+                                                    </small>
+                                                @endif
+                                            @endif
+                                        </h6>
+                                        
+                                        <small class="text-muted">
+                                            {{ Str::limit($localizedDescription, 80) }}
+                                        </small>
                                     </div>
                                 </div>
                             </td>
                             <td>
-                                <span class="badge bg-info">{{ $monument->zone }}</span>
+                                <span class="badge bg-info">{{ __('admin.zones.' . strtolower($monument->zone)) }}</span>
                             </td>
                             <td>
-                                <span class="badge bg-{{ $monument->status === 'approved' ? 'success' : ($monument->status === 'pending' ? 'warning' : 'secondary') }}">
-                                    {{ ucfirst($monument->status) }}
+                                <span class="badge bg-{{ $monument->status === 'approved' ? 'success' : ($monument->status === 'pending' ? 'warning' : ($monument->status === 'rejected' ? 'danger' : 'secondary')) }}">
+                                    {{ __('admin.' . $monument->status) }}
                                 </span>
+                                @if($monument->status === 'rejected' && $monument->rejection_reason)
+                                    <br><small class="text-muted" title="Rejection reason: {{ $monument->rejection_reason }}">
+                                        <i class="bi bi-exclamation-triangle"></i> {{ Str::limit($monument->rejection_reason, 30) }}
+                                    </small>
+                                @endif
                             </td>
                             <td>
                                 <div class="d-flex align-items-center">
@@ -100,11 +151,13 @@
                                 </div>
                             </td>
                             <td>
-                                <small class="text-muted">{{ $monument->created_at->format('M d, Y') }}</small>
+                                <small class="text-muted">{{ $monument->created_at->locale(app()->getLocale())->translatedFormat('M d, Y') }}</small>
                             </td>
                             <td>
-                                <div class="d-flex gap-2">
-                                    <a href="{{ route('admin.monuments.show', $monument) }}" class="btn-minimal btn-primary">{{ __('admin.view') }}</a>
+                                <div class="d-flex gap-1">
+                                    <a href="{{ route('admin.monuments.show', $monument) }}" class="btn-minimal btn-primary" title="{{ __('admin.view') }}">
+                                        <i class="bi bi-eye"></i>
+                                    </a>
 
                                     @php
                                         $canEdit = auth()->user()?->isAdmin() || $monument->created_by === auth()->id();
@@ -112,23 +165,27 @@
                                     @endphp
 
                                     @if($canEdit)
-                                        <a href="{{ route('admin.monuments.edit', $monument) }}" class="btn-minimal">{{ __('admin.edit') }}</a>
+                                        <a href="{{ route('admin.monuments.edit', $monument) }}" class="btn-minimal" title="{{ __('admin.edit') }}">
+                                            <i class="bi bi-pencil"></i>
+                                        </a>
                                     @endif
 
-                                    @if($monument->status === 'pending' && auth()->user()?->isAdmin())
+                                    @if($monument->status === 'pending' && (auth()->user()?->isAdmin() || \App\Services\SettingsService::canModeratorApproveMonuments()))
                                         <form action="{{ route('admin.monuments.approve', $monument) }}" method="POST" class="d-inline">
                                             @csrf
-                                            <button type="submit" class="btn-minimal btn-success">Approve</button>
+                                            <button type="submit" class="btn-minimal btn-success" title="{{ __('admin.approve') }}">
+                                                <i class="bi bi-check-circle"></i>
+                                            </button>
                                         </form>
+                                        <button type="button" class="btn-minimal btn-warning" onclick="openRejectModal('{{ route('admin.monuments.reject', $monument) }}')" title="{{ __('admin.reject') }}">
+                                            <i class="bi bi-x-circle"></i>
+                                        </button>
                                     @endif
 
                                     @if($canDelete)
-                                        <form action="{{ route('admin.monuments.destroy', $monument) }}" method="POST" class="d-inline"
-                                              onsubmit="return confirm('Are you sure you want to delete this monument?')">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="submit" class="btn-minimal btn-danger">{{ __('admin.delete') }}</button>
-                                        </form>
+                                        <button type="button" class="btn-minimal btn-danger" onclick="openDeleteModal('{{ route('admin.monuments.destroy', $monument) }}')" title="{{ __('admin.delete') }}">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
                                     @endif
                                 </div>
                             </td>
@@ -150,11 +207,11 @@
                         {{-- Previous --}}
                         @if ($monuments->onFirstPage())
                             <li class="page-item disabled">
-                                <span class="page-link">Previous</span>
+                                <span class="page-link">{{ __('admin.previous') }}</span>
                             </li>
                         @else
                             <li class="page-item">
-                                <a class="page-link" href="{{ $monuments->appends(request()->query())->previousPageUrl() }}">Previous</a>
+                                <a class="page-link" href="{{ $monuments->appends(request()->query())->previousPageUrl() }}">{{ __('admin.previous') }}</a>
                             </li>
                         @endif
 
@@ -174,11 +231,11 @@
                         {{-- Next --}}
                         @if ($monuments->hasMorePages())
                             <li class="page-item">
-                                <a class="page-link" href="{{ $monuments->appends(request()->query())->nextPageUrl() }}">Next</a>
+                                <a class="page-link" href="{{ $monuments->appends(request()->query())->nextPageUrl() }}">{{ __('admin.next') }}</a>
                             </li>
                         @else
                             <li class="page-item disabled">
-                                <span class="page-link">Next</span>
+                                <span class="page-link">{{ __('admin.next') }}</span>
                             </li>
                         @endif
                     </ul>
@@ -186,5 +243,24 @@
             </div>
         @endif
     </div>
-</div>
+    </div>
+
+    @include('admin.components.reject-modal')
+    @include('admin.components.delete-modal')
+
+@push('scripts')
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Auto-filter functionality
+    const autoFilterElements = document.querySelectorAll('.auto-filter');
+    
+    autoFilterElements.forEach(function(element) {
+        element.addEventListener('change', function() {
+            window.showLoading();
+            document.getElementById('filterForm').submit();
+        });
+    });
+});
+</script>
+@endpush
 @endsection

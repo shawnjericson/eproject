@@ -202,7 +202,12 @@
                             <!-- Current Password -->
                             <div class="col-12 mb-3">
                                 <label for="current_password" class="form-label">{{ __('admin.current_password') }} <span class="text-danger">*</span></label>
-                                <input type="password" class="form-control @error('current_password') is-invalid @enderror" id="current_password" name="current_password" placeholder="{{ __('admin.enter_current_password') }}">
+                                <div class="input-group">
+                                    <input type="password" class="form-control @error('current_password') is-invalid @enderror" id="current_password" name="current_password" placeholder="{{ __('admin.enter_current_password') }}">
+                                    <button class="btn btn-outline-secondary" type="button" onclick="togglePassword('current_password')">
+                                        <i class="bi bi-eye" id="current_password_icon"></i>
+                                    </button>
+                                </div>
                                 @error('current_password')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
@@ -211,7 +216,12 @@
                             <!-- New Password -->
                             <div class="col-md-6 mb-3">
                                 <label for="new_password" class="form-label">{{ __('admin.new_password') }} <span class="text-danger">*</span></label>
-                                <input type="password" class="form-control @error('new_password') is-invalid @enderror" id="new_password" name="new_password" placeholder="{{ __('admin.enter_new_password') }}">
+                                <div class="input-group">
+                                    <input type="password" class="form-control @error('new_password') is-invalid @enderror" id="new_password" name="new_password" placeholder="{{ __('admin.enter_new_password') }}">
+                                    <button class="btn btn-outline-secondary" type="button" onclick="togglePassword('new_password')">
+                                        <i class="bi bi-eye" id="new_password_icon"></i>
+                                    </button>
+                                </div>
                                 @error('new_password')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
@@ -220,17 +230,14 @@
                             <!-- Confirm Password -->
                             <div class="col-md-6 mb-3">
                                 <label for="new_password_confirmation" class="form-label">{{ __('admin.confirm_new_password') }} <span class="text-danger">*</span></label>
-                                <input type="password" class="form-control" id="new_password_confirmation" name="new_password_confirmation" placeholder="{{ __('admin.confirm_password') }}">
+                                <div class="input-group">
+                                    <input type="password" class="form-control" id="new_password_confirmation" name="new_password_confirmation" placeholder="{{ __('admin.confirm_password') }}">
+                                    <button class="btn btn-outline-secondary" type="button" onclick="togglePassword('new_password_confirmation')">
+                                        <i class="bi bi-eye" id="new_password_confirmation_icon"></i>
+                                    </button>
+                                </div>
                             </div>
                         </div>
-
-                        <div class="alert alert-info">
-                            <small>
-                                <strong>{{ __('admin.password_requirements') }}:</strong><br>
-                                {{ __('admin.password_requirements_text') }}
-                            </small>
-                        </div>
-
                         <div class="d-flex justify-content-end">
                             <button type="submit" class="btn btn-primary">
                                 <i class="bi bi-shield-lock"></i> {{ __('admin.update_password') }}
@@ -262,6 +269,45 @@
         const remaining = 1000 - this.value.length;
         document.getElementById('bio-count').textContent = remaining;
     });
+
+    // Password toggle function
+    function togglePassword(fieldId) {
+        const passwordField = document.getElementById(fieldId);
+        const icon = document.getElementById(fieldId + '_icon');
+        
+        if (passwordField.type === 'password') {
+            passwordField.type = 'text';
+            icon.className = 'bi bi-eye-slash';
+        } else {
+            passwordField.type = 'password';
+            icon.className = 'bi bi-eye';
+        }
+    }
+
+    // Date validation
+    document.getElementById('date_of_birth')?.addEventListener('change', function() {
+        const selectedDate = new Date(this.value);
+        const today = new Date();
+        const year1900 = new Date('1900-01-01');
+        
+        if (selectedDate > today) {
+            alert('{{ __("admin.date_cannot_be_future") }}');
+            this.value = '';
+            return;
+        }
+        
+        if (selectedDate < year1900) {
+            alert('{{ __("admin.date_cannot_be_before_1900") }}');
+            this.value = '';
+            return;
+        }
+        
+        // Check if date is valid (e.g., 31/02 doesn't exist)
+        if (this.value && selectedDate.getDate() != this.value.split('-')[2]) {
+            alert('{{ __("admin.invalid_date") }}');
+            this.value = '';
+        }
+    });
 </script>
 @endpush
 
@@ -285,6 +331,19 @@
     .form-control:focus {
         border-color: #80bdff;
         box-shadow: 0 0 0 0.2rem rgba(0,123,255,.25);
+    }
+    
+    .input-group .btn {
+        border-left: 0;
+    }
+    
+    .input-group .form-control:focus {
+        border-right: 0;
+    }
+    
+    .input-group .btn:hover {
+        background-color: #e9ecef;
+        border-color: #ced4da;
     }
 </style>
 @endpush

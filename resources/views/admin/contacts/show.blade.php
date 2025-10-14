@@ -1,18 +1,18 @@
 @extends('layouts.admin')
 
-@section('title', 'Contact Message #' . $contact->id)
+@section('title', __('admin.contact_message') . ' #' . $contact->id)
 
 @section('content')
 <!-- Header -->
 <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-4">
     <div>
         <h1 class="h3 mb-1">
-            <i class="bi bi-envelope-open"></i> Contact Message #{{ $contact->id }}
+            <i class="bi bi-envelope-open"></i> {{ __('admin.contact_message') }} #{{ $contact->id }}
         </h1>
         <p class="text-muted mb-0">{{ $contact->subject }}</p>
     </div>
     <a href="{{ route('admin.contacts.index') }}" class="btn-minimal">
-        <i class="bi bi-arrow-left"></i> Back to List
+        <i class="bi bi-arrow-left"></i> {{ __('admin.back_to_list') }}
     </a>
 </div>
 
@@ -35,16 +35,16 @@
         <!-- Message Details Card -->
         <div class="card-minimal mb-4">
             <div class="card-header">
-                <i class="bi bi-info-circle"></i> Message Details
+                <i class="bi bi-info-circle"></i> {{ __('admin.message_details') }}
             </div>
             <div class="card-body">
                 <div class="info-row">
                     <div class="info-item">
-                        <label><i class="bi bi-person"></i> From:</label>
+                        <label><i class="bi bi-person"></i> {{ __('admin.from') }}:</label>
                         <span>{{ $contact->name }}</span>
                     </div>
                     <div class="info-item">
-                        <label><i class="bi bi-envelope"></i> Email:</label>
+                        <label><i class="bi bi-envelope"></i> {{ __('admin.email') }}:</label>
                         <a href="mailto:{{ $contact->email }}" class="email-link">
                             {{ $contact->email }}
                         </a>
@@ -53,32 +53,30 @@
 
                 <div class="info-row">
                     <div class="info-item">
-                        <label><i class="bi bi-calendar"></i> Date:</label>
+                        <label><i class="bi bi-calendar"></i> {{ __('admin.date') }}:</label>
                         <span>{{ $contact->created_at->format('F d, Y H:i:s') }}</span>
                     </div>
                     <div class="info-item">
-                        <label><i class="bi bi-flag"></i> Status:</label>
+                        <label><i class="bi bi-flag"></i> {{ __('admin.status') }}:</label>
                         @if($contact->status === 'new')
-                            <span class="status-badge status-new">New</span>
+                            <span class="status-badge status-new">{{ __('admin.new') }}</span>
                         @elseif($contact->status === 'read')
-                            <span class="status-badge status-read">Read</span>
-                        @elseif($contact->status === 'replied')
-                            <span class="status-badge status-replied">Replied</span>
+                            <span class="status-badge status-read">{{ __('admin.read') }}</span>
                         @else
-                            <span class="status-badge status-archived">Archived</span>
+                            <span class="status-badge status-archived">{{ __('admin.archived') }}</span>
                         @endif
                     </div>
                 </div>
 
                 <div class="info-item">
-                    <label><i class="bi bi-chat-left-text"></i> Subject:</label>
+                    <label><i class="bi bi-chat-left-text"></i> {{ __('admin.subject') }}:</label>
                     <span>{{ $contact->subject }}</span>
                 </div>
 
                 <hr>
 
                 <div class="message-content">
-                    <label><i class="bi bi-file-text"></i> Message:</label>
+                    <label><i class="bi bi-file-text"></i> {{ __('admin.message') }}:</label>
                     <div class="message-box">
                         {{ $contact->message }}
                     </div>
@@ -86,65 +84,6 @@
             </div>
         </div>
 
-        <!-- Reply Section -->
-        @if($contact->status !== 'replied')
-            <div class="card-minimal">
-                <div class="card-header card-header-success">
-                    <i class="bi bi-reply"></i> Send Reply
-                </div>
-                <div class="card-body">
-                    <form action="{{ route('admin.contacts.reply', $contact) }}" method="POST" id="replyForm">
-                        @csrf
-                        <div class="mb-3">
-                            <label for="reply" class="form-label">Your Reply <span class="text-danger">*</span></label>
-                            <textarea class="form-control @error('reply') is-invalid @enderror"
-                                      id="reply"
-                                      name="reply"
-                                      rows="6"
-                                      placeholder="Type your reply here...">{{ old('reply') }}</textarea>
-                            @error('reply')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                            <div class="form-text">
-                                <i class="bi bi-info-circle"></i> This reply will be saved in the system. You can copy it to send via email.
-                            </div>
-                        </div>
-                        <button type="submit" class="btn-minimal btn-success" id="submitBtn">
-                            <span class="btn-text">
-                                <i class="bi bi-send"></i> Send Reply
-                            </span>
-                            <span class="btn-loading" style="display: none;">
-                                <span class="spinner-border spinner-border-sm me-2"></span>
-                                Sending...
-                            </span>
-                        </button>
-                    </form>
-                </div>
-            </div>
-        @else
-            <div class="card-minimal">
-                <div class="card-header card-header-success">
-                    <i class="bi bi-check-circle"></i> Reply Sent
-                </div>
-                <div class="card-body">
-                    <div class="info-item">
-                        <label><i class="bi bi-person-badge"></i> Replied by:</label>
-                        <span>{{ $contact->repliedBy->name ?? 'Unknown' }}</span>
-                    </div>
-                    <div class="info-item">
-                        <label><i class="bi bi-calendar-check"></i> Replied at:</label>
-                        <span>{{ $contact->replied_at->format('F d, Y H:i:s') }}</span>
-                    </div>
-                    <hr>
-                    <div class="message-content">
-                        <label><i class="bi bi-chat-quote"></i> Reply:</label>
-                        <div class="message-box">
-                            {{ $contact->admin_reply }}
-                        </div>
-                    </div>
-                </div>
-            </div>
-        @endif
     </div>
 
     <!-- Sidebar Actions -->
@@ -175,16 +114,15 @@
                     @csrf
                     @method('PATCH')
                     <label for="status" class="form-label">
-                        <strong><i class="bi bi-flag"></i> Update Status</strong>
+                        <strong><i class="bi bi-flag"></i> {{ __('admin.update_status') }}</strong>
                     </label>
                     <select name="status" id="status" class="form-select mb-2">
-                        <option value="new" {{ $contact->status === 'new' ? 'selected' : '' }}>New</option>
-                        <option value="read" {{ $contact->status === 'read' ? 'selected' : '' }}>Read</option>
-                        <option value="replied" {{ $contact->status === 'replied' ? 'selected' : '' }}>Replied</option>
-                        <option value="archived" {{ $contact->status === 'archived' ? 'selected' : '' }}>Archived</option>
+                        <option value="new" {{ $contact->status === 'new' ? 'selected' : '' }}>{{ __('admin.new') }}</option>
+                        <option value="read" {{ $contact->status === 'read' ? 'selected' : '' }}>{{ __('admin.read') }}</option>
+                        <option value="archived" {{ $contact->status === 'archived' ? 'selected' : '' }}>{{ __('admin.archived') }}</option>
                     </select>
                     <button type="submit" class="btn-minimal btn-primary w-100">
-                        <i class="bi bi-arrow-repeat"></i> Update Status
+                        <i class="bi bi-arrow-repeat"></i> {{ __('admin.update_status') }}
                     </button>
                 </form>
 
@@ -193,11 +131,11 @@
                 <!-- Delete Form -->
                 <form action="{{ route('admin.contacts.destroy', $contact) }}"
                       method="POST"
-                      onsubmit="return confirm('Are you sure you want to delete this message? This action cannot be undone.');">
+                      onsubmit="return confirm('{{ __('admin.confirm_delete_message') }}');">
                     @csrf
                     @method('DELETE')
                     <button type="submit" class="btn-minimal btn-danger w-100">
-                        <i class="bi bi-trash"></i> Delete Message
+                        <i class="bi bi-trash"></i> {{ __('admin.delete') }} {{ __('admin.message') }}
                     </button>
                 </form>
             </div>
@@ -373,16 +311,6 @@ function copyToClipboard(text) {
 }
 
 // Form submission handling
-const form = document.getElementById('replyForm');
-const submitBtn = document.getElementById('submitBtn');
-
-if (form && submitBtn) {
-    form.addEventListener('submit', function() {
-        submitBtn.disabled = true;
-        submitBtn.querySelector('.btn-text').style.display = 'none';
-        submitBtn.querySelector('.btn-loading').style.display = 'inline-block';
-    });
-}
 </script>
 @endpush
 @endsection

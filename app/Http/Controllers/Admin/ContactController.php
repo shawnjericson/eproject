@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\Admin\ContactReplyRequest;
 use App\Http\Requests\Admin\ContactStatusUpdateRequest;
 use App\Models\Contact;
 use Illuminate\Http\Request;
@@ -17,7 +16,7 @@ class ContactController extends Controller
      */
     public function index(Request $request)
     {
-        $query = Contact::with('repliedBy');
+        $query = Contact::query();
 
         // Filter by status
         if ($request->has('status') && $request->status !== '') {
@@ -40,14 +39,12 @@ class ContactController extends Controller
         // Count by status for filter buttons
         $newCount = Contact::where('status', 'new')->count();
         $readCount = Contact::where('status', 'read')->count();
-        $repliedCount = Contact::where('status', 'replied')->count();
         $archivedCount = Contact::where('status', 'archived')->count();
 
         return view('admin.contacts.index', compact(
             'contacts',
             'newCount',
             'readCount',
-            'repliedCount',
             'archivedCount'
         ));
     }
@@ -57,9 +54,6 @@ class ContactController extends Controller
      */
     public function show(Contact $contact)
     {
-        // Load relationship
-        $contact->load('repliedBy');
-
         // Mark as read if it's new
         if ($contact->status === 'new') {
             $contact->markAsRead();
@@ -68,33 +62,6 @@ class ContactController extends Controller
         return view('admin.contacts.show', compact('contact'));
     }
 
-    /**
-     * Reply to a contact message
-     */
-    public function reply(ContactReplyRequest $request, Contact $contact)
-    {
-        try {
-            // Save reply
-            $contact->markAsReplied($request->reply, Auth::id());
-
-            Log::info('Admin replied to contact message:', [
-                'contact_id' => $contact->id,
-                'admin_id' => Auth::id(),
-            ]);
-
-            return redirect()
-                ->route('admin.contacts.show', $contact)
-                ->with('success', 'Reply sent successfully!');
-
-        } catch (\Exception $e) {
-            Log::error('Error replying to contact:', [
-                'error' => $e->getMessage(),
-                'contact_id' => $contact->id,
-            ]);
-
-            return back()->with('error', 'Failed to send reply. Please try again.');
-        }
-    }
 
     /**
      * Update contact status

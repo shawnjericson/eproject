@@ -11,7 +11,17 @@ use App\Http\Controllers\Api\ContactController;
 use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\Api\SiteSettingController;
 use App\Http\Controllers\Api\DashboardController;
+use App\Http\Controllers\Api\NotificationController;
 use App\Http\Controllers\Api\VisitorController;
+use App\Http\Controllers\Api\HealthController;
+
+/*
+|--------------------------------------------------------------------------
+| Health Check Routes (for maintenance mode detection)
+|--------------------------------------------------------------------------
+*/
+Route::get('/health', [HealthController::class, 'check'])->name('api.health');
+Route::get('/status', [HealthController::class, 'status'])->name('api.status');
 
 /*
 |--------------------------------------------------------------------------
@@ -33,6 +43,7 @@ Route::middleware('throttle:60,1')->group(function () {
     Route::get('/posts/{post}', [PostController::class, 'show']);
     Route::get('/monuments', [MonumentController::class, 'index']);
     Route::get('/monuments/{monument}', [MonumentController::class, 'show']);
+    Route::get('/monuments/{monument}/feedbacks', [MonumentController::class, 'getFeedbacks']);
     Route::get('/monuments/zones', [MonumentController::class, 'zones']);
     Route::post('/monuments/{monument}/feedback', [MonumentController::class, 'submitFeedback']);
     Route::get('/gallery', [GalleryController::class, 'index']);
@@ -63,6 +74,18 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // Dashboard
     Route::get('/dashboard/stats', [DashboardController::class, 'stats']);
+
+    // Public feedback badge (no auth required)
+    Route::get('/feedback-count', [NotificationController::class, 'feedbackUnreadCount']);
+
+        // Notifications
+        Route::get('/notifications', [NotificationController::class, 'index']);
+        Route::get('/notifications/{id}', [NotificationController::class, 'show']);
+        Route::get('/notifications/unread-count', [NotificationController::class, 'unreadCount']);
+        Route::get('/notifications/feedback-unread-count', [NotificationController::class, 'feedbackUnreadCount']);
+        Route::post('/notifications/{id}/mark-read', [NotificationController::class, 'markAsRead']);
+        Route::post('/notifications/mark-all-read', [NotificationController::class, 'markAllAsRead']);
+        Route::delete('/notifications/{id}', [NotificationController::class, 'destroy']);
 
     // Posts management
     Route::post('posts', [PostController::class, 'store']);

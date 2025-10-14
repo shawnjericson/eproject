@@ -14,7 +14,10 @@ class PostController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Post::with(['creator', 'translations']);
+        // Add caching for better performance
+        $cacheKey = 'posts_' . $request->get('page', 1) . '_' . $request->get('per_page', 12) . '_' . $request->get('locale', 'vi');
+        
+        $query = Post::with(['creator:id,name', 'translations']);
 
         // For public API, only show published posts
         if (!$request->user() || !in_array($request->user()->role, ['admin', 'moderator'])) {
@@ -41,13 +44,56 @@ class PostController extends Controller
             });
         }
 
-        $posts = $query->orderBy('created_at', 'desc')
-                      ->paginate($request->get('per_page', 10));
+        // Limit per_page to prevent excessive data
+        $perPage = min($request->get('per_page', 10), 50);
+        
+        $posts = $query->select([
+            'id', 'title', 'content', 'image', 'status', 'published_at', 
+            'created_at', 'updated_at', 'created_by'
+        ])
+        ->orderBy('created_at', 'desc')
+        ->paginate($perPage);
 
-        return response()->json($posts);
+        // Get locale from request or default to 'vi'
+        $locale = $request->get('locale', 'vi');
+        
+        // Transform posts to include localized content
+        $transformedPosts = $posts->getCollection()->map(function ($post) use ($locale) {
+            // Get translation for the requested locale
+            $translation = $post->translation($locale);
+            
+            // Truncate content for list view
+            $content = $translation ? $translation->content : $post->content;
+            $truncatedContent = $content ? Str::limit(strip_tags($content), 200) : null;
+            
+            $data = [
+                'id' => $post->id,
+                'title' => $translation ? $translation->title : $post->title,
+                'description' => $translation ? $translation->description : $post->description, // Fallback to posts.description
+                'excerpt' => $truncatedContent, // Use excerpt instead of full content
+                'image' => $post->image ? (filter_var($post->image, FILTER_VALIDATE_URL) ? $post->image : asset('storage/' . $post->image)) : null,
+                'status' => $post->status,
+                'published_at' => $post->published_at?->format('Y-m-d H:i:s'),
+                'created_at' => $post->created_at->format('Y-m-d H:i:s'),
+                'updated_at' => $post->updated_at->format('Y-m-d H:i:s'),
+                'creator' => $post->creator ? [
+                    'id' => $post->creator->id,
+                    'name' => $post->creator->name
+                ] : null,
+                'has_translation' => $translation ? true : false,
+            ];
+            
+            return $data;
+        });
+
+        // Replace the collection with transformed data
+        $posts->setCollection($transformedPosts);
+
+        // Cache the response for 5 minutes
+        return response()->json($posts)->header('Cache-Control', 'public, max-age=300');
     }
 
-    public function show(Post $post)
+    public function show(Request $request, Post $post)
     {
         // Check if post is published for public access
         if (!auth()->check() || !in_array(auth()->user()->role, ['admin', 'moderator'])) {
@@ -56,9 +102,32 @@ class PostController extends Controller
             }
         }
 
-        $post->load(['creator', 'translations']);
+        $post->load(['creator:id,name', 'translations']);
 
-        return response()->json($post);
+        // Get locale from request or default to 'vi'
+        $locale = $request->get('locale', 'vi');
+        
+        // Get translation for the requested locale
+        $translation = $post->translation($locale);
+        
+        $data = [
+            'id' => $post->id,
+            'title' => $translation ? $translation->title : $post->title,
+            'description' => $translation ? $translation->description : $post->description, // Fallback to posts.description
+            'content' => $translation ? $translation->content : $post->content,
+            'image' => $post->image ? (filter_var($post->image, FILTER_VALIDATE_URL) ? $post->image : asset('storage/' . $post->image)) : null,
+            'status' => $post->status,
+            'published_at' => $post->published_at?->format('Y-m-d H:i:s'),
+            'created_at' => $post->created_at->format('Y-m-d H:i:s'),
+            'updated_at' => $post->updated_at->format('Y-m-d H:i:s'),
+            'creator' => $post->creator ? [
+                'id' => $post->creator->id,
+                'name' => $post->creator->name
+            ] : null,
+            'has_translation' => $translation ? true : false,
+        ];
+
+        return response()->json($data);
     }
 
     public function store(PostStoreRequest $request)
@@ -68,6 +137,23 @@ class PostController extends Controller
             'status' => $request->status,
             'created_by' => auth()->id(),
         ];
+
+        // Apply approval requirements based on settings
+        $user = auth()->user();
+        if ($data['status'] === 'pending') {
+            // Check if approval is required based on settings
+            if (\App\Services\SettingsService::isPostApprovalRequired()) {
+                // Approval required - only admin content is auto-approved
+                if ($user->role === 'admin') {
+                    $data['status'] = 'approved';
+                } else {
+                    $data['status'] = 'pending';
+                }
+            } else {
+                // No approval required - auto-approve all content
+                $data['status'] = 'approved';
+            }
+        }
 
         // Fill fields based on language
         if ($request->language === 'vi') {

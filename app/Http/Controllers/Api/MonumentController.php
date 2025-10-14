@@ -13,7 +13,7 @@ class MonumentController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Monument::with(['creator', 'translations']);
+        $query = Monument::with(['creator:id,name', 'translations']);
 
         // For public API, only show approved monuments
         if (!$request->user() || !in_array($request->user()->role, ['admin', 'moderator'])) {
@@ -50,13 +50,61 @@ class MonumentController extends Controller
             });
         }
 
-        $monuments = $query->orderBy('created_at', 'desc')
-                          ->paginate($request->get('per_page', 10));
+        // Limit per_page to prevent excessive data
+        $perPage = min($request->get('per_page', 10), 50);
+        
+        $monuments = $query->select([
+            'id', 'title', 'description', 'content', 'image', 'location', 'zone', 
+            'latitude', 'longitude', 'is_world_wonder', 'status', 'created_at', 
+            'updated_at', 'created_by'
+        ])
+        ->orderBy('created_at', 'desc')
+        ->paginate($perPage);
 
-        return response()->json($monuments);
+        // Get locale from request or default to 'vi'
+        $locale = $request->get('locale', 'vi');
+        
+        // Transform monuments to include localized content
+        $transformedMonuments = $monuments->getCollection()->map(function ($monument) use ($locale) {
+            // Get translation for the requested locale
+            $translation = $monument->translation($locale);
+            
+            // Truncate content for list view
+            $content = $translation ? $translation->content : $monument->content;
+            $truncatedContent = $content ? Str::limit(strip_tags($content), 200) : null;
+            
+            $data = [
+                'id' => $monument->id,
+                'title' => $translation ? $translation->title : $monument->title,
+                'description' => $translation ? $translation->description : $monument->description,
+                'excerpt' => $truncatedContent, // Use excerpt instead of full content
+                'image' => $monument->image ? (filter_var($monument->image, FILTER_VALIDATE_URL) ? $monument->image : asset('storage/' . $monument->image)) : null,
+                'location' => $translation ? $translation->location : $monument->location,
+                'zone' => $monument->zone,
+                'latitude' => $monument->latitude,
+                'longitude' => $monument->longitude,
+                'is_world_wonder' => $monument->is_world_wonder,
+                'status' => $monument->status,
+                'created_at' => $monument->created_at->format('Y-m-d H:i:s'),
+                'updated_at' => $monument->updated_at->format('Y-m-d H:i:s'),
+                'creator' => $monument->creator ? [
+                    'id' => $monument->creator->id,
+                    'name' => $monument->creator->name
+                ] : null,
+                'has_translation' => $translation ? true : false,
+            ];
+            
+            return $data;
+        });
+
+        // Replace the collection with transformed data
+        $monuments->setCollection($transformedMonuments);
+
+        // Cache the response for 5 minutes
+        return response()->json($monuments)->header('Cache-Control', 'public, max-age=300');
     }
 
-    public function show(Monument $monument)
+    public function show(Request $request, Monument $monument)
     {
         // Check if monument is approved for public access
         if (!auth()->check() || !in_array(auth()->user()->role, ['admin', 'moderator'])) {
@@ -70,11 +118,51 @@ class MonumentController extends Controller
             'gallery',
             'translations',
             'feedbacks' => function($query) {
-                $query->orderBy('created_at', 'desc');
+                $query->orderBy('created_at', 'desc')->limit(5);
             }
         ]);
 
-        return response()->json($monument);
+        // Get locale from request or default to 'vi'
+        $locale = $request->get('locale', 'vi');
+        
+        // Transform monument to include localized content
+        $data = $monument->toArray();
+        
+        // Get translation for the requested locale
+        $translation = $monument->translation($locale);
+        
+        if ($translation) {
+            // Use translated content
+            $data['title'] = $translation->title;
+            $data['description'] = $translation->description;
+            $data['history'] = $translation->history;
+            $data['content'] = $translation->content;
+            $data['location'] = $translation->location;
+            $data['has_translation'] = true;
+        } else {
+            // If no translation, keep original content (Vietnamese) and mark as no translation
+            $data['has_translation'] = false;
+        }
+
+        // Add total feedback count
+        $data['total_feedbacks'] = $monument->feedbacks()->count();
+
+        return response()->json($data);
+    }
+
+    /**
+     * Get more feedbacks for a monument (pagination)
+     */
+    public function getFeedbacks(Request $request, Monument $monument)
+    {
+        $page = $request->get('page', 1);
+        $perPage = $request->get('per_page', 5);
+        
+        $feedbacks = $monument->feedbacks()
+            ->orderBy('created_at', 'desc')
+            ->paginate($perPage, ['*'], 'page', $page);
+
+        return response()->json($feedbacks);
     }
 
     public function store(Request $request)
@@ -90,6 +178,23 @@ class MonumentController extends Controller
 
         $data = $request->only(['title', 'description', 'history', 'zone', 'status']);
         $data['created_by'] = auth()->id();
+
+        // Apply approval requirements based on settings
+        $user = auth()->user();
+        if ($data['status'] === 'pending') {
+            // Check if approval is required based on settings
+            if (\App\Services\SettingsService::isMonumentApprovalRequired()) {
+                // Approval required - only admin content is auto-approved
+                if ($user->role === 'admin') {
+                    $data['status'] = 'approved';
+                } else {
+                    $data['status'] = 'pending';
+                }
+            } else {
+                // No approval required - auto-approve all content
+                $data['status'] = 'approved';
+            }
+        }
 
         if ($request->hasFile('image')) {
             $image = $request->file('image');

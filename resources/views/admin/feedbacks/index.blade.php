@@ -9,13 +9,16 @@
         <p class="text-muted mb-0">{{ __('admin.manage_user_feedback') }}</p>
     </div>
     <div class="btn-group">
+        <button type="button" class="btn-minimal btn-success" onclick="markAllFeedbacksAsViewed()">
+            <i class="bi bi-check-circle"></i> Mark All as Viewed
+        </button>
         <button type="button" class="btn-minimal dropdown-toggle" data-bs-toggle="dropdown">
             <i class="bi bi-funnel"></i> {{ __('admin.filter') }}
         </button>
         <ul class="dropdown-menu">
-            <li><a class="dropdown-item" href="{{ route('admin.feedbacks.index') }}">All Feedbacks</a></li>
-            <li><a class="dropdown-item" href="{{ route('admin.feedbacks.index') }}?days=7">Last 7 days</a></li>
-            <li><a class="dropdown-item" href="{{ route('admin.feedbacks.index') }}?days=30">Last 30 days</a></li>
+            <li><a class="dropdown-item" href="{{ route('admin.feedbacks.index') }}">{{ __('admin.all_feedbacks') }}</a></li>
+            <li><a class="dropdown-item" href="{{ route('admin.feedbacks.index') }}?days=7">{{ __('admin.last_7_days') }}</a></li>
+            <li><a class="dropdown-item" href="{{ route('admin.feedbacks.index') }}?days=30">{{ __('admin.last_30_days') }}</a></li>
         </ul>
     </div>
 </div>
@@ -34,7 +37,7 @@
         <div class="card-minimal text-center">
             <div class="card-body">
                 <h5 class="card-title">{{ $stats['today'] ?? 0 }}</h5>
-                <p class="card-text text-muted">Today</p>
+                <p class="card-text text-muted">{{ __('admin.today') }}</p>
             </div>
         </div>
     </div>
@@ -42,7 +45,7 @@
         <div class="card-minimal text-center">
             <div class="card-body">
                 <h5 class="card-title">{{ $stats['this_week'] ?? 0 }}</h5>
-                <p class="card-text text-muted">This Week</p>
+                <p class="card-text text-muted">{{ __('admin.this_week') }}</p>
             </div>
         </div>
     </div>
@@ -50,7 +53,7 @@
         <div class="card-minimal text-center">
             <div class="card-body">
                 <h5 class="card-title">{{ $stats['this_month'] ?? 0 }}</h5>
-                <p class="card-text text-muted">This Month</p>
+                <p class="card-text text-muted">{{ __('admin.this_month') }}</p>
             </div>
         </div>
     </div>
@@ -80,7 +83,10 @@
                     </select>
                 </div>
                 <div class="col-md-4">
-                    <input type="text" name="search" class="form-control" placeholder="Search by name, email, or message..." value="{{ request('search') }}">
+                    <div class="position-relative">
+                        <input type="text" name="search" class="form-control search-input" placeholder="Nhấn Enter để tìm kiếm..." value="{{ request('search') }}">
+                        <i class="bi bi-search position-absolute top-50 end-0 translate-middle-y me-3 text-muted"></i>
+                    </div>
                 </div>
                 <div class="col-md-2 d-flex gap-2">
                     <a href="{{ route('admin.feedbacks.index') }}" class="btn-minimal">{{ __('admin.clear') }}</a>
@@ -126,9 +132,9 @@
                                         {{ Str::limit($feedback->monument->title, 30) }}
                                     </a>
                                     <br>
-                                    <small class="text-muted">{{ $feedback->monument->zone }}</small>
+                                    <small class="text-muted">{{ __('admin.zones.' . strtolower($feedback->monument->zone)) }}</small>
                                 @else
-                                    <span class="text-muted">General Feedback</span>
+                                    <span class="text-muted">{{ __('admin.general_feedback') }}</span>
                                 @endif
                             </td>
                             <td>
@@ -136,19 +142,19 @@
                                     {{ Str::limit($feedback->message, 80) }}
                                     @if(strlen($feedback->message) > 80)
                                         <a href="{{ route('admin.feedbacks.show', $feedback) }}"
-                                           class="text-primary text-decoration-none">...read more</a>
+                                           class="text-primary text-decoration-none">...{{ __('admin.read_more') }}</a>
                                     @endif
                                 </div>
                             </td>
-                            <td>{{ $feedback->created_at->format('M d, Y') }}</td>
+                            <td>{{ $feedback->created_at->locale(app()->getLocale())->translatedFormat('M d, Y') }}</td>
                             <td>
                                 <div class="d-flex gap-2">
                                     <a href="{{ route('admin.feedbacks.show', $feedback) }}" class="btn-minimal btn-primary">{{ __('admin.view') }}</a>
                                     <a href="mailto:{{ $feedback->email }}?subject=Re: Your feedback about {{ $feedback->monument ? $feedback->monument->title : 'our website' }}"
-                                       class="btn-minimal">Reply</a>
+                                       class="btn-minimal">{{ __('admin.reply') }}</a>
                                     <form action="{{ route('admin.feedbacks.destroy', $feedback) }}"
                                           method="POST" class="d-inline"
-                                          onsubmit="return confirm('Are you sure you want to delete this feedback?')">
+                                          onsubmit="return confirm('{{ __('admin.confirm_delete_feedback') }}')">
                                         @csrf
                                         @method('DELETE')
                                         <button type="submit" class="btn-minimal btn-danger">{{ __('admin.delete') }}</button>
@@ -226,6 +232,39 @@
     </div>
 </div>
 @endsection
+
+@push('scripts')
+<script>
+function markAllFeedbacksAsViewed() {
+    if (!confirm('Mark all feedbacks as viewed?')) {
+        return;
+    }
+    
+    fetch('/admin/feedbacks/mark-viewed', {
+        method: 'POST',
+        headers: {
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({})
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert(data.message);
+            location.reload(); // Refresh to update badge
+        } else {
+            alert('Error: ' + (data.error || 'Unknown error'));
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Error marking feedbacks as viewed');
+    });
+}
+</script>
+@endpush
 
 @push('styles')
 <style>

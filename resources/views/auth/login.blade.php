@@ -15,7 +15,7 @@
                     alt="Global Heritage Logo"
                     class="w-40 h-40 object-contain rounded-xl">
             </div>
-            <h1 class="font-serif text-4xl font-bold mb-4 drop-shadow-lg">{{ __('admin.global_heritage') }}</h1>
+            <h1 class="font-serif text-4xl font-bold mb-4 drop-shadow-lg">Global Heritage</h1>
             <p class="text-lg opacity-95 leading-relaxed max-w-md mx-auto mb-10">{{ __('admin.tagline') }}</p>
         </div>
     </div>

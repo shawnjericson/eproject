@@ -18,6 +18,7 @@ class Kernel extends HttpKernel
         \App\Http\Middleware\TrustProxies::class,
         \Illuminate\Http\Middleware\HandleCors::class,
         \App\Http\Middleware\PreventRequestsDuringMaintenance::class,
+        \App\Http\Middleware\MaintenanceMode::class,
         \Illuminate\Foundation\Http\Middleware\ValidatePostSize::class,
         \App\Http\Middleware\TrimStrings::class,
         \Illuminate\Foundation\Http\Middleware\ConvertEmptyStringsToNull::class,
@@ -70,5 +71,6 @@ class Kernel extends HttpKernel
         'prevent.approved.deletion' => \App\Http\Middleware\PreventApprovedDeletionMiddleware::class,
         'check.ownership' => \App\Http\Middleware\CheckOwnershipMiddleware::class,
         'locale' => \App\Http\Middleware\SetLocale::class,
+        'registration.enabled' => \App\Http\Middleware\CheckRegistrationEnabled::class,
     ];
 }

@@ -29,7 +29,10 @@
                     </select>
                 </div>
                 <div class="col-md-5">
-                    <input type="text" name="search" class="form-control" placeholder="Search by title or description..." value="{{ request('search') }}">
+                    <div class="position-relative">
+                        <input type="text" name="search" class="form-control search-input" placeholder="Nhấn Enter để tìm kiếm..." value="{{ request('search') }}">
+                        <i class="bi bi-search position-absolute top-50 end-0 translate-middle-y me-3 text-muted"></i>
+                    </div>
                 </div>
                 <div class="col-md-2">
                     <a href="{{ route('admin.gallery.index') }}" class="btn-minimal">{{ __('admin.clear') }}</a>

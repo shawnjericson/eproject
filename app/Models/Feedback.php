@@ -18,6 +18,11 @@ class Feedback extends Model
         'monument_id',
         'rating',
         'status',
+        'viewed_at',
+    ];
+
+    protected $casts = [
+        'viewed_at' => 'datetime',
     ];
 
     /**
@@ -26,5 +31,21 @@ class Feedback extends Model
     public function monument()
     {
         return $this->belongsTo(Monument::class);
+    }
+
+    /**
+     * Mark feedback as viewed
+     */
+    public function markAsViewed()
+    {
+        $this->update(['viewed_at' => now()]);
+    }
+
+    /**
+     * Scope for unviewed feedbacks
+     */
+    public function scopeUnviewed($query)
+    {
+        return $query->whereNull('viewed_at');
     }
 }

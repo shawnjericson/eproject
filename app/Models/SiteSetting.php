@@ -33,6 +33,11 @@ class SiteSetting extends Model
      */
     public static function set($key, $value)
     {
+        // Convert boolean to string for storage
+        if (is_bool($value)) {
+            $value = $value ? 'true' : 'false';
+        }
+        
         return static::updateOrCreate(
             ['key' => $key],
             ['value' => $value]

@@ -30,15 +30,29 @@ class DashboardController extends Controller
             'total_feedbacks' => Feedback::count(), // Feedbacks are global
         ];
         
-        // Add user stats only for admins
-        if ($isAdmin) {
+        // Add user stats only for admins or moderators who can manage users
+        if ($isAdmin || (auth()->user()->isModerator() && \App\Services\SettingsService::canModeratorManageUsers())) {
             $stats['total_users'] = User::count();
         }
 
-        // Get recent data safely - filtered by role
-        $recent_posts = $postsQuery->with('creator')->orderBy('created_at', 'desc')->limit(5)->get();
-        $recent_monuments = $monumentsQuery->with('creator')->orderBy('created_at', 'desc')->limit(5)->get();
-        $recent_feedbacks = Feedback::with('monument')->orderBy('created_at', 'desc')->limit(5)->get();
+        // Get recent data safely - filtered by role with optimized queries
+        $recent_posts = $postsQuery->with('creator:id,name')
+            ->select(['id', 'title', 'status', 'created_at', 'created_by'])
+            ->orderBy('created_at', 'desc')
+            ->limit(5)
+            ->get();
+            
+        $recent_monuments = $monumentsQuery->with('creator:id,name')
+            ->select(['id', 'title', 'status', 'created_at', 'created_by'])
+            ->orderBy('created_at', 'desc')
+            ->limit(5)
+            ->get();
+            
+        $recent_feedbacks = Feedback::with('monument:id,title')
+            ->select(['id', 'name', 'message', 'monument_id', 'created_at'])
+            ->orderBy('created_at', 'desc')
+            ->limit(5)
+            ->get();
 
         //Model::count(): đếm nhanh số bản ghi.
         //where(...)->count(): đếm theo điều kiện (ví dụ status).
@@ -46,6 +60,8 @@ class DashboardController extends Controller
         //orderBy('created_at', 'desc')->limit(5)->get(): lấy 5 bản ghi mới nhất.
         //view('...') + compact(...): trả dữ liệu cho Blade.
 
-        return view('admin.dashboard', compact('stats', 'recent_posts', 'recent_monuments', 'recent_feedbacks', 'isAdmin'));
+        return response()
+            ->view('admin.dashboard', compact('stats', 'recent_posts', 'recent_monuments', 'recent_feedbacks', 'isAdmin'))
+            ->header('Cache-Control', 'private, max-age=30'); // Cache for 30 seconds
     }
 }

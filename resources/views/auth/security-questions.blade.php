@@ -12,10 +12,10 @@
         <div class="relative z-10">
             <div class="w-40 h-40 bg-white rounded-full flex items-center justify-center mx-auto mb-8 shadow-lg">
                 <img src="{{ asset('favicon_io/android-chrome-192x192.png') }}"
-                     alt="Global Heritage Logo"
-                     class="w-40 h-40 object-contain rounded-xl">
+                    alt="Global Heritage Logo"
+                    class="w-40 h-40 object-contain rounded-xl">
             </div>
-            <h1 class="font-serif text-4xl font-bold mb-4 drop-shadow-lg">{{ __('admin.global_heritage') }}</h1>
+            <h1 class="font-serif text-4xl font-bold mb-4 drop-shadow-lg">Global Heritage</h1>
             <p class="text-lg opacity-95 leading-relaxed max-w-md mx-auto mb-10">{{ __('admin.tagline') }}</p>
         </div>
     </div>
@@ -28,12 +28,12 @@
         </div>
 
         @if($errors->has('answers'))
-            <div class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl mb-6 flex items-center">
-                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
-                </svg>
-                {{ $errors->first('answers') }}
-            </div>
+        <div class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl mb-6 flex items-center">
+            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
+            </svg>
+            {{ $errors->first('answers') }}
+        </div>
         @endif
 
         <form method="POST" action="{{ route('password.verify-security') }}" class="space-y-6">
@@ -52,11 +52,9 @@
                     type="text"
                     value="{{ old('answer_1') }}"
                     class="block w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors @error('answer_1') border-red-300 @enderror"
-                    placeholder="Nhập câu trả lời của bạn"
-                    
-                >
+                    placeholder="{{ __('admin.securityquestion_placeholder') }}">
                 @error('answer_1')
-                    <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
+                <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
                 @enderror
             </div>
 
@@ -74,8 +72,7 @@
                     type="text"
                     value="{{ old('answer_2') }}"
                     class="block w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors"
-                    placeholder="Nhập câu trả lời của bạn"
-                >
+                    placeholder="{{ __('admin.securityquestion_placeholder') }}">
             </div>
             @endif
 
@@ -93,8 +90,7 @@
                     type="text"
                     value="{{ old('answer_3') }}"
                     class="block w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors"
-                    placeholder="Nhập câu trả lời của bạn"
-                >
+                    placeholder="{{ __('admin.securityquestion_placeholder') }}">
             </div>
             @endif
 
@@ -103,14 +99,14 @@
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                 </svg>
-                Xác Thực
+                {{ __('admin.securityquestion_submit') }}
             </button>
         </form>
 
         <!-- Back Button -->
         <div class="text-center mt-2">
             <a href="{{ route('password.request') }}" class="text-sm text-primary-600 hover:text-primary-700 font-medium">
-                ← Quay lại
+                ← {{ __('admin.securityquestion_back') }}
             </a>
         </div>
 
@@ -121,7 +117,7 @@
                     <svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                     </svg>
-                    Câu trả lời không phân biệt chữ hoa/thường.
+                    {{ __('admin.securityquestion_tip') }}
                 </p>
             </div>
         </div>

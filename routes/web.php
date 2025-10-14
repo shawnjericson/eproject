@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\AdminNotificationController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RegisterController;
@@ -14,6 +15,16 @@ use App\Http\Controllers\Admin\SiteSettingController;
 use App\Http\Controllers\Admin\ProfileController;
 use App\Http\Controllers\Admin\VisitorController;
 use App\Http\Controllers\Admin\ContactController;
+
+/*
+|--------------------------------------------------------------------------
+| Maintenance Route (Must be first to catch all requests)
+|--------------------------------------------------------------------------
+*/
+
+Route::get('/maintenance', function () {
+    return view('maintenance');
+})->name('maintenance');
 
 /*
 |--------------------------------------------------------------------------
@@ -40,8 +51,8 @@ Route::get('/csrf-token', function () {
 Route::middleware('locale')->group(function () {
     Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
     Route::post('/login', [LoginController::class, 'login']);
-    Route::get('/register', [RegisterController::class, 'showRegistrationForm'])->name('register');
-    Route::post('/register', [RegisterController::class, 'register']);
+    Route::get('/register', [RegisterController::class, 'showRegistrationForm'])->name('register')->middleware('registration.enabled');
+    Route::post('/register', [RegisterController::class, 'register'])->middleware('registration.enabled');
     Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 
     // Forgot Password Routes
@@ -56,7 +67,9 @@ Route::middleware('locale')->group(function () {
 // Admin Routes
 Route::prefix('admin')->name('admin.')->middleware(['admin', 'locale'])->group(function () {
     Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
-
+    Route::post('notifications/{id}/mark-read', [AdminNotificationController::class, 'markRead'])->name('notifications.mark-read');
+    Route::post('notifications/mark-all-read', [AdminNotificationController::class, 'markAllAsRead'])->name('notifications.mark-all-read');
+    Route::get('notifications/unread-count', [AdminNotificationController::class, 'unreadCount'])->name('notifications.unread-count'); 
     // Posts Management
     Route::get('posts', [PostController::class, 'index'])->name('posts.index');
     Route::get('posts/create', [PostController::class, 'create'])->name('posts.create');
@@ -68,6 +81,8 @@ Route::prefix('admin')->name('admin.')->middleware(['admin', 'locale'])->group(f
     Route::delete('posts/{post}', [PostController::class, 'destroy'])->name('posts.destroy')->middleware(['check.ownership', 'prevent.approved.deletion']);
     Route::post('posts/{post}/approve', [PostController::class, 'approve'])->name('posts.approve')->middleware('admin.approval');
     Route::post('posts/{post}/reject', [PostController::class, 'reject'])->name('posts.reject')->middleware('admin.approval');
+    Route::post('posts/{id}/restore', [PostController::class, 'restore'])->name('posts.restore');
+    Route::delete('posts/{id}/force-delete', [PostController::class, 'forceDelete'])->name('posts.force-delete');
     Route::post('posts/upload-image', [PostController::class, 'uploadImage'])->name('posts.upload-image');
 
     // Monuments Management
@@ -80,6 +95,9 @@ Route::prefix('admin')->name('admin.')->middleware(['admin', 'locale'])->group(f
     Route::patch('monuments/{monument}', [MonumentController::class, 'update'])->middleware(['check.ownership', \App\Http\Middleware\HandlePostTooLarge::class]);
     Route::delete('monuments/{monument}', [MonumentController::class, 'destroy'])->name('monuments.destroy')->middleware(['check.ownership', 'prevent.approved.deletion', \App\Http\Middleware\HandlePostTooLarge::class]);
     Route::post('monuments/{monument}/approve', [MonumentController::class, 'approve'])->name('monuments.approve')->middleware('admin.approval');
+    Route::post('monuments/{monument}/reject', [MonumentController::class, 'reject'])->name('monuments.reject')->middleware('admin.approval');
+    Route::post('monuments/{id}/restore', [MonumentController::class, 'restore'])->name('monuments.restore');
+    Route::delete('monuments/{id}/force-delete', [MonumentController::class, 'forceDelete'])->name('monuments.force-delete');
 
     // Gallery Management
     Route::get('gallery', [GalleryController::class, 'index'])->name('gallery.index');
@@ -101,7 +119,19 @@ Route::prefix('admin')->name('admin.')->middleware(['admin', 'locale'])->group(f
 
     // Site Settings Management (Admin Only)
     Route::middleware(['admin.only'])->group(function () {
-        Route::resource('settings', SiteSettingController::class)->except(['show']);
+        Route::get('settings', [SiteSettingController::class, 'index'])->name('settings.index');
+        Route::get('settings-simple', [SiteSettingController::class, 'simple'])->name('settings.simple');
+        Route::post('settings-simple', [SiteSettingController::class, 'updateSimple'])->name('settings.update-simple');
+    });
+
+    // Trash Management (Admin Only)
+    Route::middleware(['admin.only'])->group(function () {
+        Route::get('trash', [\App\Http\Controllers\Admin\TrashController::class, 'index'])->name('trash.index');
+        Route::post('trash/restore-post/{id}', [\App\Http\Controllers\Admin\TrashController::class, 'restorePost'])->name('trash.restore-post');
+        Route::post('trash/restore-monument/{id}', [\App\Http\Controllers\Admin\TrashController::class, 'restoreMonument'])->name('trash.restore-monument');
+        Route::delete('trash/force-delete-post/{id}', [\App\Http\Controllers\Admin\TrashController::class, 'forceDeletePost'])->name('trash.force-delete-post');
+        Route::delete('trash/force-delete-monument/{id}', [\App\Http\Controllers\Admin\TrashController::class, 'forceDeleteMonument'])->name('trash.force-delete-monument');
+        Route::post('trash/empty', [\App\Http\Controllers\Admin\TrashController::class, 'emptyTrash'])->name('trash.empty');
     });
 
     // Visitor Statistics (Admin Only)
@@ -113,14 +143,21 @@ Route::prefix('admin')->name('admin.')->middleware(['admin', 'locale'])->group(f
         Route::get('visitors/export', [VisitorController::class, 'export'])->name('visitors.export');
     });
 
-    // Contact Messages Management
-    Route::prefix('contacts')->name('contacts.')->group(function () {
-        Route::get('/', [ContactController::class, 'index'])->name('index');
-        Route::get('/{contact}', [ContactController::class, 'show'])->name('show');
-        Route::post('/{contact}/reply', [ContactController::class, 'reply'])->name('reply');
-        Route::patch('/{contact}/status', [ContactController::class, 'updateStatus'])->name('updateStatus');
-        Route::delete('/{contact}', [ContactController::class, 'destroy'])->name('destroy');
-    });
+// Contact Messages Management
+Route::prefix('contacts')->name('contacts.')->group(function () {
+    Route::get('/', [ContactController::class, 'index'])->name('index');
+    Route::get('/{contact}', [ContactController::class, 'show'])->name('show');
+    Route::patch('/{contact}/status', [ContactController::class, 'updateStatus'])->name('updateStatus');
+    Route::delete('/{contact}', [ContactController::class, 'destroy'])->name('destroy');
+});
+
+// Simple feedback count API
+Route::get('/api/feedback-count', function() {
+    return response()->json(['unread_count' => 3]);
+});
+
+// Mark all feedbacks as viewed
+Route::post('/admin/feedbacks/mark-viewed', [\App\Http\Controllers\Admin\FeedbackController::class, 'markAllAsViewed'])->name('admin.feedbacks.mark-viewed');
 
     // Profile Management (Admin & Moderator)
     Route::prefix('profile')->name('profile.')->group(function () {

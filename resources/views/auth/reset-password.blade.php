@@ -15,16 +15,16 @@
                      alt="Global Heritage Logo"
                      class="w-40 h-40 object-contain rounded-xl">
             </div>
-            <h1 class="font-serif text-4xl font-bold mb-4 drop-shadow-lg">{{ __('admin.global_heritage') }}</h1>
+            <h1 class="font-serif text-4xl font-bold mb-4 drop-shadow-lg">Global Heritage</h1>
             <p class="text-lg opacity-95 leading-relaxed max-w-md mx-auto mb-10">{{ __('admin.tagline') }}</p>
         </div>
     </div>
 
     <!-- Right Side - Reset Password Form -->
     <div class="flex-1 p-16 flex flex-col justify-center">
-        <div class="mb-10">
-            <h2 class="font-serif text-3xl font-semibold text-gray-900 mb-3">Đặt Lại Mật Khẩu</h2>
-            <p class="text-gray-600">Tạo mật khẩu mới an toàn cho tài khoản của bạn</p>
+        <div class="mb-2">
+            <h2 class="font-serif text-3xl font-semibold text-gray-900 mb-3">{{ __('admin.resetpassword_title') }}</h2>
+            <p class="text-gray-600">{{ __('admin.resetpassword_tagline') }}</p>
         </div>
 
         @if($errors->any())
@@ -45,7 +45,7 @@
 
             <!-- New Password -->
             <div>
-                <label for="password" class="block text-sm font-medium text-gray-700 mb-2">Mật khẩu mới</label>
+                <label for="password" class="block text-sm font-medium text-gray-700 mb-2">{{ __('admin.resetpassword_newpassword') }}</label>
                 <div class="relative">
                     <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                         <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -56,7 +56,7 @@
                            class="block w-full pl-12 pr-12 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors @error('password') border-red-300 @enderror"
                            id="password"
                            name="password"
-                           placeholder="Nhập mật khẩu mới"
+                           placeholder="{{ __('admin.resetpassword_placeholder') }}"
                            required>
                     <button type="button" id="toggleResetPassword" class="absolute inset-y-0 right-0 pr-4 flex items-center text-gray-500 hover:text-gray-700" aria-label="Toggle password visibility">
                         <svg id="eyeIconReset" class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -72,7 +72,7 @@
 
             <!-- Confirm Password -->
             <div>
-                <label for="password_confirmation" class="block text-sm font-medium text-gray-700 mb-2">Xác nhận mật khẩu</label>
+                <label for="password_confirmation" class="block text-sm font-medium text-gray-700 mb-2">{{ __('admin.resetpassword_confirmation') }}</label>
                 <div class="relative">
                     <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                         <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -83,7 +83,7 @@
                            class="block w-full pl-12 pr-12 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors"
                            id="password_confirmation"
                            name="password_confirmation"
-                           placeholder="Nhập lại mật khẩu mới"
+                           placeholder="{{ __('admin.resetpassword_confirmationplaceholer') }}"
                            required>
                     <button type="button" id="toggleResetPasswordConfirm" class="absolute inset-y-0 right-0 pr-4 flex items-center text-gray-500 hover:text-gray-700" aria-label="Toggle password visibility">
                         <svg id="eyeIconResetConfirm" class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -100,12 +100,12 @@
                     <svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                     </svg>
-                    Yêu cầu mật khẩu:
+                    {{ __('admin.resetpassword_required') }}
                 </h4>
                 <ul class="text-sm text-blue-700 space-y-1 ml-5">
-                    <li>• Ít nhất 8 ký tự</li>
-                    <li>• Nên bao gồm chữ hoa, chữ thường và số</li>
-                    <li>• Tránh sử dụng thông tin cá nhân dễ đoán</li>
+                    <li>{{ __('admin.resetpassword_required1') }}</li>
+                    <li>{{ __('admin.resetpassword_required2') }}</li>
+                    <li>{{ __('admin.resetpassword_required3') }}</li>
                 </ul>
             </div>
 
@@ -114,7 +114,7 @@
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                 </svg>
-                Đặt Lại Mật Khẩu
+                {{ __('admin.resetpassword_title') }}
             </button>
         </form>
 
@@ -125,7 +125,7 @@
                     <svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                     </svg>
-                    Sau khi đặt lại thành công, bạn sẽ được chuyển đến trang đăng nhập.
+                    {{ __('admin.resetpassword_message') }}
                 </p>
             </div>
         </div>

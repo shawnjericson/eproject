@@ -12,6 +12,17 @@ use Illuminate\Validation\Rule;
 
 class UserController extends Controller
 {
+    public function __construct()
+    {
+        // Check if moderators can manage users
+        $this->middleware(function ($request, $next) {
+            if (auth()->user()->isModerator() && !\App\Services\SettingsService::canModeratorManageUsers()) {
+                abort(403, 'Moderators are not allowed to manage users.');
+            }
+            return $next($request);
+        });
+    }
+
     public function index(Request $request)
     {
         $query = User::with(['posts', 'monuments']);
@@ -28,9 +39,9 @@ class UserController extends Controller
 
         // Search - works independently of filters
         if ($request->filled('search')) {
-            $query->where(function($q) use ($request) {
+            $query->where(function ($q) use ($request) {
                 $q->where('name', 'like', '%' . $request->search . '%')
-                  ->orWhere('email', 'like', '%' . $request->search . '%');
+                    ->orWhere('email', 'like', '%' . $request->search . '%');
             });
         }
 
@@ -78,7 +89,25 @@ class UserController extends Controller
 
     public function update(UserUpdateRequest $request, User $user)
     {
-        $data = $request->only(['name', 'email', 'role', 'status']);
+        $data = $request->only(['name', 'email']);
+        
+        // Trim email to remove spaces
+        if (isset($data['email'])) {
+            $data['email'] = trim($data['email']);
+        }
+        if (isset($data['name'])) {
+            $data['name'] = trim($data['name']);
+        }
+
+        // Chỉ thêm role nếu có trong request và user có quyền
+        if ($request->has('role') && !auth()->user()->isModerator() && $user->id !== auth()->id()) {
+            $data['role'] = $request->role;
+        }
+
+        // Chỉ cho phép đổi status nếu không phải đang edit chính mình
+        if ($user->id !== auth()->id()) {
+            $data['status'] = $request->status;
+        }
 
         if ($request->filled('password')) {
             $data['password'] = Hash::make($request->password);
@@ -89,15 +118,36 @@ class UserController extends Controller
         return redirect()->route('admin.users.index')->with('success', 'User updated successfully!');
     }
 
-    public function destroy(User $user)
+    public function destroy(Request $request, User $user)
     {
         // Prevent deleting the current user
         if ($user->id === auth()->id()) {
             return redirect()->route('admin.users.index')->with('error', 'You cannot delete your own account!');
         }
 
+        // Get transfer user ID from request, default to first admin
+        $transferUserId = $request->input('transfer_to');
+        if (!$transferUserId) {
+            $admin = User::where('role', 'admin')->where('id', '!=', $user->id)->first();
+            $transferUserId = $admin ? $admin->id : null;
+        }
+
+        // Transfer posts and monuments to the specified user
+        if ($transferUserId) {
+            \App\Models\Post::where('created_by', $user->id)->update(['created_by' => $transferUserId]);
+            \App\Models\Monument::where('created_by', $user->id)->update(['created_by' => $transferUserId]);
+        } else {
+            // If no admin found, set to null (orphaned content)
+            \App\Models\Post::where('created_by', $user->id)->update(['created_by' => null]);
+            \App\Models\Monument::where('created_by', $user->id)->update(['created_by' => null]);
+        }
+
         $user->delete();
 
-        return redirect()->route('admin.users.index')->with('success', 'User deleted successfully!');
+        $message = $transferUserId
+            ? "User deleted successfully! All posts and monuments transferred to another admin."
+            : "User deleted successfully! Posts and monuments are now orphaned.";
+
+        return redirect()->route('admin.users.index')->with('success', $message);
     }
 }

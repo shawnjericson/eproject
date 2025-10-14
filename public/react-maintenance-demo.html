@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>React Maintenance Mode Integration Demo</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: #f8fafc;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .method {
+            margin: 30px 0;
+            padding: 20px;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            background: #f9fafb;
+        }
+        .method h3 {
+            color: #1f2937;
+            margin-top: 0;
+        }
+        .code-block {
+            background: #1f2937;
+            color: #f9fafb;
+            padding: 20px;
+            border-radius: 8px;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 14px;
+            overflow-x: auto;
+            margin: 15px 0;
+        }
+        .btn {
+            background: #3b82f6;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            margin: 5px;
+        }
+        .btn:hover {
+            background: #2563eb;
+        }
+        .btn-danger {
+            background: #ef4444;
+        }
+        .btn-danger:hover {
+            background: #dc2626;
+        }
+        .status {
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+            font-weight: 600;
+        }
+        .status.healthy {
+            background: #d1fae5;
+            color: #065f46;
+            border: 1px solid #a7f3d0;
+        }
+        .status.maintenance {
+            background: #fef3c7;
+            color: #92400e;
+            border: 1px solid #fde68a;
+        }
+        .step {
+            margin: 15px 0;
+            padding: 15px;
+            background: #f0f9ff;
+            border-left: 4px solid #3b82f6;
+            border-radius: 0 8px 8px 0;
+        }
+        .step h4 {
+            margin-top: 0;
+            color: #1e40af;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>React Maintenance Mode Integration</h1>
+        
+        <div id="status" class="status healthy">
+            ✅ System Status: Healthy
+        </div>
+
+        <div>
+            <button class="btn" onclick="checkStatus()">Check Status</button>
+            <button class="btn btn-danger" onclick="simulateMaintenance()">Simulate Maintenance Mode</button>
+            <button class="btn" onclick="disableMaintenance()">Disable Maintenance</button>
+        </div>
+
+        <div class="method">
+            <h3>Method 1: React Hook (Recommended)</h3>
+            <p>Use the <code>useMaintenanceMode</code> hook for fine-grained control:</p>
+            
+            <div class="code-block">
+// Install the hook
+import { useMaintenanceMode } from './js/react-maintenance-hook';
+
+const App = () => {
+    const { 
+        isMaintenanceMode, 
+        isChecking, 
+        error, 
+        manualCheck 
+    } = useMaintenanceMode({
+        apiUrl: '/api/health',
+        maintenanceUrl: '/maintenance',
+        checkInterval: 30000,
+        retryCount: 3,
+        autoRedirect: true
+    });
+
+    if (isMaintenanceMode) {
+        return &lt;div&gt;Maintenance Mode Active&lt;/div&gt;;
+    }
+
+    return &lt;div&gt;Your App Content&lt;/div&gt;;
+};
+            </div>
+        </div>
+
+        <div class="method">
+            <h3>Method 2: React Component (Simpler)</h3>
+            <p>Wrap your app with the <code>MaintenanceDetector</code> component:</p>
+            
+            <div class="code-block">
+import MaintenanceDetector from './js/react-maintenance-component';
+
+const App = () => {
+    return (
+        &lt;MaintenanceDetector
+            apiUrl="/api/health"
+            maintenanceUrl="/maintenance"
+            checkInterval={30000}
+            autoRedirect={true}
+        &gt;
+            &lt;div&gt;Your App Content&lt;/div&gt;
+        &lt;/MaintenanceDetector&gt;
+    );
+};
+            </div>
+        </div>
+
+        <div class="method">
+            <h3>Method 3: Axios Interceptor (For API-heavy apps)</h3>
+            <p>Automatically detect maintenance mode in API responses:</p>
+            
+            <div class="code-block">
+import axios from 'axios';
+
+const api = axios.create({
+    baseURL: '/api',
+    timeout: 10000
+});
+
+// Add response interceptor
+api.interceptors.response.use(
+    (response) => response,
+    (error) => {
+        if (error.response?.status === 503) {
+            const data = error.response.data;
+            if (data?.error === 'maintenance_mode') {
+                // Redirect to maintenance page
+                window.location.href = data.maintenance_page_url || '/maintenance';
+            }
+        }
+        return Promise.reject(error);
+    }
+);
+            </div>
+        </div>
+
+        <div class="method">
+            <h3>Installation Steps</h3>
+            
+            <div class="step">
+                <h4>Step 1: Copy Files</h4>
+                <p>Copy these files to your React project:</p>
+                <ul>
+                    <li><code>public/js/react-maintenance-hook.js</code></li>
+                    <li><code>public/js/react-maintenance-component.js</code></li>
+                </ul>
+            </div>
+
+            <div class="step">
+                <h4>Step 2: Choose Integration Method</h4>
+                <p>Select the method that best fits your app:</p>
+                <ul>
+                    <li><strong>Hook:</strong> Best for apps needing fine-grained control</li>
+                    <li><strong>Component:</strong> Best for simple automatic handling</li>
+                    <li><strong>Axios:</strong> Best for API-heavy apps</li>
+                </ul>
+            </div>
+
+            <div class="step">
+                <h4>Step 3: Configure Options</h4>
+                <p>Customize the behavior:</p>
+                <ul>
+                    <li><code>apiUrl</code>: Your API health check endpoint</li>
+                    <li><code>maintenanceUrl</code>: Your maintenance page URL</li>
+                    <li><code>checkInterval</code>: How often to check (default: 30s)</li>
+                    <li><code>autoRedirect</code>: Whether to auto-redirect (default: true)</li>
+                </ul>
+            </div>
+
+            <div class="step">
+                <h4>Step 4: Test</h4>
+                <p>Enable maintenance mode in admin panel and verify your React app redirects properly.</p>
+            </div>
+        </div>
+
+        <div class="method">
+            <h3>API Endpoints</h3>
+            <p>Your React app will check these endpoints:</p>
+            <ul>
+                <li><code>GET /api/health</code> - Returns 503 during maintenance, 200 when healthy</li>
+                <li><code>GET /api/status</code> - Always returns 200 with maintenance status</li>
+                <li><code>GET /maintenance</code> - Maintenance page</li>
+            </ul>
+        </div>
+
+        <div class="method">
+            <h3>Response Format</h3>
+            <p>During maintenance mode, API returns:</p>
+            <div class="code-block">
+{
+    "error": "maintenance_mode",
+    "message": "Website is currently under maintenance. Please try again later.",
+    "maintenance_page_url": "http://yoursite.com/maintenance"
+}
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Demo functions
+        async function checkStatus() {
+            try {
+                const response = await fetch('/api/status');
+                const data = await response.json();
+                
+                const statusDiv = document.getElementById('status');
+                if (data.maintenance_mode) {
+                    statusDiv.className = 'status maintenance';
+                    statusDiv.textContent = '⚠️ System Status: Maintenance Mode Active';
+                } else {
+                    statusDiv.className = 'status healthy';
+                    statusDiv.textContent = '✅ System Status: Healthy';
+                }
+            } catch (error) {
+                console.error('Status check failed:', error);
+            }
+        }
+
+        async function simulateMaintenance() {
+            try {
+                const response = await fetch('/admin/settings/update-simple', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content')
+                    },
+                    body: 'maintenance_mode=true'
+                });
+                
+                if (response.ok) {
+                    alert('Maintenance mode enabled! Your React app should redirect to maintenance page.');
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 1000);
+                } else {
+                    alert('Please enable maintenance mode through the admin panel: /admin/settings');
+                }
+            } catch (error) {
+                alert('Please enable maintenance mode through the admin panel: /admin/settings');
+            }
+        }
+
+        async function disableMaintenance() {
+            try {
+                const response = await fetch('/admin/settings/update-simple', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content')
+                    },
+                    body: 'maintenance_mode=false'
+                });
+                
+                if (response.ok) {
+                    alert('Maintenance mode disabled!');
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 1000);
+                } else {
+                    alert('Please disable maintenance mode through the admin panel: /admin/settings');
+                }
+            } catch (error) {
+                alert('Please disable maintenance mode through the admin panel: /admin/settings');
+            }
+        }
+
+        // Check status on page load
+        checkStatus();
+    </script>
+</body>
+</html>
+
+
+
+
+
+
+
+

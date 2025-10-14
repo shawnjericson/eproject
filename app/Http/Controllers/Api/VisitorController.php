@@ -14,11 +14,26 @@ class VisitorController extends Controller
      */
     public function track(Request $request)
     {
-        // Get visitor's IP address
+        // Get visitor's IP address with better detection
         $ipAddress = $request->ip();
+        
+        // Fallback IP detection for development
+        if ($ipAddress === '127.0.0.1' || $ipAddress === '::1') {
+            $ipAddress = $request->header('X-Forwarded-For') 
+                ?? $request->header('X-Real-IP') 
+                ?? $request->server('REMOTE_ADDR') 
+                ?? '127.0.0.1';
+        }
 
         // Get user agent
         $userAgent = $request->userAgent();
+
+        // Log the request for debugging
+        \Log::info('Visitor tracking request', [
+            'ip' => $ipAddress,
+            'user_agent' => $userAgent,
+            'headers' => $request->headers->all()
+        ]);
 
         // Check if this IP has visited in the last 24 hours
         $hasVisitedRecently = VisitorLog::hasVisitedRecently($ipAddress, 24);
@@ -34,6 +49,12 @@ class VisitorController extends Controller
             // Increment and save
             $newCount = $currentCount + 1;
             SiteSetting::set('visitor_count', $newCount);
+            
+            \Log::info('New visitor logged', [
+                'ip' => $ipAddress,
+                'old_count' => $currentCount,
+                'new_count' => $newCount
+            ]);
         }
 
         // Return current visitor count
@@ -42,6 +63,7 @@ class VisitorController extends Controller
         return response()->json([
             'visitor_count' => $visitorCount,
             'is_new_visitor' => !$hasVisitedRecently,
+            'ip_address' => $ipAddress, // For debugging
         ]);
     }
 

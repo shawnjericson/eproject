@@ -301,6 +301,26 @@ npm start
    - Component structure
    - State management
 
+7. **[07-EPIC-USER-STORIES.md](./07-EPIC-USER-STORIES.md)**
+   - Epic và User Stories chi tiết
+   - Sprint planning và roadmap
+   - Definition of Done
+
+8. **[08-API-DOCUMENTATION.md](./08-API-DOCUMENTATION.md)**
+   - Complete API documentation
+   - Request/Response formats
+   - Authentication methods
+
+9. **[09-DEPLOYMENT-GUIDE.md](./09-DEPLOYMENT-GUIDE.md)**
+   - Production deployment guide
+   - Server configuration
+   - Security hardening
+
+10. **[10-TESTING-GUIDE.md](./10-TESTING-GUIDE.md)**
+    - Testing strategy và framework
+    - Unit, Integration, E2E tests
+    - CI/CD integration
+
 ---
 
 ## 🎯 **Key Features Summary**

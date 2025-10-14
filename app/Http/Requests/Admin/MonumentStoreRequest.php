@@ -34,7 +34,7 @@ class MonumentStoreRequest extends FormRequest
             'featured_image' => "nullable|image|mimes:{$allowedTypes}|max:{$maxImageSize}",
             'gallery_images.*' => "nullable|image|mimes:{$allowedTypes}|max:{$maxImageSize}",
             'gallery_images' => "max:{$maxFilesPerMonument}",
-            'status' => 'required|in:draft,pending,approved',
+            'status' => 'required|in:draft,pending,approved,rejected',
         ];
     }
 
